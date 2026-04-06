@@ -6,6 +6,35 @@
 
 ---
 
+## Начальные шаблоны
+
+В проекте уже есть начальные шаблоны, которые нужно использовать как базу для разработки:
+
+### Backend Template (`/backend`)
+
+Базовый NestJS проект с преднастроенным окружением:
+- **Фреймворк:** NestJS с TypeScript
+- **ORM:** TypeORM с PostgreSQL
+- **Конфигурация:** `nest-cli.json`, `tsconfig.json`, eslint, prettier
+- **Docker:** `docker-compose.yml` для локальной разработки
+- **Структура:** Базовые файлы в `/src` (app.module.ts, main.ts)
+- **База данных:** data-source.ts для миграций, seed скрипты
+
+> **Важно:** При переходе к Фазе 1 нужно реструктурировать существующий проект в monorepo mode, сохранив已有的 настройки.
+
+### Frontend Template (`/frontend`)
+
+Базовый React + Vite проект с преднастроенным UI kit:
+- **Фреймворк:** React 19 + Vite 7
+- **UI Kit:** shadcn/ui (уже установлен, есть button компонент)
+- **Стилизация:** Tailwind CSS 4
+- **Конфигурация:** `components.json`, vite.config.ts, tsconfig
+- **Структура:** Базовые компоненты в `/src/components/ui`
+
+> **Важно:** При разработке фронтенда (Фаза 7) использовать существующий шаблон, добавляя новые компоненты и страницы.
+
+---
+
 ## Фаза 1: Infrastructure & Setup
 
 ### 1.1. NestJS Monorepo Setup
