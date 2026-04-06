@@ -371,10 +371,3 @@ graph TD
 | 5         | Notification Service | Важно, но не блокирует основные флоу             |
 | 6         | API Gateway          | Единая точка входа                               |
 | 7         | Frontend             | Визуализация всего backend                       |
-
----
-
-## Следующие шаги
-
-1. Утвердить план
-2. Начать с Фазы 1: Infrastructure & Setup
