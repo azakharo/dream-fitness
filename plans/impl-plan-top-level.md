@@ -13,6 +13,7 @@
 ### Backend Template (`/backend`)
 
 Базовый NestJS проект с преднастроенным окружением:
+
 - **Фреймворк:** NestJS с TypeScript
 - **ORM:** TypeORM с PostgreSQL
 - **Конфигурация:** `nest-cli.json`, `tsconfig.json`, eslint, prettier
@@ -25,6 +26,7 @@
 ### Frontend Template (`/frontend`)
 
 Базовый React + Vite проект с преднастроенным UI kit:
+
 - **Фреймворк:** React 19 + Vite 7
 - **UI Kit:** shadcn/ui (уже установлен, есть button компонент)
 - **Стилизация:** Tailwind CSS 4
