@@ -590,15 +590,17 @@ frontend/
 
 ### API Endpoints Mapping
 
-| Frontend Call       | API Gateway Route  | Backend Service  |
-| ------------------- | ------------------ | ---------------- |
-| POST /auth/login    | /api/auth/login    | Auth Service     |
-| POST /auth/register | /api/auth/register | Auth Service     |
-| POST /auth/refresh  | /api/auth/refresh  | Auth Service     |
-| GET /auth/me        | /api/auth/me       | Auth Service     |
-| GET /trainings      | /api/trainings     | Training Service |
-| POST /bookings      | /api/bookings      | Booking Service  |
-| GET /notifications  | /api/notifications | Notification Svc |
+| Frontend Request        | Backend Service  | Notes                     |
+| ----------------------- | ---------------- | ------------------------- |
+| POST /api/auth/login    | Auth Service     | Login with email/password |
+| POST /api/auth/register | Auth Service     | New user registration     |
+| POST /api/auth/refresh  | Auth Service     | Refresh access token      |
+| GET /api/auth/me        | Auth Service     | Get current user profile  |
+| GET /api/trainings      | Training Service | List available trainings  |
+| POST /api/bookings      | Booking Service  | Book a training session   |
+| GET /api/notifications  | Notification Svc | Get user notifications    |
+
+> **Note:** Frontend uses `ky` with `prefixUrl: "/api"`, so actual requests from code like `api.post("/auth/login")` become `/api/auth/login`.
 
 ### Vite Proxy Configuration
 
