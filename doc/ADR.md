@@ -1,9 +1,5 @@
 # ADR (Architecture Decision Record)
 
-## Статус
-
-In progress
-
 ## Контекст
 
 Смотри ./PRD.md.
@@ -370,25 +366,29 @@ Compensating Actions:
 ### 10.2. Структура проекта
 
 ```
-dreamfitness/
-├── apps/
-│   ├── api-gateway/          # API Gateway
-│   │   ├── src/
-│   │   │   ├── auth/         # JWT validation guard
-│   │   │   ├── routes/       # Proxy controllers
-│   │   │   └── aggregator/   # Request aggregation
-│   │   └── main.ts
+DreamFitness/
+├── doc/                      # Документация
+├── backend/                  # Backend (NestJS monorepo)
+│   ├── apps/
+│   │   ├── api-gateway/      # API Gateway
+│   │   │   ├── src/
+│   │   │   │   ├── auth/     # JWT validation guard
+│   │   │   │   ├── routes/   # Proxy controllers
+│   │   │   │   └── aggregator/ # Request aggregation
+│   │   │   └── main.ts
+│   │   │
+│   │   ├── auth-service/
+│   │   ├── training-service/
+│   │   ├── booking-service/
+│   │   └── notification-service/
 │   │
-│   ├── auth-service/
-│   ├── training-service/
-│   ├── booking-service/
-│   └── notification-service/
+│   ├── libs/
+│   │   ├── shared/           # Shared utilities
+│   │   └── contracts/        # DTOs, interfaces
+│   │
+│   └── nest-cli.json         # Monorepo config
 │
-├── libs/
-│   ├── shared/               # Shared utilities
-│   └── contracts/            # DTOs, interfaces
-│
-└── nest-cli.json             # Monorepo config
+└── frontend/                 # Frontend приложение
 ```
 
 ### 10.3. Обязанности
