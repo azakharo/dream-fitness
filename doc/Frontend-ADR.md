@@ -16,6 +16,7 @@
 | Build Tool     | Vite                        | 7.2    |
 | UI Kit         | shadcn/ui + Radix           | Latest |
 | Styling        | Tailwind CSS                | 4.2    |
+| HTTP Client    | ky                          | 1.7    |
 | React Compiler | babel-plugin-react-compiler | 1.0    |
 
 ---
@@ -124,78 +125,95 @@ interface UIStore {
 
 ### Решение
 
-**Native fetch** с кастомной обёрткой.
+**ky** — современный HTTP клиент на базе fetch с поддержкой хуков.
 
 ### Обоснование
 
-| Аргумент         | Обоснование                              |
-| ---------------- | ---------------------------------------- |
-| Нет зависимостей | Fetch встроен в браузер                  |
-| TanStack Query   | Уже решает retry, caching, deduplication |
-| Минимализм       | Меньше абстракций = проще понимать       |
+| Аргумент        | Обоснование                                         |
+| --------------- | --------------------------------------------------- |
+| Хуки            | beforeRequest/afterResponse для автоинъекции токена |
+| TypeScript      | Отличная типизация из коробки                       |
+| Минимализм      | ~13 KB, один dependency                             |
+| Современный API | Promise-based, automatic JSON parsing               |
+| Error handling  | HTTP ошибки автоматически throw как KyError         |
 
 ### Реализация
 
 ```typescript
 // lib/api-client.ts
+import ky, { KyError } from "ky";
+import { useAuthStore } from "@/stores/auth-store";
+
 const API_BASE = "/api";
 
-class ApiError extends Error {
+/**
+ * Custom error class for API errors
+ */
+export class ApiError extends Error {
   constructor(
     public status: number,
-    message: string,
+    public data: unknown,
   ) {
-    super(message);
+    super(`API Error: ${status}`);
+    this.name = "ApiError";
   }
 }
 
-async function apiClient<T>(
-  endpoint: string,
-  options?: RequestInit & { token?: string },
-): Promise<T> {
-  const { token, ...fetchOptions } = options || {};
+/**
+ * Base ky instance with auto token injection and refresh logic
+ */
+const kyInstance = ky.create({
+  prefixUrl: API_BASE,
+  credentials: "include", // For HTTP-only cookies (refresh token)
+  hooks: {
+    beforeRequest: [
+      (request) => {
+        const token = useAuthStore.getState().accessToken;
+        if (token) {
+          request.headers.set("Authorization", `Bearer ${token}`);
+        }
+      },
+    ],
+    beforeError: [
+      (error) => {
+        // Convert KyError to ApiError for consistent error handling
+        const { response } = error;
+        if (response) {
+          return new ApiError(response.status, error);
+        }
+        return error;
+      },
+    ],
+    afterResponse: [
+      async (request, options, response) => {
+        if (response.status === 401 && !request.url.includes("/auth/")) {
+          try {
+            await useAuthStore.getState().refreshTokens();
+            const newToken = useAuthStore.getState().accessToken;
+            request.headers.set("Authorization", `Bearer ${newToken}`);
+            return ky(request);
+          } catch {
+            useAuthStore.getState().logout();
+          }
+        }
+      },
+    ],
+  },
+});
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...fetchOptions,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...fetchOptions.headers,
-    },
-    credentials: "include", // For HTTP-only cookies
-  });
-
-  if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Unknown error" }));
-    throw new ApiError(response.status, error.message);
-  }
-
-  return response.json();
-}
-
-// Convenience methods
+/**
+ * Convenience API methods with typed responses
+ */
 export const api = {
-  get: <T>(endpoint: string, token?: string) =>
-    apiClient<T>(endpoint, { method: "GET", token }),
+  get: <T>(endpoint: string) => kyInstance.get(endpoint).json<T>(),
 
-  post: <T>(endpoint: string, body: unknown, token?: string) =>
-    apiClient<T>(endpoint, {
-      method: "POST",
-      body: JSON.stringify(body),
-      token,
-    }),
+  post: <T>(endpoint: string, body?: unknown) =>
+    kyInstance.post(endpoint, { json: body }).json<T>(),
 
-  put: <T>(endpoint: string, body: unknown, token?: string) =>
-    apiClient<T>(endpoint, {
-      method: "PUT",
-      body: JSON.stringify(body),
-      token,
-    }),
+  put: <T>(endpoint: string, body?: unknown) =>
+    kyInstance.put(endpoint, { json: body }).json<T>(),
 
-  delete: <T>(endpoint: string, token?: string) =>
-    apiClient<T>(endpoint, { method: "DELETE", token }),
+  delete: <T>(endpoint: string) => kyInstance.delete(endpoint).json<T>(),
 };
 ```
 
@@ -208,19 +226,18 @@ export const useTrainings = (filters?: TrainingFilters) => {
 
   return useQuery({
     queryKey: ["trainings", filters],
-    queryFn: () => api.get<Training[]>("/trainings", accessToken!),
+    queryFn: () => api.get<Training[]>("trainings"),
     enabled: !!accessToken,
   });
 };
 
 // hooks/use-create-booking.ts
 export const useCreateBooking = () => {
-  const { accessToken } = useAuthStore();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (trainingId: string) =>
-      api.post<Booking>("/bookings", { trainingId }, accessToken!),
+      api.post<Booking>("bookings", { trainingId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
     },
@@ -483,30 +500,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
 ### API Client with Auto-Refresh
 
-```typescript
-// lib/api-client.ts
-async function apiClient<T>(
-  endpoint: string,
-  options?: RequestInit & { token?: string },
-): Promise<T> {
-  // ... fetch logic ...
-
-  if (response.status === 401 && !endpoint.includes("/auth/")) {
-    // Try to refresh token
-    try {
-      await useAuthStore.getState().refreshTokens();
-      const newToken = useAuthStore.getState().accessToken;
-      // Retry original request with new token
-      return apiClient(endpoint, { ...options, token: newToken });
-    } catch {
-      useAuthStore.getState().logout();
-      throw new ApiError(401, "Session expired");
-    }
-  }
-
-  // ... rest of logic ...
-}
-```
+Token refresh logic is now integrated into the ky instance via `afterResponse` hook (see Section 4). No separate implementation needed - ky handles automatic retries on 401 responses.
 
 ---
 
