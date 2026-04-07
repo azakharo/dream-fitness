@@ -19,6 +19,9 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       CREATE TYPE notification_type_enum AS ENUM ('booking', 'cancellation', 'transaction', 'reminder');
     `);
 
+    // Enable UUID extension
+    await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+
     // Create users table
     await queryRunner.createTable(
       new Table({
@@ -348,8 +351,6 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       }),
     );
 
-    // Enable UUID extension
-    await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
