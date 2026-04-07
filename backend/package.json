@@ -1,17 +1,38 @@
 {
-  "name": "nest-typeorm-starter",
+  "name": "dreamfitness-backend",
   "version": "0.1.0",
-  "description": "",
+  "description": "DreamFitness Backend - NestJS Monorepo",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "build:api-gateway": "nest build api-gateway",
+    "build:auth-service": "nest build auth-service",
+    "build:training-service": "nest build training-service",
+    "build:booking-service": "nest build booking-service",
+    "build:notification-service": "nest build notification-service",
+    "build:all": "nest build api-gateway ; nest build auth-service ; nest build training-service ; nest build booking-service ; nest build notification-service",
+    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/apps/api-gateway/main",
+    "start:dev:api-gateway": "nest start api-gateway --watch",
+    "start:dev:auth-service": "nest start auth-service --watch",
+    "start:dev:training-service": "nest start training-service --watch",
+    "start:dev:booking-service": "nest start booking-service --watch",
+    "start:dev:notification-service": "nest start notification-service --watch",
+    "start:debug:api-gateway": "nest start api-gateway --debug --watch",
+    "start:debug:auth-service": "nest start auth-service --debug --watch",
+    "start:debug:training-service": "nest start training-service --debug --watch",
+    "start:debug:booking-service": "nest start booking-service --debug --watch",
+    "start:debug:notification-service": "nest start notification-service --debug --watch",
+    "start:prod:api-gateway": "node dist/apps/api-gateway/main",
+    "start:prod:auth-service": "node dist/apps/auth-service/main",
+    "start:prod:training-service": "node dist/apps/training-service/main",
+    "start:prod:booking-service": "node dist/apps/booking-service/main",
+    "start:prod:notification-service": "node dist/apps/notification-service/main",
     "ts": "tsc --noEmit",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -70,15 +91,26 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "apps/**/*.ts",
+      "libs/**/*.ts"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "@app/contracts/(.*)": "<rootDir>/libs/contracts/src/$1",
+      "@app/contracts": "<rootDir>/libs/contracts/src",
+      "@app/shared/(.*)": "<rootDir>/libs/shared/src/$1",
+      "@app/shared": "<rootDir>/libs/shared/src"
+    }
   }
 }
