@@ -1,4 +1,10 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+  TableIndex,
+} from 'typeorm';
 
 export class InitialSchema1744032000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -18,7 +24,12 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       new Table({
         name: 'users',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            default: 'uuid_generate_v4()',
+          },
           { name: 'email', type: 'varchar', length: '255', isUnique: true },
           { name: 'password_hash', type: 'varchar', length: '255' },
           { name: 'name', type: 'varchar', length: '255' },
@@ -40,10 +51,20 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       new Table({
         name: 'trainers',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            default: 'uuid_generate_v4()',
+          },
           { name: 'name', type: 'varchar', length: '255' },
           { name: 'bio', type: 'text', isNullable: true },
-          { name: 'avatar_url', type: 'varchar', length: '500', isNullable: true },
+          {
+            name: 'avatar_url',
+            type: 'varchar',
+            length: '500',
+            isNullable: true,
+          },
           { name: 'is_active', type: 'boolean', default: true },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
           { name: 'updated_at', type: 'timestamp', default: 'now()' },
@@ -57,7 +78,12 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       new Table({
         name: 'trainings',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            default: 'uuid_generate_v4()',
+          },
           { name: 'trainer_id', type: 'uuid' },
           { name: 'title', type: 'varchar', length: '255' },
           { name: 'description', type: 'text', isNullable: true },
@@ -78,10 +104,19 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       new Table({
         name: 'bookings',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            default: 'uuid_generate_v4()',
+          },
           { name: 'user_id', type: 'uuid' },
           { name: 'training_id', type: 'uuid' },
-          { name: 'status', type: 'booking_status_enum', default: "'confirmed'" },
+          {
+            name: 'status',
+            type: 'booking_status_enum',
+            default: "'confirmed'",
+          },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
           { name: 'updated_at', type: 'timestamp', default: 'now()' },
         ],
@@ -94,7 +129,12 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       new Table({
         name: 'waitlist',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            default: 'uuid_generate_v4()',
+          },
           { name: 'user_id', type: 'uuid' },
           { name: 'training_id', type: 'uuid' },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
@@ -108,7 +148,12 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       new Table({
         name: 'transactions',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            default: 'uuid_generate_v4()',
+          },
           { name: 'user_id', type: 'uuid' },
           { name: 'amount', type: 'integer' },
           { name: 'type', type: 'transaction_type_enum' },
@@ -124,7 +169,12 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       new Table({
         name: 'notifications',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            default: 'uuid_generate_v4()',
+          },
           { name: 'user_id', type: 'uuid' },
           { name: 'type', type: 'notification_type_enum' },
           { name: 'title', type: 'varchar', length: '255' },
@@ -215,19 +265,88 @@ export class InitialSchema1744032000000 implements MigrationInterface {
     );
 
     // Create indexes
-    await queryRunner.createIndex('users', new TableIndex({ name: 'IDX_users_email', columnNames: ['email'] }));
-    await queryRunner.createIndex('trainings', new TableIndex({ name: 'IDX_trainings_trainer_id', columnNames: ['trainer_id'] }));
-    await queryRunner.createIndex('trainings', new TableIndex({ name: 'IDX_trainings_scheduled_at', columnNames: ['scheduled_at'] }));
-    await queryRunner.createIndex('trainings', new TableIndex({ name: 'IDX_trainings_type', columnNames: ['type'] }));
-    await queryRunner.createIndex('bookings', new TableIndex({ name: 'IDX_bookings_user_id', columnNames: ['user_id'] }));
-    await queryRunner.createIndex('bookings', new TableIndex({ name: 'IDX_bookings_training_id', columnNames: ['training_id'] }));
-    await queryRunner.createIndex('bookings', new TableIndex({ name: 'IDX_bookings_status', columnNames: ['status'] }));
-    await queryRunner.createIndex('waitlist', new TableIndex({ name: 'IDX_waitlist_user_id', columnNames: ['user_id'] }));
-    await queryRunner.createIndex('waitlist', new TableIndex({ name: 'IDX_waitlist_training_id', columnNames: ['training_id'] }));
-    await queryRunner.createIndex('transactions', new TableIndex({ name: 'IDX_transactions_user_id', columnNames: ['user_id'] }));
-    await queryRunner.createIndex('transactions', new TableIndex({ name: 'IDX_transactions_created_at', columnNames: ['created_at'] }));
-    await queryRunner.createIndex('notifications', new TableIndex({ name: 'IDX_notifications_user_id', columnNames: ['user_id'] }));
-    await queryRunner.createIndex('notifications', new TableIndex({ name: 'IDX_notifications_is_read', columnNames: ['is_read'] }));
+    await queryRunner.createIndex(
+      'users',
+      new TableIndex({ name: 'IDX_users_email', columnNames: ['email'] }),
+    );
+    await queryRunner.createIndex(
+      'trainings',
+      new TableIndex({
+        name: 'IDX_trainings_trainer_id',
+        columnNames: ['trainer_id'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'trainings',
+      new TableIndex({
+        name: 'IDX_trainings_scheduled_at',
+        columnNames: ['scheduled_at'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'trainings',
+      new TableIndex({ name: 'IDX_trainings_type', columnNames: ['type'] }),
+    );
+    await queryRunner.createIndex(
+      'bookings',
+      new TableIndex({
+        name: 'IDX_bookings_user_id',
+        columnNames: ['user_id'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'bookings',
+      new TableIndex({
+        name: 'IDX_bookings_training_id',
+        columnNames: ['training_id'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'bookings',
+      new TableIndex({ name: 'IDX_bookings_status', columnNames: ['status'] }),
+    );
+    await queryRunner.createIndex(
+      'waitlist',
+      new TableIndex({
+        name: 'IDX_waitlist_user_id',
+        columnNames: ['user_id'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'waitlist',
+      new TableIndex({
+        name: 'IDX_waitlist_training_id',
+        columnNames: ['training_id'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'transactions',
+      new TableIndex({
+        name: 'IDX_transactions_user_id',
+        columnNames: ['user_id'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'transactions',
+      new TableIndex({
+        name: 'IDX_transactions_created_at',
+        columnNames: ['created_at'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'notifications',
+      new TableIndex({
+        name: 'IDX_notifications_user_id',
+        columnNames: ['user_id'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'notifications',
+      new TableIndex({
+        name: 'IDX_notifications_is_read',
+        columnNames: ['is_read'],
+      }),
+    );
 
     // Enable UUID extension
     await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
@@ -250,7 +369,10 @@ export class InitialSchema1744032000000 implements MigrationInterface {
     await queryRunner.dropIndex('users', 'IDX_users_email');
 
     // Drop foreign keys
-    await queryRunner.dropForeignKey('notifications', 'FK_notifications_user_id');
+    await queryRunner.dropForeignKey(
+      'notifications',
+      'FK_notifications_user_id',
+    );
     await queryRunner.dropForeignKey('transactions', 'FK_transactions_user_id');
     await queryRunner.dropForeignKey('waitlist', 'FK_waitlist_training_id');
     await queryRunner.dropForeignKey('waitlist', 'FK_waitlist_user_id');

@@ -1,7 +1,9 @@
 import { RabbitMQConfig } from '@golevelup/nestjs-rabbitmq';
 import { EXCHANGES } from './rabbitmq.constants';
 
-export function createRabbitMQConfig(serviceName: string): Partial<RabbitMQConfig> {
+export function createRabbitMQConfig(
+  serviceName: string,
+): Partial<RabbitMQConfig> {
   return {
     exchanges: [
       {
@@ -27,8 +29,10 @@ export function createRabbitMQConfig(serviceName: string): Partial<RabbitMQConfi
 // Preset configurations for each service
 export const AUTH_SERVICE_RABBITMQ_CONFIG = createRabbitMQConfig('auth');
 
-export const TRAINING_SERVICE_RABBITMQ_CONFIG = createRabbitMQConfig('training');
+export const TRAINING_SERVICE_RABBITMQ_CONFIG =
+  createRabbitMQConfig('training');
 
 export const BOOKING_SERVICE_RABBITMQ_CONFIG = createRabbitMQConfig('booking');
 
-export const NOTIFICATION_SERVICE_RABBITMQ_CONFIG = createRabbitMQConfig('notification');
+export const NOTIFICATION_SERVICE_RABBITMQ_CONFIG =
+  createRabbitMQConfig('notification');
