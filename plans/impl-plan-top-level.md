@@ -68,6 +68,23 @@
 - [ ] Настроить exchanges и queues
 - [ ] Создать общие модули для Pub/Sub
 
+### DoD
+
+**Что на выходе:**
+
+- Работающий NestJS monorepo с 5 приложениями (api-gateway, auth-service, training-service, booking-service, notification-service)
+- 2 shared библиотеки: `@app/contracts` и `@app/shared`
+- Docker Compose с PostgreSQL и RabbitMQ
+- Базовая миграция для всех таблиц
+
+**Минимальные проверки:**
+
+- [ ] `npm run build` — успешная сборка всех приложений
+- [ ] `npm run lint` — без ошибок
+- [ ] Docker Compose `up` — все контейнеры здоровы
+- [ ] TypeORM migration `run` — миграции применены без ошибок
+- [ ] RabbitMQ — exchanges и queues созданы (проверить через management UI)
+
 ---
 
 ## Фаза 2: Auth Service
@@ -107,6 +124,26 @@
 - [ ] Опубликовать `UserCreated` event
 - [ ] Слушать `BalanceChanged` для уведомлений
 
+### DoD
+
+**Что на выходе:**
+
+- Работающий Auth Service на порту 3001
+- User и Transaction entities с миграциями
+- REST API endpoints: `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/me`, `/auth/balance/*`, `/auth/transactions`
+- JWT access и refresh tokens
+- RabbitMQ publisher для `UserCreated` event
+
+**Минимальные проверки:**
+
+- [ ] Unit тесты: AuthModule, UsersModule (min 70% coverage)
+- [ ] E2E тесты: регистрация → логин → доступ к `/auth/me`
+- [ ] E2E тесты: balance flow (deposit → reserve → release → refund)
+- [ ] Контракты: DTOs в `@app/contracts` соответствуют API
+- [ ] `npm run lint` — без ошибок
+- [ ] `npm run test` — все тесты проходят
+- [ ] Ручная проверка: RabbitMQ management UI — `UserCreated` event публикуется
+
 ---
 
 ## Фаза 3: Training Service
@@ -133,6 +170,25 @@
 - [ ] GET /schedule/week — недельное расписание
 - [ ] GET /schedule/trainer/:id — расписание по тренеру
 - [ ] Фильтрация по типу тренировки и дате
+
+### DoD
+
+**Что на выходе:**
+
+- Работающий Training Service на порту 3002
+- Trainer и Training entities с миграциями
+- REST API endpoints: `/trainers`, `/trainings`, `/schedule/*`
+- Admin endpoints для CRUD тренировок и тренеров
+- Проверка доступных мест `/trainings/:id/availability`
+
+**Минимальные проверки:**
+
+- [ ] Unit тесты: TrainingModule, TrainerModule (min 70% coverage)
+- [ ] E2E тесты: создание тренера → создание тренировки → получение расписания
+- [ ] E2E тесты: фильтрация по типу и дате
+- [ ] Контракты: DTOs в `@app/contracts/training` соответствуют API
+- [ ] `npm run lint` — без ошибок
+- [ ] `npm run test` — все тесты проходят
 
 ---
 
@@ -197,6 +253,28 @@
 - [ ] Создать HttpModule для коммуникации с Training Service
 - [ ] Обработать timeout и retry
 
+### DoD
+
+**Что на выходе:**
+
+- Работающий Booking Service на порту 3003
+- Booking и Waitlist entities с миграциями
+- CQRS структура: commands, queries, handlers, sagas
+- REST API endpoints: `/bookings`, `/bookings/:id`, `/waitlist`
+- 3 Saga: Booking, Cancellation, Waitlist Promotion
+
+**Минимальные проверки:**
+
+- [ ] Unit тесты: все command handlers и query handlers
+- [ ] Unit тесты: saga orchestration logic
+- [ ] E2E тесты: booking flow (создание → получение → отмена)
+- [ ] E2E тесты: waitlist flow (join → position check → leave)
+- [ ] Integration тесты: HTTP клиенты к Auth и Training services
+- [ ] Контракты: DTOs в `@app/contracts/booking` соответствуют API
+- [ ] `npm run lint` — без ошибок
+- [ ] `npm run test` — все тесты проходят
+- [ ] Ручная проверка: compensating transactions работают при ошибках
+
 ---
 
 ## Фаза 5: Notification Service
@@ -227,6 +305,24 @@
 
 - [ ] Интеграция с nodemailer
 - [ ] Шаблоны писем
+
+### DoD
+
+**Что на выходе:**
+
+- Работающий Notification Service на порту 3004
+- Notification entity с миграцией
+- REST API endpoints: `/notifications`, `/notifications/:id/read`, `/notifications/unread-count`
+- RabbitMQ consumers для всех event types
+
+**Минимальные проверки:**
+
+- [ ] Unit тесты: NotificationModule (min 70% coverage)
+- [ ] E2E тесты: создание → список → mark as read
+- [ ] Integration тесты: RabbitMQ consumers получают events
+- [ ] Контракты: event DTOs в `@app/contracts/notification` соответствуют consumers
+- [ ] `npm run lint` — без ошибок
+- [ ] `npm run test` — все тесты проходят
 
 ---
 
@@ -271,6 +367,27 @@
 - [ ] Агрегировать схемы всех сервисов
 - [ ] Настроить Bearer auth в Swagger UI
 - [ ] Endpoint: /api/docs
+
+### DoD
+
+**Что на выходе:**
+
+- Работающий API Gateway на порту 3000
+- Proxy controllers для всех services
+- JWT authentication и role-based authorization
+- Rate limiting на endpoints
+- Глобальный error handling (RFC 7807)
+- Swagger UI на `/api/docs`
+
+**Минимальные проверки:**
+
+- [ ] E2E тесты: proxy routing для каждого сервиса
+- [ ] E2E тесты: JWT validation (valid/invalid/expired tokens)
+- [ ] E2E тесты: role-based access (client vs admin)
+- [ ] Integration тесты: rate limiting работает
+- [ ] Ручная проверка: Swagger UI доступен и содержит все endpoints
+- [ ] `npm run lint` — без ошибок
+- [ ] `npm run test` — все тесты проходят
 
 ---
 
@@ -369,6 +486,29 @@
 - [ ] Empty states
 - [ ] Confirm dialogs
 - [ ] Toast notifications (sonner)
+
+### DoD
+
+**Что на выходе:**
+
+- Работающий React frontend с Vite
+- Client pages: Dashboard, Schedule, Booking, Profile, History, Notifications
+- Admin pages: Dashboard, Schedule Management, Users Management, Reports
+- Auth flow: login, register, protected routes, token refresh
+- Responsive layout: desktop и mobile
+
+**Минимальные проверки:**
+
+- [ ] Unit тесты: Zustand stores, utility functions
+- [ ] Component тесты: ключевые компоненты (React Testing Library)
+- [ ] E2E тесты (Playwright):
+  - Auth flow: login → redirect to dashboard
+  - Booking flow: schedule → select training → book → confirmation
+  - Admin flow: login → create training → verify in schedule
+- [ ] `npm run lint` — без ошибок
+- [ ] `npm run build` — успешная сборка
+- [ ] Accessibility: Lighthouse accessibility score ≥ 80
+- [ ] Ручная проверка: responsive на разных экранах
 
 ---
 
