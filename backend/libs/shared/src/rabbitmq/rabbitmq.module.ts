@@ -1,4 +1,9 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import {
+  Module,
+  DynamicModule,
+  InjectionToken,
+  OptionalFactoryDependency,
+} from '@nestjs/common';
 import { RabbitMQModule as GolevelupModule } from '@golevelup/nestjs-rabbitmq';
 
 export interface RabbitMQModuleOptions {
@@ -19,15 +24,15 @@ export class RabbitMQModule {
 
   static forRootAsync(options: {
     useFactory: (
-      ...args: any[]
+      ...args: unknown[]
     ) => Promise<RabbitMQModuleOptions> | RabbitMQModuleOptions;
-    inject?: any[];
+    inject?: (InjectionToken | OptionalFactoryDependency)[];
   }): DynamicModule {
     return {
       module: RabbitMQModule,
       imports: [
         GolevelupModule.forRootAsync({
-          useFactory: async (...args: any[]) => {
+          useFactory: async (...args: unknown[]) => {
             const config = await options.useFactory(...args);
             return RabbitMQModule.createOptions(config);
           },

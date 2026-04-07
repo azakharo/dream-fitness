@@ -7,4 +7,5 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`Notification Service is running on port ${port}`);
 }
-bootstrap();
+
+void bootstrap();

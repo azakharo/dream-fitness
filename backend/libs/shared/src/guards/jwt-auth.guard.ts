@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 /**
  * JWT Authentication Guard
@@ -12,10 +13,10 @@ import {
  */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     // TODO: Implement JWT validation in Phase 2
     // For now, this is a placeholder that allows all requests
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
 
     // Placeholder: Check for Authorization header
     const authHeader = request.headers.authorization;
