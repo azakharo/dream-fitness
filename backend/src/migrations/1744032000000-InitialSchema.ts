@@ -350,7 +350,6 @@ export class InitialSchema1744032000000 implements MigrationInterface {
         columnNames: ['is_read'],
       }),
     );
-
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
