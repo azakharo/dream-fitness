@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
@@ -46,7 +47,7 @@ export class UsersService {
 
   async updateUserProfile(
     id: string,
-    updateUserDto: any,
+    updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto | undefined> {
     await this.userRepository.update(id, updateUserDto);
     return this.getUserById(id);
