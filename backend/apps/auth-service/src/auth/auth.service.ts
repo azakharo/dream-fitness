@@ -5,6 +5,9 @@ import { compare, hash } from 'bcrypt';
 
 import { UserRepository } from '../users/repositories/user.repository';
 import { ConfigService } from '../config/config.service';
+import { User } from '../users/entities/user.entity';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 export interface Tokens {
   accessToken: string;
@@ -20,7 +23,9 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(createUserDto: any): Promise<any> {
+  async register(
+    createUserDto: RegisterDto,
+  ): Promise<{ user: User; tokens: Tokens }> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(
       createUserDto.email,
@@ -46,12 +51,12 @@ export class AuthService {
     await this.userRepository.save(user);
 
     // Generate tokens
-    const tokens = await this.generateTokens(user);
+    const tokens = this.generateTokens(user);
 
     return { user, tokens };
   }
 
-  async login(loginDto: any): Promise<Tokens> {
+  async login(loginDto: LoginDto): Promise<Tokens> {
     const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
       throw new Error('Invalid credentials');
@@ -71,7 +76,12 @@ export class AuthService {
   async refresh(refreshToken: string): Promise<Tokens> {
     try {
       const payload = this.jwtService.decode(refreshToken);
-      if (!payload || !payload.sub) {
+      if (
+        !payload ||
+        typeof payload !== 'object' ||
+        !('sub' in payload) ||
+        typeof payload.sub !== 'string'
+      ) {
         throw new Error('Invalid token');
       }
 
@@ -81,25 +91,22 @@ export class AuthService {
       }
 
       return this.generateTokens(user);
-    } catch (error) {
+    } catch {
       throw new Error('Invalid refresh token');
     }
   }
 
-  async logout(userId: string): Promise<void> {
+  async logout(): Promise<void> {
     // For simplicity, we'll just return - in a real app, you'd invalidate the refresh token
     // This could be implemented with a cache of revoked tokens
-    return;
   }
 
-  async generateTokens(user: any): Promise<Tokens> {
+  generateTokens(user: User): Tokens {
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_SECRET'),
       expiresIn: this.configService.get('JWT_ACCESS_TTL'),
     });
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_SECRET'),
       expiresIn: this.configService.get('JWT_REFRESH_TTL'),
     });
 

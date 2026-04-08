@@ -11,16 +11,16 @@ import { UserGender } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(8)
   @MaxLength(50)
-  password: string;
+  password!: string;
 
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @IsOptional()
   @IsString()

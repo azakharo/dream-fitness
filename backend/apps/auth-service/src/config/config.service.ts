@@ -1,10 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 
+interface JwtConfig {
+  secret: string;
+  accessTokenTtl: string;
+  refreshTokenTtl: string;
+}
+
 @Injectable()
 export class ConfigService {
-  constructor(@Inject('JWT_CONFIG') private readonly jwtConfig: any) {}
+  constructor(@Inject('JWT_CONFIG') private readonly jwtConfig: JwtConfig) {}
 
-  get(key: string): any {
+  get(key: string): string {
     if (key === 'JWT_SECRET') {
       return this.jwtConfig.secret;
     }
@@ -14,6 +20,6 @@ export class ConfigService {
     if (key === 'JWT_REFRESH_TTL') {
       return this.jwtConfig.refreshTokenTtl;
     }
-    return undefined;
+    return '';
   }
 }

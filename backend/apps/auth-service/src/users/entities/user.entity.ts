@@ -4,11 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  Index,
   BeforeInsert,
   Unique,
   Check,
-  Generated,
 } from 'typeorm';
 
 export enum UserRole {

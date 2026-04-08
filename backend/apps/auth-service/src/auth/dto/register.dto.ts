@@ -7,19 +7,20 @@ import {
   MinLength,
   MaxLength,
 } from 'class-validator';
+import { UserGender } from '../../users/entities/user.entity';
 
 export class RegisterDto {
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(8)
   @MaxLength(50)
-  password: string;
+  password!: string;
 
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
@@ -30,6 +31,6 @@ export class RegisterDto {
   birthDate?: string;
 
   @IsOptional()
-  @IsEnum(['male', 'female'])
-  gender?: 'male' | 'female';
+  @IsEnum(UserGender)
+  gender?: UserGender;
 }
