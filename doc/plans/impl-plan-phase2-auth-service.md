@@ -23,10 +23,8 @@ backend/apps/auth-service/
 │   ├── common/
 │   │   ├── decorators/
 │   │   │   └── current-user.decorator.ts
-│   │   ├── guards/
-│   │   │   └── jwt-auth.guard.ts
-│   │   └── interfaces/
-│   │       └── jwt-payload.interface.ts
+│   │   └── guards/
+│   │       └── jwt-auth.guard.ts
 │   │
 │   ├── users/
 │   │   ├── users.module.ts
@@ -88,26 +86,37 @@ backend/apps/auth-service/
 
 ## Shared Libraries Updates
 
-### Обновить `libs/contracts/auth/`
+### Обновить `libs/contracts/`
+
+> **Note:** В `libs/contracts` хранятся только те DTOs и интерфейсы, которые используются несколькими сервисами или фронтендом. Внутренние DTOs с validation decorators остаются в самих сервисах.
 
 ```
 libs/contracts/
 ├── auth/
 │   ├── index.ts
 │   ├── dtos/
-│   │   ├── register.dto.ts
-│   │   ├── login.dto.ts
-│   │   ├── user-response.dto.ts
-│   │   └── balance-response.dto.ts
+│   │   ├── user-response.dto.ts     # Используется всеми сервисами и фронтендом
+│   │   └── balance-response.dto.ts  # Используется booking service и фронтендом
 │   └── interfaces/
-│       ├── jwt-payload.interface.ts
-│       └── user.interface.ts
+│       ├── jwt-payload.interface.ts # Для API Gateway и других сервисов
+│       └── user.interface.ts        # Базовый интерфейс пользователя
 │
 └── events/
-    └── auth/
-        ├── user-created.event.ts
-        └── balance-changed.event.ts
+    ├── auth/
+    │   └── user-created.event.ts    # Публикуется Auth Service
+    └── balance/
+        └── balance-changed.event.ts # Публикуется Auth Service, слушается другими
 ```
+
+### Разделение ответственности
+
+| Файл                       | Расположение                      | Причина                            |
+| -------------------------- | --------------------------------- | ---------------------------------- |
+| `register.dto.ts`          | `apps/auth-service/src/auth/dto/` | Внутренний DTO с validation        |
+| `login.dto.ts`             | `apps/auth-service/src/auth/dto/` | Внутренний DTO с validation        |
+| `user-response.dto.ts`     | `libs/contracts/auth/dtos/`       | Используется API Gateway, Frontend |
+| `balance-response.dto.ts`  | `libs/contracts/auth/dtos/`       | Используется Booking Service       |
+| `jwt-payload.interface.ts` | `libs/contracts/auth/interfaces/` | Используется API Gateway           |
 
 ---
 
@@ -747,14 +756,15 @@ export class AppModule {}
 
 ### Нефункциональные требования
 
-- [ ] Unit тесты: минимальный coverage 70%
+- [ ] Unit тесты выполняются без ошибок
 - [ ] E2E тесты покрывают основные сценарии
-- [ ] Swagger документация доступна на /docs
+- [ ] Swagger документация доступна на /api/docs
 - [ ] Глобальный error handling в формате RFC 7807
 - [ ] Input validation на всех endpoints
 
 ### Качество кода
 
+- [ ] `npm run ts` — без ошибок
 - [ ] `npm run lint` — без ошибок
 - [ ] `npm run test` — все тесты проходят
 - [ ] `npm run build` — успешная сборка
@@ -796,20 +806,20 @@ graph TD
 
 ## API Summary
 
-| Method | Path                  | Description         | Auth | Role    |
-| ------ | --------------------- | ------------------- | ---- | ------- |
-| POST   | /auth/register        | Register new user   | No   | -       |
-| POST   | /auth/login           | Login user          | No   | -       |
-| POST   | /auth/refresh         | Refresh tokens      | No   | -       |
-| POST   | /auth/logout          | Logout user         | Yes  | -       |
-| GET    | /auth/me              | Get current user    | Yes  | -       |
-| PATCH  | /auth/me              | Update profile      | Yes  | -       |
-| GET    | /auth/balance         | Get balance         | Yes  | -       |
-| POST   | /auth/balance/deposit | Deposit points      | Yes  | admin   |
-| POST   | /auth/balance/reserve | Reserve points      | Yes  | service |
-| POST   | /auth/balance/release | Release reserve     | Yes  | service |
-| POST   | /auth/balance/refund  | Refund points       | Yes  | service |
-| GET    | /auth/transactions    | Transaction history | Yes  | -       |
+| Method | Path                      | Description         | Auth | Role    |
+| ------ | ------------------------- | ------------------- | ---- | ------- |
+| POST   | /api/auth/register        | Register new user   | No   | -       |
+| POST   | /api/auth/login           | Login user          | No   | -       |
+| POST   | /api/auth/refresh         | Refresh tokens      | No   | -       |
+| POST   | /api/auth/logout          | Logout user         | Yes  | -       |
+| GET    | /api/auth/me              | Get current user    | Yes  | -       |
+| PATCH  | /api/auth/me              | Update profile      | Yes  | -       |
+| GET    | /api/auth/balance         | Get balance         | Yes  | -       |
+| POST   | /api/auth/balance/deposit | Deposit points      | Yes  | admin   |
+| POST   | /api/auth/balance/reserve | Reserve points      | Yes  | service |
+| POST   | /api/auth/balance/release | Release reserve     | Yes  | service |
+| POST   | /api/auth/balance/refund  | Refund points       | Yes  | service |
+| GET    | /api/auth/transactions    | Transaction history | Yes  | -       |
 
 ---
 
@@ -838,7 +848,7 @@ graph TD
 
 **Использование в последующих фазах:**
 
-- Фаза 4 (Booking Service) → /auth/balance/reserve, release, refund
+- Фаза 4 (Booking Service) → /api/auth/balance/reserve, release, refund
 - Фаза 5 (Notification Service) → слушает balance.changed events
 - Фаза 6 (API Gateway) → JWT валидация, проксирование запросов
 - Фаза 7 (Frontend) → login, register, profile, balance UI
