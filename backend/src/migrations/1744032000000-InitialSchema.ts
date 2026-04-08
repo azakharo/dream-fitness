@@ -15,7 +15,7 @@ export class InitialSchema1744032000000 implements MigrationInterface {
       CREATE TYPE user_gender_enum AS ENUM ('male', 'female');
       CREATE TYPE training_type_enum AS ENUM ('yoga', 'pilates', 'crossfit', 'boxing', 'strength', 'cardio', 'dance', 'stretching');
       CREATE TYPE booking_status_enum AS ENUM ('confirmed', 'cancelled');
-      CREATE TYPE transaction_type_enum AS ENUM ('deposit', 'withdraw', 'refund');
+      CREATE TYPE transaction_type_enum AS ENUM ('deposit', 'withdraw', 'refund', 'reserve', 'release');
       CREATE TYPE notification_type_enum AS ENUM ('booking', 'cancellation', 'transaction', 'reminder');
     `);
 
