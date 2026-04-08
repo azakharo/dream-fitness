@@ -1,6 +1,9 @@
 {
 	"folders": [
 		{
+			"path": "."
+		},
+		{
 			"path": "backend"
 		},
 		{
@@ -10,5 +13,11 @@
 			"path": "doc"
 		}
 	],
-	"settings": {}
+	"settings": {
+           "files.exclude": {
+             "backend": true,
+             "frontend": true,
+             "doc": true
+           }
+        }
 }
