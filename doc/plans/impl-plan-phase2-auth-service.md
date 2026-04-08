@@ -10,6 +10,14 @@
 
 ## Структура файлов Auth Service
 
+Этот файл лежит в папке:
+`<project_root>/doc/plans`
+
+Исходные коды бекенда лежат в папке:
+`<project_root>/backend`
+
+Далее в документе все пути указаны от <project_root>.
+
 ```
 backend/apps/auth-service/
 ├── src/
@@ -110,13 +118,13 @@ libs/contracts/
 
 ### Разделение ответственности
 
-| Файл                       | Расположение                      | Причина                            |
-| -------------------------- | --------------------------------- | ---------------------------------- |
-| `register.dto.ts`          | `apps/auth-service/src/auth/dto/` | Внутренний DTO с validation        |
-| `login.dto.ts`             | `apps/auth-service/src/auth/dto/` | Внутренний DTO с validation        |
-| `user-response.dto.ts`     | `libs/contracts/auth/dtos/`       | Используется API Gateway, Frontend |
-| `balance-response.dto.ts`  | `libs/contracts/auth/dtos/`       | Используется Booking Service       |
-| `jwt-payload.interface.ts` | `libs/contracts/auth/interfaces/` | Используется API Gateway           |
+| Файл                       | Расположение                              | Причина                            |
+| -------------------------- | ----------------------------------------- | ---------------------------------- |
+| `register.dto.ts`          | `backend/apps/auth-service/src/auth/dto/` | Внутренний DTO с validation        |
+| `login.dto.ts`             | `backend/apps/auth-service/src/auth/dto/` | Внутренний DTO с validation        |
+| `user-response.dto.ts`     | `backend/libs/contracts/auth/dtos/`       | Используется API Gateway, Frontend |
+| `balance-response.dto.ts`  | `backend/libs/contracts/auth/dtos/`       | Используется Booking Service       |
+| `jwt-payload.interface.ts` | `backend/libs/contracts/auth/interfaces/` | Используется API Gateway           |
 
 ---
 
@@ -124,7 +132,7 @@ libs/contracts/
 
 ### 2.1.1. Создать User Entity
 
-**Файл:** `apps/auth-service/src/users/entities/user.entity.ts`
+**Файл:** `backend/apps/auth-service/src/users/entities/user.entity.ts`
 
 ```typescript
 // Поля согласно ADR:
@@ -144,7 +152,7 @@ libs/contracts/
 
 ### 2.1.2. Создать User Repository
 
-**Файл:** `apps/auth-service/src/users/repositories/user.repository.ts`
+**Файл:** `backend/apps/auth-service/src/users/repositories/user.repository.ts`
 
 - Расширить `Repository<User>`
 - Добавить кастомные методы:
@@ -176,7 +184,7 @@ npm i -D -E @types/bcrypt @types/passport-jwt
 
 ### 2.2.2. Создать JWT Configuration
 
-**Файл:** `apps/auth-service/src/config/jwt.config.ts`
+**Файл:** `backend/apps/auth-service/src/config/jwt.config.ts`
 
 ```typescript
 // Конфигурация:
@@ -187,7 +195,7 @@ npm i -D -E @types/bcrypt @types/passport-jwt
 
 ### 2.2.3. Создать Auth Service
 
-**Файл:** `apps/auth-service/src/auth/auth.service.ts`
+**Файл:** `backend/apps/auth-service/src/auth/auth.service.ts`
 
 **Методы:**
 
@@ -203,7 +211,7 @@ npm i -D -E @types/bcrypt @types/passport-jwt
 
 ### 2.2.4. Создать Auth Controller
 
-**Файл:** `apps/auth-service/src/auth/auth.controller.ts`
+**Файл:** `backend/apps/auth-service/src/auth/auth.controller.ts`
 
 **Endpoints:**
 
@@ -250,7 +258,7 @@ npm i -D -E @types/bcrypt @types/passport-jwt
 
 ### 2.2.6. JWT Strategy
 
-**Файл:** `apps/auth-service/src/auth/strategies/jwt.strategy.ts`
+**Файл:** `backend/apps/auth-service/src/auth/strategies/jwt.strategy.ts`
 
 - Расширить `PassportStrategy(Strategy)`
 - Извлекать token из Authorization header
@@ -258,7 +266,7 @@ npm i -D -E @types/bcrypt @types/passport-jwt
 
 ### 2.2.7. Current User Decorator
 
-**Файл:** `apps/auth-service/src/common/decorators/current-user.decorator.ts`
+**Файл:** `backend/apps/auth-service/src/common/decorators/current-user.decorator.ts`
 
 ```typescript
 // @CurrentUser() decorator для извлечения user из request
@@ -276,7 +284,7 @@ export const CurrentUser = createParamDecorator(
 
 ### 2.3.1. Создать Users Service
 
-**Файл:** `apps/auth-service/src/users/users.service.ts`
+**Файл:** `backend/apps/auth-service/src/users/users.service.ts`
 
 **Методы:**
 
@@ -288,7 +296,7 @@ export const CurrentUser = createParamDecorator(
 
 ### 2.3.2. Создать Users Controller
 
-**Файл:** `apps/auth-service/src/users/users.controller.ts`
+**Файл:** `backend/apps/auth-service/src/users/users.controller.ts`
 
 **Endpoints:**
 
@@ -343,7 +351,7 @@ export const CurrentUser = createParamDecorator(
 
 ### 2.4.1. Создать Transaction Entity
 
-**Файл:** `apps/auth-service/src/balance/entities/transaction.entity.ts`
+**Файл:** `backend/apps/auth-service/src/balance/entities/transaction.entity.ts`
 
 ```typescript
 // Поля согласно ADR:
@@ -360,7 +368,7 @@ export const CurrentUser = createParamDecorator(
 
 ### 2.4.2. Создать Transaction Repository
 
-**Файл:** `apps/auth-service/src/balance/repositories/transaction.repository.ts`
+**Файл:** `backend/apps/auth-service/src/balance/repositories/transaction.repository.ts`
 
 **Методы:**
 
@@ -369,7 +377,7 @@ export const CurrentUser = createParamDecorator(
 
 ### 2.4.3. Создать Balance Service
 
-**Файл:** `apps/auth-service/src/balance/balance.service.ts`
+**Файл:** `backend/apps/auth-service/src/balance/balance.service.ts`
 
 **Методы:**
 
@@ -406,7 +414,7 @@ async release(userId: string, amount: number, bookingId: string): Promise<Transa
 
 ### 2.4.4. Создать Balance Controller
 
-**Файл:** `apps/auth-service/src/balance/balance.controller.ts`
+**Файл:** `backend/apps/auth-service/src/balance/balance.controller.ts`
 
 **Endpoints:**
 
@@ -510,7 +518,7 @@ npm i -D -E @types/amqplib
 
 ### 2.5.2. Создать Events Publisher
 
-**Файл:** `apps/auth-service/src/events/events.publisher.ts`
+**Файл:** `backend/apps/auth-service/src/events/events.publisher.ts`
 
 **Методы:**
 
@@ -569,7 +577,7 @@ npm i -D -E @types/amqplib
 
 ### 2.6.1. Создать Custom Exceptions
 
-**Файлы:** `apps/auth-service/src/common/exceptions/`
+**Файлы:** `backend/apps/auth-service/src/common/exceptions/`
 
 ```typescript
 // user-already-exists.exception.ts
@@ -603,7 +611,7 @@ export class UserBlockedException extends ForbiddenException {
 
 ### 2.6.2. Global Exception Filter
 
-**Файл:** `apps/auth-service/src/common/filters/all-exceptions.filter.ts`
+**Файл:** `backend/apps/auth-service/src/common/filters/all-exceptions.filter.ts`
 
 - Форматировать ошибки в RFC 7807 Problem Details
 - Логировать ошибки
@@ -617,7 +625,7 @@ export class UserBlockedException extends ForbiddenException {
 **Структура тестов:**
 
 ```
-apps/auth-service/src/
+backend/apps/auth-service/src/
 ├── auth/
 │   └── auth.service.spec.ts
 ├── users/
@@ -640,7 +648,7 @@ apps/auth-service/src/
 **Файлы:**
 
 ```
-apps/auth-service/test/
+backend/apps/auth-service/test/
 ├── auth.e2e-spec.ts          # Регистрация, вход, refresh
 ├── profile.e2e-spec.ts       # Профиль и баланс
 └── balance.e2e-spec.ts       # Операции с балансом
@@ -683,7 +691,7 @@ apps/auth-service/test/
 
 ### 2.8.1. Main.ts
 
-**Файл:** `apps/auth-service/src/main.ts`
+**Файл:** `backend/apps/auth-service/src/main.ts`
 
 ```typescript
 async function bootstrap() {
@@ -713,7 +721,7 @@ async function bootstrap() {
 
 ### 2.8.2. App Module
 
-**Файл:** `apps/auth-service/src/app.module.ts`
+**Файл:** `backend/apps/auth-service/src/app.module.ts`
 
 ```typescript
 @Module({

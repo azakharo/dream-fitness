@@ -1,5 +1,13 @@
 # План реализации DreamFitness
 
+Этот файл лежит в папке:
+`<project_root>/doc/plans`
+
+Исходные коды бекенда лежат в папке:
+`<project_root>/backend`
+
+Далее в документе все пути указаны от <project_root>.
+
 ## Подход
 
 **Horizontal Layers** — сначала весь backend со всеми микросервисами, потом frontend.

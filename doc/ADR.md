@@ -1,5 +1,11 @@
 # ADR (Architecture Decision Record)
 
+Этот файл лежит в папке:
+`<project_root>/doc`
+
+Исходные коды бекенда лежат в папке:
+`<project_root>/backend`
+
 ## Контекст
 
 Смотри ./PRD.md.
