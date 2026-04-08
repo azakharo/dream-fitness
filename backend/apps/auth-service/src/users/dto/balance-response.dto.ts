@@ -1,4 +1,4 @@
 export class BalanceResponseDto {
-  balance: number;
-  userId: string;
+  balance!: number;
+  userId!: string;
 }
