@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { UserGender } from '../entities/user.entity';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -14,6 +15,6 @@ export class UpdateUserDto {
   birthDate?: string;
 
   @IsOptional()
-  @IsEnum(['male', 'female'])
-  gender?: 'male' | 'female';
+  @IsEnum(UserGender)
+  gender?: UserGender;
 }

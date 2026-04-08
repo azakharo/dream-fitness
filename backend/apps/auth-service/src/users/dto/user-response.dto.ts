@@ -1,12 +1,14 @@
+import { UserGender, UserRole, UserStatus } from '../entities/user.entity';
+
 export class UserResponseDto {
   id: string;
   email: string;
   name: string;
   phone: string | null;
   birthDate: string | null;
-  gender: 'male' | 'female' | null;
-  role: 'client' | 'admin';
+  gender: UserGender | null;
+  role: UserRole;
   balance: number;
-  status: 'active' | 'blocked';
+  status: UserStatus;
   createdAt: string;
 }

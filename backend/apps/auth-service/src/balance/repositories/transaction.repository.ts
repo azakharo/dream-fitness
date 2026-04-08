@@ -47,7 +47,7 @@ export class TransactionRepository extends Repository<Transaction> {
     userId: string,
     bookingId: string,
   ): Promise<Transaction | undefined> {
-    return this.findOne({
+    const transaction = await this.findOne({
       where: {
         userId,
         bookingId,
@@ -55,6 +55,7 @@ export class TransactionRepository extends Repository<Transaction> {
       },
       order: { createdAt: 'DESC' },
     });
+    return transaction || undefined;
   }
 
   async getBalance(userId: string): Promise<number> {

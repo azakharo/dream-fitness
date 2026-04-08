@@ -1,4 +1,13 @@
-import { IsEmail, IsString, IsOptional, IsEnum, IsDateString, MinLength, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
+import { UserGender } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsEmail()
@@ -22,6 +31,6 @@ export class CreateUserDto {
   birthDate?: string;
 
   @IsOptional()
-  @IsEnum(['male', 'female'])
-  gender?: 'male' | 'female';
+  @IsEnum(UserGender)
+  gender?: UserGender;
 }

@@ -17,7 +17,7 @@ import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { TransactionListResponseDto } from './dto/transaction-list-response.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { PaginationParams } from '@app/shared';
+import type { PaginationParams } from '@app/shared';
 
 @Controller('auth')
 export class BalanceController {
