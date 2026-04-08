@@ -5,6 +5,7 @@ import { UsersService } from './users.service';
 import { BalanceResponseDto } from './dto/balance-response.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import type { AuthenticatedUser } from '@app/shared';
 
 @Controller('auth')
 export class UsersController {
@@ -12,7 +13,9 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@CurrentUser() user: any): Promise<UserResponseDto> {
+  async getProfile(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserResponseDto> {
     const userProfile = await this.usersService.getUserById(user.id);
     if (!userProfile) {
       throw new Error('User not found');
@@ -23,7 +26,7 @@ export class UsersController {
   @Patch('me')
   @UseGuards(JwtAuthGuard)
   async updateProfile(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto> {
     const updatedUser = await this.usersService.updateUserProfile(
@@ -38,7 +41,9 @@ export class UsersController {
 
   @Get('balance')
   @UseGuards(JwtAuthGuard)
-  async getBalance(@CurrentUser() user: any): Promise<BalanceResponseDto> {
+  async getBalance(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<BalanceResponseDto> {
     const balance = await this.usersService.getUserBalance(user.id);
     return { balance: balance.balance, userId: user.id };
   }

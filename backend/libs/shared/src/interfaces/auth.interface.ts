@@ -1,0 +1,27 @@
+import { Request } from 'express';
+
+/**
+ * Represents the authenticated user object extracted from JWT payload
+ * This is the actual shape of data returned by JwtStrategy.validate()
+ */
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+}
+
+/**
+ * JWT payload interface
+ * Contains standard JWT claims with user information
+ */
+export interface JwtPayload {
+  sub: string;
+  email: string;
+}
+
+/**
+ * Extended Request interface that includes the authenticated user
+ * Use this when typing request objects in guards and interceptors
+ */
+export interface RequestWithUser extends Request {
+  user: AuthenticatedUser;
+}

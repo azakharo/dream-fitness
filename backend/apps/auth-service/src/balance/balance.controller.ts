@@ -17,7 +17,7 @@ import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { TransactionListResponseDto } from './dto/transaction-list-response.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import type { PaginationParams } from '@app/shared';
+import type { PaginationParams, AuthenticatedUser } from '@app/shared';
 
 @Controller('auth')
 export class BalanceController {
@@ -60,7 +60,7 @@ export class BalanceController {
   @Get('transactions')
   @UseGuards(JwtAuthGuard)
   async getTransactions(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query() filters: PaginationParams,
   ): Promise<TransactionListResponseDto> {
     return this.balanceService.getTransactions(user.id, filters);

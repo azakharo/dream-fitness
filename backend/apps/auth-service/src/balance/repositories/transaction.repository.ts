@@ -3,6 +3,10 @@ import { Transaction, TransactionType } from '../entities/transaction.entity';
 import { PaginationParams, normalizePaginationParams } from '@app/shared';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
 
+interface BalanceRawResult {
+  balance: string | null;
+}
+
 @EntityRepository(Transaction)
 export class TransactionRepository extends Repository<Transaction> {
   async findByUserId(
@@ -62,15 +66,15 @@ export class TransactionRepository extends Repository<Transaction> {
     const result = await this.createQueryBuilder('transaction')
       .select(
         `SUM(CASE
-          WHEN transaction.type IN ('deposit', 'refund') THEN transaction.amount
+          WHEN transaction.type IN ('deposit', 'refund', 'release') THEN transaction.amount
           WHEN transaction.type IN ('withdraw', 'reserve') THEN -transaction.amount
           ELSE 0
         END)`,
         'balance',
       )
       .where('transaction.userId = :userId', { userId })
-      .getRawOne();
+      .getRawOne<BalanceRawResult>();
 
-    return parseInt(result?.balance || 0, 10);
+    return Number(result?.balance ?? 0);
   }
 }

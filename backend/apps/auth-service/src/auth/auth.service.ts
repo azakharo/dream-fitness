@@ -9,6 +9,7 @@ import { User } from '../users/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import type { StringValue } from 'ms';
+import { JwtPayload } from '@app/shared/interfaces';
 
 export interface Tokens {
   accessToken: string;
@@ -76,16 +77,8 @@ export class AuthService {
 
   async refresh(refreshToken: string): Promise<Tokens> {
     try {
-      const payload = this.jwtService.decode(refreshToken);
-      if (
-        !payload ||
-        typeof payload !== 'object' ||
-        !('sub' in payload) ||
-        typeof payload.sub !== 'string'
-      ) {
-        throw new Error('Invalid token');
-      }
-
+      const payload =
+        await this.jwtService.verifyAsync<JwtPayload>(refreshToken);
       const user = await this.userRepository.findByIdWithBalance(payload.sub);
       if (!user) {
         throw new Error('User not found');
@@ -95,6 +88,10 @@ export class AuthService {
     } catch {
       throw new Error('Invalid refresh token');
     }
+  }
+
+  validate(payload: JwtPayload) {
+    return { id: payload.sub, email: payload.email };
   }
 
   async logout(): Promise<void> {
