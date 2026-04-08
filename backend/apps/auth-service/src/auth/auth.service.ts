@@ -8,6 +8,7 @@ import { ConfigService } from '../config/config.service';
 import { User } from '../users/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import type { StringValue } from 'ms';
 
 export interface Tokens {
   accessToken: string;
@@ -104,10 +105,10 @@ export class AuthService {
   generateTokens(user: User): Tokens {
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get('JWT_ACCESS_TTL'),
+      expiresIn: this.configService.get('JWT_ACCESS_TTL') as StringValue,
     });
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get('JWT_REFRESH_TTL'),
+      expiresIn: this.configService.get('JWT_REFRESH_TTL') as StringValue,
     });
 
     return { accessToken, refreshToken };
