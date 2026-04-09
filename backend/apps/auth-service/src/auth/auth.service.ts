@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
 
 import { UserRepository } from '../users/repositories/user.repository';
-import { ConfigService } from '../config/config.service';
+import { ConfigService } from '../config';
 import { User } from '../users/entities/user.entity';
 import { LoginDto, RegisterDto, LoginResponseDto } from '@app/contracts';
 import type { StringValue } from 'ms';
