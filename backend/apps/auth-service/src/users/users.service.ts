@@ -6,6 +6,7 @@ import { RegisterDto } from '@app/contracts';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { User } from './entities/user.entity';
+import { UserAlreadyExistsException } from '../common/exceptions/user-already-exists.exception';
 
 @Injectable()
 export class UsersService {
@@ -35,7 +36,7 @@ export class UsersService {
       registerDto.email,
     );
     if (existingUser) {
-      throw new Error(`User with email ${registerDto.email} already exists`);
+      throw new UserAlreadyExistsException(registerDto.email);
     }
 
     const { birthDate, ...rest } = registerDto;

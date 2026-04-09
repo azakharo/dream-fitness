@@ -601,12 +601,9 @@ export class UserBlockedException extends ForbiddenException {
 }
 ```
 
-### 2.6.2. Global Exception Filter
+### 2.6.2. Использовать custom exceptions в коде
 
-**Файл:** `backend/apps/auth-service/src/common/filters/all-exceptions.filter.ts`
-
-- Форматировать ошибки в RFC 7807 Problem Details
-- Логировать ошибки
+- Нужно посмотреть текущую реализацию, есть ли места, где можно использовать Custom Exceptions. Если да, то использовать их.
 
 ---
 

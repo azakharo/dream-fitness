@@ -10,6 +10,8 @@ import { LoginDto, RegisterDto, LoginResponseDto } from '@app/contracts';
 import type { StringValue } from 'ms';
 import { JwtPayload } from '@app/shared';
 import { EventsPublisher } from '../events/events.publisher';
+import { UserAlreadyExistsException } from '../common/exceptions/user-already-exists.exception';
+import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +31,7 @@ export class AuthService {
       createUserDto.email,
     );
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new UserAlreadyExistsException(createUserDto.email);
     }
 
     // Hash password
@@ -67,7 +69,7 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new InvalidCredentialsException();
     }
 
     const isPasswordValid = await this.validatePassword(
@@ -75,7 +77,7 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordValid) {
-      throw new Error('Invalid credentials');
+      throw new InvalidCredentialsException();
     }
 
     return this.generateTokens(user);
