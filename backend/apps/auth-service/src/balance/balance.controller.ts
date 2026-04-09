@@ -8,6 +8,14 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 import { BalanceService } from './balance.service';
 import { DepositDto } from './dto/deposit.dto';
 import { ReserveDto } from './dto/reserve.dto';
@@ -19,12 +27,18 @@ import { JwtAuthGuard } from '@app/shared';
 import { CurrentUser } from '@app/shared';
 import type { PaginationParams, AuthenticatedUser } from '@app/shared';
 
+@ApiTags('Balance')
 @Controller('auth')
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
   @Post('balance/deposit')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Deposit funds to user balance' })
+  @ApiOkResponse({ type: TransactionResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBody({ type: DepositDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   async deposit(
     @Body() depositDto: DepositDto,
@@ -34,6 +48,11 @@ export class BalanceController {
 
   @Post('balance/reserve')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reserve funds for a booking' })
+  @ApiOkResponse({ type: TransactionResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBody({ type: ReserveDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   async reserve(
     @Body() reserveDto: ReserveDto,
@@ -43,6 +62,11 @@ export class BalanceController {
 
   @Post('balance/release')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Release reserved funds back to balance' })
+  @ApiOkResponse({ type: TransactionResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBody({ type: ReleaseDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   async release(
     @Body() releaseDto: ReleaseDto,
@@ -52,6 +76,11 @@ export class BalanceController {
 
   @Post('balance/refund')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Refund funds to user balance' })
+  @ApiOkResponse({ type: TransactionResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBody({ type: RefundDto })
   @UsePipes(new ValidationPipe({ transform: true }))
   async refund(@Body() refundDto: RefundDto): Promise<TransactionResponseDto> {
     return this.balanceService.refund(refundDto);
@@ -59,6 +88,10 @@ export class BalanceController {
 
   @Get('transactions')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get user transaction history' })
+  @ApiOkResponse({ type: TransactionListResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getTransactions(
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: PaginationParams,

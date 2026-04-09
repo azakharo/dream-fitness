@@ -1,4 +1,12 @@
 import { Controller, Get, Patch, UseGuards, Body } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiBearerAuth,
+  ApiBody,
+} from '@nestjs/swagger';
 import { CurrentUser } from '@app/shared';
 import { JwtAuthGuard } from '@app/shared';
 import { UsersService } from './users.service';
@@ -7,12 +15,17 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import type { AuthenticatedUser } from '@app/shared';
 
+@ApiTags('Users')
 @Controller('auth')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProfile(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<UserResponseDto> {
@@ -25,6 +38,11 @@ export class UsersController {
 
   @Patch('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiBody({ type: UpdateUserDto })
   async updateProfile(
     @CurrentUser() user: AuthenticatedUser,
     @Body() updateUserDto: UpdateUserDto,
@@ -41,6 +59,10 @@ export class UsersController {
 
   @Get('balance')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get user balance' })
+  @ApiOkResponse({ type: BalanceResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getBalance(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BalanceResponseDto> {
