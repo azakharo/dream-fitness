@@ -6,9 +6,20 @@ interface JwtConfig {
   refreshTokenTtl: string;
 }
 
+interface DatabaseConfig {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+}
+
 @Injectable()
 export class ConfigService {
-  constructor(@Inject('JWT_CONFIG') private readonly jwtConfig: JwtConfig) {}
+  constructor(
+    @Inject('JWT_CONFIG') private readonly jwtConfig: JwtConfig,
+    @Inject('DATABASE_CONFIG') private readonly dbConfig: DatabaseConfig,
+  ) {}
 
   get(key: string): string {
     if (key === 'JWT_SECRET') {
@@ -21,5 +32,9 @@ export class ConfigService {
       return this.jwtConfig.refreshTokenTtl;
     }
     return '';
+  }
+
+  getDatabaseConfig(): DatabaseConfig {
+    return this.dbConfig;
   }
 }

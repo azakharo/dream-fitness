@@ -726,6 +726,14 @@ async function bootstrap() {
 export class AppModule {}
 ```
 
+### 2.8.3. Think where to use the logging interceptor
+
+backend\libs\shared\src\interceptors\logging.interceptor.ts:16-16
+
+```
+LoggingInterceptor
+```
+
 ---
 
 ## DoD (Definition of Done)
