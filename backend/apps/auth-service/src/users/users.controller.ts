@@ -1,6 +1,6 @@
 import { Controller, Get, Patch, UseGuards, Body } from '@nestjs/common';
 import { CurrentUser } from '@app/shared';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '@app/shared';
 import { UsersService } from './users.service';
 import { BalanceResponseDto } from './dto/balance-response.dto';
 import { UserResponseDto } from './dto/user-response.dto';

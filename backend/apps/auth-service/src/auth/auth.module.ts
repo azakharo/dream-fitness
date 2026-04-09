@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '../config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '@app/shared';
 import type { StringValue } from 'ms';
 
 @Module({
