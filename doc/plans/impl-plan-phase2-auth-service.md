@@ -10,15 +10,6 @@
 
 ## Структура файлов Auth Service
 
-project_root = "C:\study\fullstack\DreamFitness"
-Этот файл лежит в папке:
-`<project_root>/doc/plans`
-
-Исходные коды бекенда лежат в папке:
-`<project_root>/backend`
-
-Далее в документе все пути указаны от <project_root>.
-
 ```
 backend/apps/auth-service/
 ├── src/
