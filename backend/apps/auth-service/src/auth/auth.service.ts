@@ -92,10 +92,6 @@ export class AuthService {
     }
   }
 
-  validate(payload: JwtPayload) {
-    return { id: payload.sub, email: payload.email };
-  }
-
   async logout(): Promise<void> {
     // For simplicity, we'll just return - in a real app, you'd invalidate the refresh token
     // This could be implemented with a cache of revoked tokens
