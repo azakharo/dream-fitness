@@ -7,8 +7,9 @@ import {
   IsOptional,
   IsNumber,
   IsPositive,
-  IsDateString,
+  IsDate,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
 
 export class LoginDto {
@@ -39,8 +40,9 @@ export class RegisterDto {
   phone?: string;
 
   @IsOptional()
-  @IsDateString()
-  birthDate?: string;
+  @Type(() => Date)
+  @IsDate()
+  birthDate?: Date;
 
   @IsOptional()
   @IsEnum(UserGender)
