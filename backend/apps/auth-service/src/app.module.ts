@@ -10,7 +10,7 @@ import { LoggingInterceptor } from '@app/shared';
 
 @Module({
   imports: [
-    ConfigModule.configure(),
+    ConfigModule,
     DatabaseModule,
     AuthModule,
     UsersModule,

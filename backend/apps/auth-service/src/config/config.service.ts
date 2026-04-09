@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 
 interface JwtConfig {
-  secret: string;
-  accessTokenTtl: string;
-  refreshTokenTtl: string;
+  JWT_SECRET: string;
+  JWT_ACCESS_TTL: string;
+  JWT_REFRESH_TTL: string;
 }
 
 interface DatabaseConfig {
@@ -23,13 +23,13 @@ export class ConfigService {
 
   get(key: string): string {
     if (key === 'JWT_SECRET') {
-      return this.jwtConfig.secret;
+      return this.jwtConfig.JWT_SECRET;
     }
     if (key === 'JWT_ACCESS_TTL') {
-      return this.jwtConfig.accessTokenTtl;
+      return this.jwtConfig.JWT_ACCESS_TTL;
     }
     if (key === 'JWT_REFRESH_TTL') {
-      return this.jwtConfig.refreshTokenTtl;
+      return this.jwtConfig.JWT_REFRESH_TTL;
     }
     return '';
   }

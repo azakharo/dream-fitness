@@ -1,17 +1,16 @@
-import { DynamicModule, Global, Provider, Module } from '@nestjs/common';
+import 'dotenv/config';
+import { Global, Module } from '@nestjs/common';
 import { jwtConfig } from './jwt.config';
 import { ConfigService } from './config.service';
 
 @Global()
-@Module({})
-export class ConfigModule {
-  static configure(): DynamicModule {
-    const configServiceProvider: Provider = {
-      provide: ConfigService,
-      useClass: ConfigService,
-    };
-
-    const databaseConfigProvider: Provider = {
+@Module({
+  providers: [
+    {
+      provide: 'JWT_CONFIG',
+      useValue: jwtConfig,
+    },
+    {
       provide: 'DATABASE_CONFIG',
       useValue: {
         host: process.env.DATABASE_HOST || 'localhost',
@@ -20,20 +19,9 @@ export class ConfigModule {
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME || 'dreamfitness',
       },
-    };
-
-    return {
-      module: ConfigModule,
-      global: true,
-      providers: [
-        {
-          provide: 'JWT_CONFIG',
-          useValue: jwtConfig,
-        },
-        databaseConfigProvider,
-        configServiceProvider,
-      ],
-      exports: ['JWT_CONFIG', 'DATABASE_CONFIG', 'ConfigService'],
-    };
-  }
-}
+    },
+    ConfigService,
+  ],
+  exports: ['JWT_CONFIG', 'DATABASE_CONFIG', ConfigService],
+})
+export class ConfigModule {}

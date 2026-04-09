@@ -8,6 +8,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from '@app/shared';
 import type { StringValue } from 'ms';
 import { EventsModule } from '../events/events.module';
+import { UsersModule } from '../users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
@@ -23,6 +26,8 @@ import { EventsModule } from '../events/events.module';
       inject: [ConfigService],
     }),
     EventsModule,
+    UsersModule,
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],
