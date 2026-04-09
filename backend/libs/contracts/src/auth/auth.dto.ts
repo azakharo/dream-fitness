@@ -40,7 +40,7 @@ export class RegisterDto {
 
   @IsOptional()
   @IsDateString()
-  birthDate?: Date;
+  birthDate?: string;
 
   @IsOptional()
   @IsEnum(UserGender)

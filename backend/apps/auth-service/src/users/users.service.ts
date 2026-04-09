@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 import { UserRepository } from './repositories/user.repository';
-import { CreateUserDto } from './dto/create-user.dto';
+import { RegisterDto } from '@app/contracts';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { User } from './entities/user.entity';
@@ -29,16 +29,16 @@ export class UsersService {
     };
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+  async createUser(registerDto: RegisterDto): Promise<UserResponseDto> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(
-      createUserDto.email,
+      registerDto.email,
     );
     if (existingUser) {
-      throw new Error(`User with email ${createUserDto.email} already exists`);
+      throw new Error(`User with email ${registerDto.email} already exists`);
     }
 
-    const { birthDate, ...rest } = createUserDto;
+    const { birthDate, ...rest } = registerDto;
     const user = this.userRepository.create({
       ...rest,
       birthDate: birthDate ? new Date(birthDate) : null,
