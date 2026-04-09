@@ -43,6 +43,14 @@ export class RabbitMQModule {
     };
   }
 
+  static forService(): DynamicModule {
+    return {
+      module: RabbitMQModule,
+      imports: [GolevelupModule.forRoot(RabbitMQModule.createOptions({}))],
+      exports: [GolevelupModule],
+    };
+  }
+
   private static createOptions(options: RabbitMQModuleOptions) {
     const exchanges = options.exchanges || ['dreamfitness.exchange'];
 

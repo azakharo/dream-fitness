@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from '@app/shared';
 import type { StringValue } from 'ms';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import type { StringValue } from 'ms';
       }),
       inject: [ConfigService],
     }),
+    EventsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],

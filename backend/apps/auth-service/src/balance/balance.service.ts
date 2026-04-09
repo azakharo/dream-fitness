@@ -12,6 +12,7 @@ import { TransactionListResponseDto } from './dto/transaction-list-response.dto'
 import { PaginationParams } from '@app/shared';
 import { UserRepository } from '../users/repositories/user.repository';
 import { InsufficientBalanceException } from '../common/exceptions/insufficient-balance.exception';
+import { EventsPublisher } from '../events/events.publisher';
 
 @Injectable()
 export class BalanceService {
@@ -21,15 +22,20 @@ export class BalanceService {
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
     private readonly dataSource: DataSource,
+    private readonly eventsPublisher: EventsPublisher,
   ) {}
 
   async deposit(depositDto: DepositDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
+      const oldBalance = await this.transactionRepository.getBalance(
+        depositDto.userId,
+      );
+
       const transaction = await manager.save(Transaction, {
         userId: depositDto.userId,
         type: TransactionType.DEPOSIT,
         amount: depositDto.amount,
-        description: depositDto.description,
+        description: depositDto.description || 'Deposit',
       });
 
       await this.userRepository.updateBalance(
@@ -37,17 +43,29 @@ export class BalanceService {
         depositDto.amount,
       );
 
+      const newBalance = await this.transactionRepository.getBalance(
+        depositDto.userId,
+      );
+
+      await this.eventsPublisher.publishBalanceChanged({
+        userId: depositDto.userId,
+        oldBalance,
+        newBalance,
+        amount: depositDto.amount,
+        description: depositDto.description || 'Deposit',
+      });
+
       return this.mapToResponseDto(transaction);
     });
   }
 
   async reserve(reserveDto: ReserveDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
-      const balance = await this.transactionRepository.getBalance(
+      const oldBalance = await this.transactionRepository.getBalance(
         reserveDto.userId,
       );
-      if (balance < reserveDto.amount) {
-        throw new InsufficientBalanceException(balance, reserveDto.amount);
+      if (oldBalance < reserveDto.amount) {
+        throw new InsufficientBalanceException(oldBalance, reserveDto.amount);
       }
 
       const transaction = await manager.save(Transaction, {
@@ -63,12 +81,28 @@ export class BalanceService {
         -reserveDto.amount,
       );
 
+      const newBalance = await this.transactionRepository.getBalance(
+        reserveDto.userId,
+      );
+
+      await this.eventsPublisher.publishBalanceChanged({
+        userId: reserveDto.userId,
+        oldBalance,
+        newBalance,
+        amount: reserveDto.amount,
+        description: `Reserve for booking ${reserveDto.bookingId}`,
+      });
+
       return this.mapToResponseDto(transaction);
     });
   }
 
   async release(releaseDto: ReleaseDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
+      const oldBalance = await this.transactionRepository.getBalance(
+        releaseDto.userId,
+      );
+
       // Find the reserve transaction for this booking
       const reserveTransaction =
         await this.transactionRepository.findReserveByBookingId(
@@ -91,12 +125,28 @@ export class BalanceService {
       });
 
       // Note: DO NOT increase user balance (money left the system)
+      const newBalance = await this.transactionRepository.getBalance(
+        releaseDto.userId,
+      );
+
+      await this.eventsPublisher.publishBalanceChanged({
+        userId: releaseDto.userId,
+        oldBalance,
+        newBalance,
+        amount: releaseDto.amount,
+        description: `Release reserve for booking ${releaseDto.bookingId}`,
+      });
+
       return this.mapToResponseDto(transaction);
     });
   }
 
   async refund(refundDto: RefundDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
+      const oldBalance = await this.transactionRepository.getBalance(
+        refundDto.userId,
+      );
+
       const transaction = await manager.save(Transaction, {
         userId: refundDto.userId,
         type: TransactionType.REFUND,
@@ -109,6 +159,18 @@ export class BalanceService {
         refundDto.userId,
         refundDto.amount,
       );
+
+      const newBalance = await this.transactionRepository.getBalance(
+        refundDto.userId,
+      );
+
+      await this.eventsPublisher.publishBalanceChanged({
+        userId: refundDto.userId,
+        oldBalance,
+        newBalance,
+        amount: refundDto.amount,
+        description: `Refund for booking ${refundDto.bookingId}`,
+      });
 
       return this.mapToResponseDto(transaction);
     });

@@ -9,6 +9,7 @@ import { User } from '../users/entities/user.entity';
 import { LoginDto, RegisterDto, LoginResponseDto } from '@app/contracts';
 import type { StringValue } from 'ms';
 import { JwtPayload } from '@app/shared';
+import { EventsPublisher } from '../events/events.publisher';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly eventsPublisher: EventsPublisher,
   ) {}
 
   async register(
@@ -47,6 +49,14 @@ export class AuthService {
 
     // Save user
     await this.userRepository.save(user);
+
+    // Publish user.created event
+    await this.eventsPublisher.publishUserCreated({
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    });
 
     // Generate tokens
     const tokens = this.generateTokens(user);

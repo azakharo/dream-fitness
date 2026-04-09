@@ -6,6 +6,7 @@ import { BalanceService } from './balance.service';
 import { BalanceController } from './balance.controller';
 import { UserRepository } from '../users/repositories/user.repository';
 import { User } from '../users/entities/user.entity';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { User } from '../users/entities/user.entity';
       User,
       UserRepository,
     ]),
+    EventsModule,
   ],
   providers: [TransactionRepository, UserRepository, BalanceService],
   controllers: [BalanceController],

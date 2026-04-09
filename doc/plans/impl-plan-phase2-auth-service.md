@@ -10,6 +10,7 @@
 
 ## Структура файлов Auth Service
 
+project_root = "C:\study\fullstack\DreamFitness"
 Этот файл лежит в папке:
 `<project_root>/doc/plans`
 
@@ -540,7 +541,7 @@ npm i -D -E @types/amqplib
     userId: string;
     email: string;
     name: string;
-    role: "client" | "admin";
+    role: UserRole;
   }
 }
 ```
