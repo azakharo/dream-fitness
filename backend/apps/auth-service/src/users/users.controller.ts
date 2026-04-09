@@ -1,5 +1,5 @@
 import { Controller, Get, Patch, UseGuards, Body } from '@nestjs/common';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CurrentUser } from '@app/shared';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UsersService } from './users.service';
 import { BalanceResponseDto } from './dto/balance-response.dto';

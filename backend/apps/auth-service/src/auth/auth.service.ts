@@ -6,15 +6,9 @@ import { compare, hash } from 'bcrypt';
 import { UserRepository } from '../users/repositories/user.repository';
 import { ConfigService } from '../config/config.service';
 import { User } from '../users/entities/user.entity';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto, RegisterDto, LoginResponseDto } from '@app/contracts';
 import type { StringValue } from 'ms';
-import { JwtPayload } from '@app/shared/interfaces';
-
-export interface Tokens {
-  accessToken: string;
-  refreshToken: string;
-}
+import { JwtPayload } from '@app/shared';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +21,7 @@ export class AuthService {
 
   async register(
     createUserDto: RegisterDto,
-  ): Promise<{ user: User; tokens: Tokens }> {
+  ): Promise<{ user: User; tokens: LoginResponseDto }> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(
       createUserDto.email,
@@ -60,7 +54,7 @@ export class AuthService {
     return { user, tokens };
   }
 
-  async login(loginDto: LoginDto): Promise<Tokens> {
+  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
       throw new Error('Invalid credentials');
@@ -77,7 +71,7 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  async refresh(refreshToken: string): Promise<Tokens> {
+  async refresh(refreshToken: string): Promise<LoginResponseDto> {
     try {
       const payload =
         await this.jwtService.verifyAsync<JwtPayload>(refreshToken);
@@ -97,7 +91,7 @@ export class AuthService {
     // This could be implemented with a cache of revoked tokens
   }
 
-  generateTokens(user: User): Tokens {
+  generateTokens(user: User): LoginResponseDto {
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.configService.get('JWT_ACCESS_TTL') as StringValue,

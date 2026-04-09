@@ -16,7 +16,7 @@ import { RefundDto } from './dto/refund.dto';
 import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { TransactionListResponseDto } from './dto/transaction-list-response.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CurrentUser } from '@app/shared';
 import type { PaginationParams, AuthenticatedUser } from '@app/shared';
 
 @Controller('auth')

@@ -1,5 +1,1 @@
-export * from './login.dto';
-export * from './register.dto';
-export * from './refresh-token.dto';
-export * from './login-response.dto';
-export * from './tokens.dto';
+export * from '@app/contracts';
