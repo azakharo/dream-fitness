@@ -4,10 +4,17 @@ import { Strategy } from 'passport-jwt';
 import { ConfigService } from '../../config';
 import { Request } from 'express';
 import { JwtPayload } from '@app/shared/interfaces';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User, UserStatus } from '../../users/entities/user.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {
     super({
       jwtFromRequest: (req: Request) => {
         let token: string | null = null;
@@ -23,7 +30,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  validate(payload: JwtPayload) {
-    return { id: payload.sub, email: payload.email };
+  async validate(payload: JwtPayload): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { id: payload.sub },
+    });
+    if (!user) {
+      return null;
+    }
+    // Check if user is active
+    if (user.status !== UserStatus.ACTIVE) {
+      return null;
+    }
+    return user;
   }
 }
