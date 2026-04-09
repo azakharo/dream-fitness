@@ -45,7 +45,9 @@ export class AuthService {
       password: passwordHash,
       name: createUserDto.name,
       phone: createUserDto.phone || null,
-      birthDate: createUserDto.birthDate || null,
+      birthDate: createUserDto.birthDate
+        ? new Date(createUserDto.birthDate)
+        : null,
       gender: createUserDto.gender || null,
     });
 

@@ -4,7 +4,6 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  BeforeInsert,
   Unique,
   Check,
 } from 'typeorm';
@@ -44,7 +43,7 @@ export class User {
   phone: string | null;
 
   @Column({ type: 'date', nullable: true })
-  birthDate: string | null;
+  birthDate: Date | null;
 
   @Column({
     type: 'enum',
@@ -75,9 +74,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @BeforeInsert()
-  beforeInsert() {
-    // Can add any pre-insert logic if needed
-  }
 }

@@ -5,7 +5,7 @@ export class UserResponseDto {
   email!: string;
   name!: string;
   phone!: string | null;
-  birthDate!: string | null;
+  birthDate!: Date | null;
   gender!: UserGender | null;
   role!: UserRole;
   balance!: number;

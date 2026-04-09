@@ -38,9 +38,11 @@ export class UsersService {
       throw new Error(`User with email ${createUserDto.email} already exists`);
     }
 
-    // For now, just create a user with basic properties
-    // In a real implementation, you'd hash the password and save properly
-    const user = this.userRepository.create(createUserDto as DeepPartial<User>);
+    const { birthDate, ...rest } = createUserDto;
+    const user = this.userRepository.create({
+      ...rest,
+      birthDate: birthDate ? new Date(birthDate) : null,
+    } as DeepPartial<User>);
     const savedUser = await this.userRepository.save(user);
     return this.toResponseDto(savedUser);
   }
@@ -68,7 +70,13 @@ export class UsersService {
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto | undefined> {
-    await this.userRepository.update(id, updateUserDto as DeepPartial<User>);
+    const { birthDate, ...rest } = updateUserDto;
+    await this.userRepository.update(id, {
+      ...rest,
+      ...(birthDate !== undefined && {
+        birthDate: birthDate ? new Date(birthDate) : null,
+      }),
+    } as DeepPartial<User>);
     return this.getUserById(id);
   }
 
