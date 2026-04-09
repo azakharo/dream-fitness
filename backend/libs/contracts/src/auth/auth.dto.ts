@@ -9,7 +9,7 @@ import {
   IsPositive,
   IsDateString,
 } from 'class-validator';
-import { UserGender } from '@app/shared/enums';
+import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
 
 export class LoginDto {
   @IsEmail()
@@ -40,7 +40,7 @@ export class RegisterDto {
 
   @IsOptional()
   @IsDateString()
-  birthDate?: string;
+  birthDate?: Date;
 
   @IsOptional()
   @IsEnum(UserGender)
@@ -59,9 +59,9 @@ export class UserDto {
   phone: string | null;
   birthDate: Date | null;
   gender: UserGender | null;
-  role: 'client' | 'admin';
+  role: UserRole;
   balance: number;
-  status: 'active' | 'blocked';
+  status: UserStatus;
   createdAt: Date;
 }
 
@@ -72,9 +72,9 @@ export class UserProfileDto {
   phone: string | null;
   birthDate: Date | null;
   gender: UserGender | null;
-  role: 'client' | 'admin';
+  role: UserRole;
   balance: number;
-  status: 'active' | 'blocked';
+  status: UserStatus;
   createdAt: Date;
   updatedAt: Date;
 }
