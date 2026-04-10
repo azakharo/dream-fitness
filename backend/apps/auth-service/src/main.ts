@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from '@app/shared';
-import { LoggingInterceptor } from '@app/shared';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,12 +24,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-
-  // Global exception filter
-  app.useGlobalFilters(new HttpExceptionFilter());
-
-  // Global logging interceptor
-  app.useGlobalInterceptors(new LoggingInterceptor());
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
