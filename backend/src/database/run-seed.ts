@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { dataSourceOptions } from '../data-source';
 import * as bcrypt from 'bcrypt';
-import type {
+import {
   User,
   UserRole,
   UserStatus,
