@@ -1,4 +1,4 @@
-import { UserGender, UserRole, UserStatus } from '../entities/user.entity';
+import { UserGender, UserRole, UserStatus } from '@app/shared';
 
 export class UserResponseDto {
   id!: string;

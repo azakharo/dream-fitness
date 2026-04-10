@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsEnum, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
-import { UserGender } from '../entities/user.entity';
+import { UserGender } from '@app/shared';
 
 export class UpdateUserDto {
   @IsOptional()

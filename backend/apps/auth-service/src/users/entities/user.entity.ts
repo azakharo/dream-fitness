@@ -7,21 +7,7 @@ import {
   Unique,
   Check,
 } from 'typeorm';
-
-export enum UserRole {
-  CLIENT = 'client',
-  ADMIN = 'admin',
-}
-
-export enum UserStatus {
-  ACTIVE = 'active',
-  BLOCKED = 'blocked',
-}
-
-export enum UserGender {
-  MALE = 'male',
-  FEMALE = 'female',
-}
+import { UserRole, UserStatus, UserGender } from '@app/shared/enums';
 
 @Entity('users')
 @Unique(['email'])
@@ -33,7 +19,12 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 255, select: false, name: 'password_hash' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    select: false,
+    name: 'password_hash',
+  })
   password: string;
 
   @Column({ type: 'varchar', length: 255 })

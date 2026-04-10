@@ -161,7 +161,12 @@ export class InitialSchema1744032000000 implements MigrationInterface {
           { name: 'amount', type: 'integer' },
           { name: 'type', type: 'transaction_type_enum' },
           { name: 'booking_id', type: 'uuid', isNullable: true },
-          { name: 'description', type: 'varchar', length: '500', isNullable: true },
+          {
+            name: 'description',
+            type: 'varchar',
+            length: '500',
+            isNullable: true,
+          },
           { name: 'created_at', type: 'timestamp', default: 'now()' },
         ],
       }),

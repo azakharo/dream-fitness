@@ -1,11 +1,8 @@
 import { DataSource } from 'typeorm';
 import { dataSourceOptions } from '../data-source';
 import * as bcrypt from 'bcrypt';
-import {
-  User,
-  UserRole,
-  UserStatus,
-} from '../../apps/auth-service/src/users/entities/user.entity';
+import { User } from '../../apps/auth-service/src/users/entities/user.entity';
+import { UserRole, UserStatus } from '@app/shared';
 
 /**
  * Seed script to populate database with initial data
