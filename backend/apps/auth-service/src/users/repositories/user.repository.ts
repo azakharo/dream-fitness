@@ -1,10 +1,31 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 
-@EntityRepository(User)
+@Injectable()
 export class UserRepository extends Repository<User> {
+  constructor(dataSource: DataSource) {
+    super(User, dataSource.createEntityManager());
+  }
+
   async findByEmail(email: string): Promise<User | undefined> {
-    const user = await this.findOne({ where: { email } });
+    const user = await this.findOne({
+      where: { email },
+      select: [
+        'id',
+        'email',
+        'password',
+        'name',
+        'phone',
+        'birthDate',
+        'gender',
+        'role',
+        'balance',
+        'status',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
     return user || undefined;
   }
 

@@ -4,21 +4,12 @@ import { Transaction } from './entities/transaction.entity';
 import { TransactionRepository } from './repositories/transaction.repository';
 import { BalanceService } from './balance.service';
 import { BalanceController } from './balance.controller';
-import { UserRepository } from '../users/repositories/user.repository';
-import { User } from '../users/entities/user.entity';
 import { EventsModule } from '../events/events.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Transaction,
-      TransactionRepository,
-      User,
-      UserRepository,
-    ]),
-    EventsModule,
-  ],
-  providers: [TransactionRepository, UserRepository, BalanceService],
+  imports: [TypeOrmModule.forFeature([Transaction]), EventsModule, UsersModule],
+  providers: [TransactionRepository, BalanceService],
   controllers: [BalanceController],
   exports: [BalanceService, TransactionRepository],
 })

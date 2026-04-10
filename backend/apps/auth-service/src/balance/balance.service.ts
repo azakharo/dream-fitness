@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { TransactionRepository } from './repositories/transaction.repository';
 import { Transaction, TransactionType } from './entities/transaction.entity';
@@ -17,9 +16,7 @@ import { EventsPublisher } from '../events/events.publisher';
 @Injectable()
 export class BalanceService {
   constructor(
-    @InjectRepository(TransactionRepository)
     private readonly transactionRepository: TransactionRepository,
-    @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
     private readonly dataSource: DataSource,
     private readonly eventsPublisher: EventsPublisher,

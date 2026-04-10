@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 import { UserRepository } from './repositories/user.repository';
 import { RegisterDto } from '@app/contracts';
@@ -10,10 +9,7 @@ import { UserAlreadyExistsException } from '../common/exceptions/user-already-ex
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(UserRepository)
-    private readonly userRepository: UserRepository,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   private toResponseDto(user: User): UserResponseDto {
     return {

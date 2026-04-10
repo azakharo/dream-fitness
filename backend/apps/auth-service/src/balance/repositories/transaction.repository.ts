@@ -1,4 +1,5 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { Transaction, TransactionType } from '../entities/transaction.entity';
 import { PaginationParams, normalizePaginationParams } from '@app/shared';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
@@ -7,8 +8,11 @@ interface BalanceRawResult {
   balance: string | null;
 }
 
-@EntityRepository(Transaction)
+@Injectable()
 export class TransactionRepository extends Repository<Transaction> {
+  constructor(dataSource: DataSource) {
+    super(Transaction, dataSource.createEntityManager());
+  }
   async findByUserId(
     userId: string,
     options?: PaginationParams,
