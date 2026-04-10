@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -39,11 +39,31 @@ export class UserRepository extends Repository<User> {
     return user || undefined;
   }
 
-  async updateBalance(id: string, amount: number): Promise<void> {
-    await this.createQueryBuilder()
+  async updateBalance(
+    id: string,
+    amount: number,
+    manager?: EntityManager,
+  ): Promise<void> {
+    const queryBuilder = manager
+      ? manager.createQueryBuilder()
+      : this.createQueryBuilder();
+
+    await queryBuilder
       .update(User)
       .set({ balance: () => `balance + ${amount}` })
       .where('id = :id', { id })
       .execute();
+  }
+
+  async findByIdWithBalanceForUpdate(
+    id: string,
+    manager: EntityManager,
+  ): Promise<User | undefined> {
+    const user = await manager.findOne(User, {
+      where: { id },
+      select: ['id', 'email', 'name', 'balance', 'role', 'status'],
+      lock: { mode: 'pessimistic_write' },
+    });
+    return user || undefined;
   }
 }

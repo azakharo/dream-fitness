@@ -24,8 +24,9 @@ export class BalanceService {
 
   async deposit(depositDto: DepositDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
-      const user = await this.userRepository.findByIdWithBalance(
+      const user = await this.userRepository.findByIdWithBalanceForUpdate(
         depositDto.userId,
+        manager,
       );
       if (!user) {
         throw new NotFoundException('User not found');
@@ -42,12 +43,10 @@ export class BalanceService {
       await this.userRepository.updateBalance(
         depositDto.userId,
         depositDto.amount,
+        manager,
       );
 
-      const updatedUser = await this.userRepository.findByIdWithBalance(
-        depositDto.userId,
-      );
-      const newBalance = updatedUser!.balance;
+      const newBalance = oldBalance + depositDto.amount;
 
       await this.eventsPublisher.publishBalanceChanged({
         userId: depositDto.userId,
@@ -63,8 +62,9 @@ export class BalanceService {
 
   async reserve(reserveDto: ReserveDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
-      const user = await this.userRepository.findByIdWithBalance(
+      const user = await this.userRepository.findByIdWithBalanceForUpdate(
         reserveDto.userId,
+        manager,
       );
       if (!user) {
         throw new NotFoundException('User not found');
@@ -85,12 +85,10 @@ export class BalanceService {
       await this.userRepository.updateBalance(
         reserveDto.userId,
         -reserveDto.amount,
+        manager,
       );
 
-      const updatedUser = await this.userRepository.findByIdWithBalance(
-        reserveDto.userId,
-      );
-      const newBalance = updatedUser!.balance;
+      const newBalance = oldBalance - reserveDto.amount;
 
       await this.eventsPublisher.publishBalanceChanged({
         userId: reserveDto.userId,
@@ -106,8 +104,9 @@ export class BalanceService {
 
   async release(releaseDto: ReleaseDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
-      const user = await this.userRepository.findByIdWithBalance(
+      const user = await this.userRepository.findByIdWithBalanceForUpdate(
         releaseDto.userId,
+        manager,
       );
       if (!user) {
         throw new NotFoundException('User not found');
@@ -138,12 +137,10 @@ export class BalanceService {
       await this.userRepository.updateBalance(
         releaseDto.userId,
         releaseDto.amount,
+        manager,
       );
 
-      const updatedUser = await this.userRepository.findByIdWithBalance(
-        releaseDto.userId,
-      );
-      const newBalance = updatedUser!.balance;
+      const newBalance = oldBalance + releaseDto.amount;
 
       await this.eventsPublisher.publishBalanceChanged({
         userId: releaseDto.userId,
@@ -159,8 +156,9 @@ export class BalanceService {
 
   async refund(refundDto: RefundDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
-      const user = await this.userRepository.findByIdWithBalance(
+      const user = await this.userRepository.findByIdWithBalanceForUpdate(
         refundDto.userId,
+        manager,
       );
       if (!user) {
         throw new NotFoundException('User not found');
@@ -178,12 +176,10 @@ export class BalanceService {
       await this.userRepository.updateBalance(
         refundDto.userId,
         refundDto.amount,
+        manager,
       );
 
-      const updatedUser = await this.userRepository.findByIdWithBalance(
-        refundDto.userId,
-      );
-      const newBalance = updatedUser!.balance;
+      const newBalance = oldBalance + refundDto.amount;
 
       await this.eventsPublisher.publishBalanceChanged({
         userId: refundDto.userId,
