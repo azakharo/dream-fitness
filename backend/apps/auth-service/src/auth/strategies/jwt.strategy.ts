@@ -41,6 +41,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (user.status !== UserStatus.ACTIVE) {
       return null;
     }
+    // Check if role matches payload
+    if (user.role !== payload.role) {
+      return null;
+    }
     return user;
   }
 }

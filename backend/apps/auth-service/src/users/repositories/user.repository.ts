@@ -8,6 +8,8 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.createEntityManager());
   }
 
+  // This method returns user password hash!!!
+  // It's expected, because it's used for checking password during the login
   async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.findOne({
       where: { email },

@@ -23,7 +23,7 @@ export class AuthService {
 
   async register(
     createUserDto: RegisterDto,
-  ): Promise<{ user: User; tokens: LoginResponseDto }> {
+  ): Promise<{ user: Omit<User, 'password'>; tokens: LoginResponseDto }> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(
       createUserDto.email,
@@ -61,7 +61,10 @@ export class AuthService {
     // Generate tokens
     const tokens = this.generateTokens(user);
 
-    return { user, tokens };
+    // Return user without password hash
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...userWithoutPassword } = user;
+    return { user: userWithoutPassword as Omit<User, 'password'>, tokens };
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
@@ -102,7 +105,7 @@ export class AuthService {
   }
 
   generateTokens(user: User): LoginResponseDto {
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.configService.get('JWT_ACCESS_TTL') as StringValue,
     });

@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { UserRole } from '../enums';
 
 /**
  * Represents the authenticated user object extracted from JWT payload
@@ -16,6 +17,7 @@ export interface AuthenticatedUser {
 export interface JwtPayload {
   sub: string;
   email: string;
+  role: UserRole;
 }
 
 /**
