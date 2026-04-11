@@ -609,30 +609,7 @@ export class UserBlockedException extends ForbiddenException {
 
 ## Этап 2.7: Testing Strategy
 
-### 2.7.1. Unit Tests
-
-**Структура тестов:**
-
-```
-backend/apps/auth-service/src/
-├── auth/
-│   └── auth.service.spec.ts
-├── users/
-│   └── users.service.spec.ts
-├── balance/
-│   └── balance.service.spec.ts
-└── events/
-    └── events.publisher.spec.ts
-```
-
-**Покрытие:**
-
-- AuthService: register, login, refresh, logout, password hashing
-- UsersService: getProfile, updateProfile
-- BalanceService: deposit, reserve, release, refund, checkEnoughBalance
-- EventsPublisher: корректность публикации событий
-
-### 2.7.2. E2E Tests
+### 2.7.1. E2E Tests
 
 **Файлы:**
 
@@ -668,11 +645,6 @@ backend/apps/auth-service/test/
 2. Login с неверным паролем → 401 Unauthorized
 3. Reserve с недостаточным балансом → 400 Bad Request
 4. Access protected route без token → 401 Unauthorized
-
-### 2.7.3. Integration Tests
-
-- Проверка RabbitMQ публикации событий (с использованием test queue)
-- Проверка database transactions в balance operations
 
 ---
 
