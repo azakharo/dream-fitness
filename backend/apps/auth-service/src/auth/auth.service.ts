@@ -11,6 +11,7 @@ import { JwtPayload } from '@app/shared';
 import { EventsPublisher } from '../events/events.publisher';
 import { UserAlreadyExistsException } from '../common/exceptions/user-already-exists.exception';
 import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
+import { InvalidRefreshTokenException } from '../common/exceptions/invalid-refresh-token.exception';
 
 @Injectable()
 export class AuthService {
@@ -95,7 +96,7 @@ export class AuthService {
 
       return this.generateTokens(user);
     } catch {
-      throw new Error('Invalid refresh token');
+      throw new InvalidRefreshTokenException();
     }
   }
 
