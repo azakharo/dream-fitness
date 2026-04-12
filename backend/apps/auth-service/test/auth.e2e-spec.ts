@@ -3,6 +3,7 @@ import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { createRegisterDto } from './fixtures/user.fixtures';
 import { UserGender } from '@app/shared/enums';
+import jwt from 'jsonwebtoken';
 
 describe('AuthController (e2e)', () => {
   let appHelper: AppTestHelper;
@@ -230,14 +231,29 @@ describe('AuthController (e2e)', () => {
       expect(refreshResp.body.refreshToken).toBeDefined();
     });
 
-    it('should throw 401 when refresh token is invalid', async () => {
+    it('should throw 400 when refresh token is invalid', async () => {
       const response = await authHelper.refresh('invalid-token');
 
       expect(response.status).toBe(400);
     });
 
     it('should throw 400 when refresh token is expired', async () => {
-      const response = await authHelper.refresh('expired-token');
+      const userData = createRegisterDto();
+      const regResp = await authHelper.register(userData);
+
+      const expiredToken = jwt.sign(
+        {
+          sub: regResp.body.user.id,
+          email: regResp.body.user.email,
+          role: regResp.body.user.role,
+        },
+        process.env.JWT_SECRET!,
+        { expiresIn: '1ms' },
+      );
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const response = await authHelper.refresh(expiredToken);
 
       expect(response.status).toBe(400);
     });
