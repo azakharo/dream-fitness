@@ -231,34 +231,25 @@ describe('AuthController (e2e)', () => {
     });
 
     it('should throw 401 when refresh token is invalid', async () => {
-      const response = await appHelper.getRequest().post('/auth/refresh').send({
-        refreshToken: 'invalid-token',
-      });
+      const response = await authHelper.refresh('invalid-token');
 
       expect(response.status).toBe(401);
     });
 
     it('should throw 401 when refresh token is expired', async () => {
-      const response = await appHelper.getRequest().post('/auth/refresh').send({
-        refreshToken: 'expired-token',
-      });
+      const response = await authHelper.refresh('expired-token');
 
       expect(response.status).toBe(401);
     });
 
     it('should throw 400 when request body is missing', async () => {
-      const response = await appHelper
-        .getRequest()
-        .post('/auth/refresh')
-        .send({});
+      const response = await authHelper.refresh('');
 
       expect(response.status).toBe(400);
     });
 
     it('should throw 400 when refresh token is empty string', async () => {
-      const response = await appHelper.getRequest().post('/auth/refresh').send({
-        refreshToken: '',
-      });
+      const response = await authHelper.refresh('');
 
       expect(response.status).toBe(400);
     });
