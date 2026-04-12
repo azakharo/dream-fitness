@@ -5,9 +5,10 @@ import { RegisterDto } from '@app/contracts';
 export class AuthHelper {
   constructor(private request: request.SuperTest<request.Test>) {}
 
-  async register(
-    userData: RegisterDto,
-  ): Promise<{ user: Omit<User, 'password'>; tokens: { accessToken: string; refreshToken: string } }> {
+  async register(userData: RegisterDto): Promise<{
+    user: Omit<User, 'password'>;
+    tokens: { accessToken: string; refreshToken: string };
+  }> {
     const response = await this.request.post('/auth/register').send(userData);
     return response.body;
   }
@@ -16,7 +17,9 @@ export class AuthHelper {
     email: string,
     password: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const response = await this.request.post('/auth/login').send({ email, password });
+    const response = await this.request
+      .post('/auth/login')
+      .send({ email, password });
     return response.body;
   }
 
