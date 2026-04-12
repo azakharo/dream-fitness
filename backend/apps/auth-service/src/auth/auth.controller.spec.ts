@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from '@app/contracts';
 import { LoginDto } from '@app/contracts';
 import { RefreshTokenDto } from '@app/contracts';
-import { LoginResponseDto } from '@app/contracts';
+import { LoginResponseBody } from '@app/contracts';
 import { UserGender } from '@app/shared';
 
 describe('AuthController', () => {
@@ -17,7 +17,7 @@ describe('AuthController', () => {
     logout: jest.fn(),
   };
 
-  const mockTokens: LoginResponseDto = {
+  const mockTokens: LoginResponseBody = {
     accessToken: 'access-token',
     refreshToken: 'refresh-token',
   };
@@ -84,7 +84,7 @@ describe('AuthController', () => {
     };
 
     it('should return new tokens', async () => {
-      const newTokens: LoginResponseDto = {
+      const newTokens: LoginResponseBody = {
         accessToken: 'new-access-token',
         refreshToken: 'new-refresh-token',
       };

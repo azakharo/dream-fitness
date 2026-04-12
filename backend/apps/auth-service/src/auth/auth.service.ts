@@ -5,7 +5,12 @@ import { compare, hash } from 'bcrypt';
 import { UserRepository } from '../users/repositories/user.repository';
 import { ConfigService } from '../config';
 import { User } from '../users/entities/user.entity';
-import { LoginDto, RegisterDto, LoginResponseDto } from '@app/contracts';
+import {
+  LoginDto,
+  RegisterDto,
+  LoginResponseBody,
+  RegisterResponseBody,
+} from '@app/contracts';
 import type { StringValue } from 'ms';
 import { JwtPayload } from '@app/shared';
 import { EventsPublisher } from '../events/events.publisher';
@@ -22,9 +27,7 @@ export class AuthService {
     private readonly eventsPublisher: EventsPublisher,
   ) {}
 
-  async register(
-    createUserDto: RegisterDto,
-  ): Promise<{ user: Omit<User, 'password'>; tokens: LoginResponseDto }> {
+  async register(createUserDto: RegisterDto): Promise<RegisterResponseBody> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(
       createUserDto.email,
@@ -68,7 +71,7 @@ export class AuthService {
     return { user: userWithoutPassword as Omit<User, 'password'>, tokens };
   }
 
-  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
+  async login(loginDto: LoginDto): Promise<LoginResponseBody> {
     const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
       throw new InvalidCredentialsException();
@@ -85,7 +88,7 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  async refresh(refreshToken: string): Promise<LoginResponseDto> {
+  async refresh(refreshToken: string): Promise<LoginResponseBody> {
     try {
       const payload =
         await this.jwtService.verifyAsync<JwtPayload>(refreshToken);
@@ -105,7 +108,7 @@ export class AuthService {
     // This could be implemented with a cache of revoked tokens
   }
 
-  generateTokens(user: User): LoginResponseDto {
+  generateTokens(user: User): LoginResponseBody {
     const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.configService.get('JWT_ACCESS_TTL') as StringValue,

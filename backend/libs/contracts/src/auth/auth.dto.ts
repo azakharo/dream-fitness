@@ -10,6 +10,7 @@ import {
   IsDateString,
 } from 'class-validator';
 import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
+import { User } from 'apps/auth-service/src/users/entities/user.entity';
 
 export class LoginDto {
   @IsEmail()
@@ -89,7 +90,16 @@ export class UpdateBalanceDto {
   description?: string;
 }
 
-export class LoginResponseDto {
+export class LoginResponseBody {
   accessToken: string;
   refreshToken: string;
+}
+
+export class LogoutResponseBody {
+  message: string;
+}
+
+export class RegisterResponseBody {
+  user: Omit<User, 'password'>;
+  tokens: LoginResponseBody;
 }

@@ -1,38 +1,61 @@
 import request from 'supertest';
-import { User } from '../../src/users/entities/user.entity';
-import { LoginResponseDto, RegisterDto } from '@app/contracts';
+import { Response } from 'supertest';
+import {
+  RegisterDto,
+  LoginResponseBody,
+  RegisterResponseBody,
+  LogoutResponseBody,
+} from '@app/contracts';
 
-type RegisterResponse = {
-  user: Omit<User, 'password'>;
-  tokens: LoginResponseDto;
+type TestResponse<T> = Omit<Response, 'body'> & {
+  body: T;
 };
 
 export class AuthHelper {
   constructor(private request: request.SuperTest<request.Test>) {}
 
-  async register(userData: RegisterDto): Promise<RegisterResponse> {
+  async register(
+    userData: RegisterDto,
+  ): Promise<TestResponse<RegisterResponseBody>> {
     const response = await this.request.post('/auth/register').send(userData);
-    expect(response.status).toBe(201);
-    return response.body as RegisterResponse;
+    return response as unknown as TestResponse<RegisterResponseBody>;
   }
 
-  async login(email: string, password: string): Promise<LoginResponseDto> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<TestResponse<LoginResponseBody>> {
     const response = await this.request
       .post('/auth/login')
       .send({ email, password });
-    expect(response.status).toBe(200);
-    return response.body as LoginResponseDto;
+    return response as unknown as TestResponse<LoginResponseBody>;
   }
 
-  async registerAndLogin(
-    userData: RegisterDto,
-  ): Promise<{ accessToken: string; refreshToken: string; userId: string }> {
+  async refresh(
+    refreshToken: string,
+  ): Promise<TestResponse<LoginResponseBody>> {
+    const response = await this.request
+      .post('/auth/refresh')
+      .send({ refreshToken });
+    return response as unknown as TestResponse<LoginResponseBody>;
+  }
+
+  async registerAndLogin(userData: RegisterDto): Promise<{
+    registerResponse: TestResponse<RegisterResponseBody>;
+    loginResponse: TestResponse<LoginResponseBody>;
+  }> {
     const registerResponse = await this.register(userData);
     const loginResponse = await this.login(userData.email, userData.password);
     return {
-      accessToken: loginResponse.accessToken,
-      refreshToken: loginResponse.refreshToken,
-      userId: registerResponse.user.id,
+      registerResponse,
+      loginResponse,
     };
+  }
+
+  async logout(accessToken: string): Promise<TestResponse<LogoutResponseBody>> {
+    const response = await this.request
+      .post('/auth/logout')
+      .set('Authorization', `Bearer ${accessToken}`);
+    return response as unknown as TestResponse<LogoutResponseBody>;
   }
 }
