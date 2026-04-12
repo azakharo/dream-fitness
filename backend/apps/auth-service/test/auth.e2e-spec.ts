@@ -236,14 +236,16 @@ describe('AuthController (e2e)', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should throw 401 when refresh token is expired', async () => {
+    it('should throw 400 when refresh token is expired', async () => {
       const response = await authHelper.refresh('expired-token');
 
       expect(response.status).toBe(400);
     });
 
     it('should throw 400 when request body is missing', async () => {
-      const response = await authHelper.refresh('');
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const response = await authHelper.refresh();
 
       expect(response.status).toBe(400);
     });
