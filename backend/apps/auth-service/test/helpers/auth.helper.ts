@@ -1,26 +1,27 @@
 import request from 'supertest';
 import { User } from '../../src/users/entities/user.entity';
-import { RegisterDto } from '@app/contracts';
+import { LoginResponseDto, RegisterDto } from '@app/contracts';
+
+type RegisterResponse = {
+  user: Omit<User, 'password'>;
+  tokens: LoginResponseDto;
+};
 
 export class AuthHelper {
   constructor(private request: request.SuperTest<request.Test>) {}
 
-  async register(userData: RegisterDto): Promise<{
-    user: Omit<User, 'password'>;
-    tokens: { accessToken: string; refreshToken: string };
-  }> {
+  async register(userData: RegisterDto): Promise<RegisterResponse> {
     const response = await this.request.post('/auth/register').send(userData);
-    return response.body;
+    expect(response.status).toBe(201);
+    return response.body as RegisterResponse;
   }
 
-  async login(
-    email: string,
-    password: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(email: string, password: string): Promise<LoginResponseDto> {
     const response = await this.request
       .post('/auth/login')
       .send({ email, password });
-    return response.body;
+    expect(response.status).toBe(200);
+    return response.body as LoginResponseDto;
   }
 
   async registerAndLogin(
