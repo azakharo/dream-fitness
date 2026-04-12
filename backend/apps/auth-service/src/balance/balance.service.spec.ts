@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { BalanceService } from './balance.service';
-import { Transaction } from './entities/transaction.entity';
+import { Transaction, TransactionType } from './entities/transaction.entity';
 import { TransactionRepository } from './repositories/transaction.repository';
 import { UserRepository } from '../users/repositories/user.repository';
 import { DepositDto } from './dto/deposit.dto';
@@ -10,39 +10,53 @@ import { ReserveDto } from './dto/reserve.dto';
 import { ReleaseDto } from './dto/release.dto';
 import { RefundDto } from './dto/refund.dto';
 import { TransactionResponseDto } from './dto/transaction-response.dto';
-import { TransactionListResponseDto } from './dto/transaction-list-response.dto';
 import { InsufficientBalanceException } from '../common/exceptions/insufficient-balance.exception';
 import { NotFoundException } from '@nestjs/common';
+import { EventsPublisher } from '../events/events.publisher';
+import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
+import { User } from '../users/entities/user.entity';
 
 describe('BalanceService', () => {
+  // Зачем тогда эти переменные?
+  // Это распространённый паттерн в NestJS-тестах.
+  // Переменные существуют на случай, если в будущем понадобится обратиться к
+  // реальным экземплярам (например, для проверки spies или прямых вызовов).
+  // Но сейчас они — просто «заглушки» без использования.
   let service: BalanceService;
-  let transactionRepository: any;
-  let userRepository: any;
-  let dataSource: any;
-  let eventsPublisher: any;
+  let transactionRepository: TransactionRepository; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let userRepository: UserRepository; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let dataSource: DataSource; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let eventsPublisher: EventsPublisher; // eslint-disable-line @typescript-eslint/no-unused-vars
 
-  const mockUser = {
+  const mockUser: User = {
     id: 'user-1',
     email: 'test@example.com',
+    password: 'hashed-password',
     name: 'Test User',
+    phone: '+1234567890',
+    birthDate: new Date('1990-01-01'),
+    gender: UserGender.MALE,
+    role: UserRole.CLIENT,
     balance: 100,
-    role: 'client',
-    status: 'active',
+    status: UserStatus.ACTIVE,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   const mockTransaction: Transaction = {
     id: 'transaction-1',
     userId: 'user-1',
-    type: 'deposit',
+    type: TransactionType.DEPOSIT,
     amount: 100,
     bookingId: null,
     description: 'Deposit',
     createdAt: new Date(),
+    user: mockUser,
   };
 
   const mockTransactionResponse: TransactionResponseDto = {
     id: 'transaction-1',
-    type: 'deposit',
+    type: TransactionType.DEPOSIT,
     amount: 100,
     bookingId: null,
     description: 'Deposit',
@@ -52,6 +66,7 @@ describe('BalanceService', () => {
   const mockTransactionRepository = {
     findByUserId: jest.fn(),
     findReserveByBookingId: jest.fn(),
+    createTransaction: jest.fn(),
   };
 
   const mockUserRepository = {
@@ -65,7 +80,18 @@ describe('BalanceService', () => {
   };
 
   const mockDataSource = {
-    transaction: jest.fn(),
+    transaction: jest.fn(
+      (callback: (manager: EntityManager) => Promise<unknown>) =>
+        callback(mockManager as unknown as EntityManager),
+    ),
+  };
+
+  const mockManager = {
+    save: jest
+      .fn()
+      .mockImplementation((entity: unknown, data: Record<string, unknown>) => {
+        return { ...data, id: 'transaction-1', createdAt: new Date() };
+      }),
   };
 
   beforeEach(async () => {
@@ -73,7 +99,7 @@ describe('BalanceService', () => {
       providers: [
         BalanceService,
         {
-          provide: getRepositoryToken(Transaction),
+          provide: TransactionRepository,
           useValue: mockTransactionRepository,
         },
         {
@@ -104,9 +130,10 @@ describe('BalanceService', () => {
     };
 
     it('should successfully deposit and return TransactionResponseDto', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue(
         mockUser,
@@ -140,9 +167,10 @@ describe('BalanceService', () => {
     });
 
     it('should throw NotFoundException when user not found', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue(
         undefined,
@@ -165,9 +193,10 @@ describe('BalanceService', () => {
     };
 
     it('should successfully reserve and return transaction type=reserve', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue(
         mockUser,
@@ -199,9 +228,10 @@ describe('BalanceService', () => {
     });
 
     it('should throw InsufficientBalanceException when insufficient balance', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue({
         ...mockUser,
@@ -217,9 +247,10 @@ describe('BalanceService', () => {
     });
 
     it('should throw NotFoundException when user not found', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue(
         undefined,
@@ -242,9 +273,10 @@ describe('BalanceService', () => {
     };
 
     it('should successfully release and return transaction type=release', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue(
         mockUser,
@@ -275,9 +307,10 @@ describe('BalanceService', () => {
     });
 
     it('should throw NotFoundException when reserve not found', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue(
         mockUser,
@@ -303,9 +336,10 @@ describe('BalanceService', () => {
     };
 
     it('should successfully refund and return transaction type=refund', async () => {
-      const manager = {};
-      mockDataSource.transaction.mockImplementation(async (callback) =>
-        callback(manager),
+      const manager = {} as EntityManager;
+      mockDataSource.transaction.mockImplementation(
+        (callback: (manager: EntityManager) => Promise<unknown>) =>
+          callback(manager),
       );
       mockUserRepository.findByIdWithBalanceForUpdate.mockResolvedValue(
         mockUser,
