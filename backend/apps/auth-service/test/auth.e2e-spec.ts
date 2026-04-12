@@ -219,18 +219,15 @@ describe('AuthController (e2e)', () => {
   describe('POST /auth/refresh', () => {
     it('should refresh tokens successfully', async () => {
       const userData = createRegisterDto();
-      const loginResponse = await authHelper.login(
-        userData.email,
-        userData.password,
+      const regResp = await authHelper.register(userData);
+
+      const refreshResp = await authHelper.refresh(
+        regResp.body.tokens.refreshToken,
       );
 
-      const response = await authHelper.refresh(
-        loginResponse.body.refreshToken,
-      );
-
-      expect(response.status).toBe(200);
-      expect(response.body.accessToken).toBeDefined();
-      expect(response.body.refreshToken).toBeDefined();
+      expect(refreshResp.status).toBe(200);
+      expect(refreshResp.body.accessToken).toBeDefined();
+      expect(refreshResp.body.refreshToken).toBeDefined();
     });
 
     it('should throw 401 when refresh token is invalid', async () => {
