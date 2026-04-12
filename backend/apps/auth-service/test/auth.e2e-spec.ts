@@ -267,12 +267,9 @@ describe('AuthController (e2e)', () => {
   describe('POST /auth/logout', () => {
     it('should logout successfully with valid access token', async () => {
       const userData = createRegisterDto();
-      const loginResponse = await authHelper.login(
-        userData.email,
-        userData.password,
-      );
+      const regResp = await authHelper.register(userData);
 
-      const response = await authHelper.logout(loginResponse.body.accessToken);
+      const response = await authHelper.logout(regResp.body.tokens.accessToken);
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Logout successful');
