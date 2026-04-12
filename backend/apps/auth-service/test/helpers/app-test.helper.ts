@@ -1,15 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ValidationPipe } from '@nestjs/common';
+import {
+  ValidationPipe,
+  INestApplication,
+  ValidationPipeOptions,
+} from '@nestjs/common';
 import { AppModule } from '../../src/app.module';
 import { MockEventsModule } from '../mocks/events.module.mock';
 import { DataSource } from 'typeorm';
-import { INestApplication, ValidationPipeOptions } from '@nestjs/common';
+import { Server } from 'node:http';
 import request from 'supertest';
 
 export class AppTestHelper {
   private app: INestApplication;
   private dataSource: DataSource;
-  private httpServer: any;
+  private httpServer: Server;
   private request: request.SuperTest<request.Test>;
 
   async init(): Promise<void> {
@@ -33,8 +37,10 @@ export class AppTestHelper {
     await this.app.init();
 
     this.dataSource = moduleFixture.get<DataSource>(DataSource);
-    this.httpServer = this.app.getHttpServer();
-    this.request = request(this.httpServer);
+    this.httpServer = this.app.getHttpServer() as Server;
+    this.request = request(
+      this.httpServer,
+    ) as unknown as request.SuperTest<request.Test>;
   }
 
   async cleanup(): Promise<void> {
@@ -43,7 +49,7 @@ export class AppTestHelper {
     }
   }
 
-  getHttpServer(): any {
+  getHttpServer(): Server {
     return this.httpServer;
   }
 
