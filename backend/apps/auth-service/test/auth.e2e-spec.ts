@@ -55,7 +55,7 @@ describe('AuthController (e2e)', () => {
       expect(response.body.user.email).toBe('fulluser@example.com');
       expect(response.body.user.name).toBe('Full User');
       expect(response.body.user.phone).toBe('+79001234567');
-      expect(response.body.user.birthDate).toBeInstanceOf(Date);
+      expect(response.body.user.birthDate).toBe('1990-01-01T00:00:00.000Z');
       expect(response.body.user.gender).toBe(UserGender.MALE);
       expect(response.body.tokens).toBeDefined();
     });

@@ -58,12 +58,12 @@ export class UserDto {
   email: string;
   name: string;
   phone: string | null;
-  birthDate: Date | null;
+  birthDate: string | null;
   gender: UserGender | null;
   role: UserRole;
   balance: number;
   status: UserStatus;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export class UserProfileDto {
@@ -71,13 +71,13 @@ export class UserProfileDto {
   email: string;
   name: string;
   phone: string | null;
-  birthDate: Date | null;
+  birthDate: string | null;
   gender: UserGender | null;
   role: UserRole;
   balance: number;
   status: UserStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export class UpdateBalanceDto {
