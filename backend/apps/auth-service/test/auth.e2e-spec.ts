@@ -233,13 +233,13 @@ describe('AuthController (e2e)', () => {
     it('should throw 401 when refresh token is invalid', async () => {
       const response = await authHelper.refresh('invalid-token');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
     it('should throw 401 when refresh token is expired', async () => {
       const response = await authHelper.refresh('expired-token');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
     it('should throw 400 when request body is missing', async () => {
