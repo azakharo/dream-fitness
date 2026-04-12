@@ -7,6 +7,8 @@ import {
   Query,
   UsePipes,
   ValidationPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -33,6 +35,7 @@ export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
   @Post('balance/deposit')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deposit funds to user balance' })
@@ -47,6 +50,7 @@ export class BalanceController {
   }
 
   @Post('balance/reserve')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Reserve funds for a booking' })
@@ -61,6 +65,7 @@ export class BalanceController {
   }
 
   @Post('balance/release')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Release reserved funds back to balance' })
@@ -75,6 +80,7 @@ export class BalanceController {
   }
 
   @Post('balance/refund')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Refund funds to user balance' })
