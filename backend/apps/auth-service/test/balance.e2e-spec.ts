@@ -155,6 +155,9 @@ describe('BalanceController (e2e)', () => {
       );
 
       expect(response.status).toBe(400);
+      // Expected
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       expect(response.body.message).toContain('Insufficient balance');
     });
 
@@ -174,6 +177,9 @@ describe('BalanceController (e2e)', () => {
       );
 
       expect(response.status).toBe(400);
+      // Expected
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       expect(response.body.message).toContain('Insufficient balance');
     });
 
@@ -472,7 +478,7 @@ describe('BalanceController (e2e)', () => {
       expect(balanceResp1.status).toBe(200);
       expect(balanceResp1.body.balance).toBe(1000);
 
-      const reservResp = await balanceHelper.reserve(
+      const reserveResp = await balanceHelper.reserve(
         accessToken,
         createReserveDto({
           userId,
@@ -481,9 +487,9 @@ describe('BalanceController (e2e)', () => {
         }),
       );
 
-      expect(reservResp.status).toBe(200);
-      expect(reservResp.body.type).toBe('reserve');
-      expect(reservResp.body.amount).toBe(100);
+      expect(reserveResp.status).toBe(200);
+      expect(reserveResp.body.type).toBe('reserve');
+      expect(reserveResp.body.amount).toBe(100);
 
       const balanceResp2 = await balanceHelper.getBalance(accessToken);
 
