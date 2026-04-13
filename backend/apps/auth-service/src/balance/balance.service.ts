@@ -27,9 +27,10 @@ export class BalanceService {
   ) {}
 
   async deposit(depositDto: DepositDto): Promise<TransactionResponseDto> {
+    const { userId, amount, description } = depositDto;
     return this.dataSource.transaction(async (manager) => {
       const user = await this.userRepository.findByIdWithBalanceForUpdate(
-        depositDto.userId,
+        userId,
         manager,
       );
       if (!user) {
@@ -38,26 +39,22 @@ export class BalanceService {
       const oldBalance = user.balance;
 
       const transaction = await manager.save(Transaction, {
-        userId: depositDto.userId,
+        userId,
         type: TransactionType.DEPOSIT,
-        amount: depositDto.amount,
-        description: depositDto.description || 'Deposit',
+        amount,
+        description: description || 'Deposit',
       });
 
-      await this.userRepository.updateBalance(
-        depositDto.userId,
-        depositDto.amount,
-        manager,
-      );
+      await this.userRepository.updateBalance(userId, amount, manager);
 
-      const newBalance = oldBalance + depositDto.amount;
+      const newBalance = oldBalance + amount;
 
       await this.eventsPublisher.publishBalanceChanged({
-        userId: depositDto.userId,
+        userId,
         oldBalance,
         newBalance,
-        amount: depositDto.amount,
-        description: depositDto.description || 'Deposit',
+        amount,
+        description: description || 'Deposit',
       });
 
       return this.mapToResponseDto(transaction);
@@ -109,9 +106,10 @@ export class BalanceService {
   }
 
   async release(releaseDto: ReleaseDto): Promise<TransactionResponseDto> {
+    const { userId, bookingId, amount } = releaseDto;
     return this.dataSource.transaction(async (manager) => {
       const user = await this.userRepository.findByIdWithBalanceForUpdate(
-        releaseDto.userId,
+        userId,
         manager,
       );
       if (!user) {
@@ -122,38 +120,34 @@ export class BalanceService {
       // Find the reserve transaction for this booking
       const reserveTransaction =
         await this.transactionRepository.findReserveByBookingId(
-          releaseDto.userId,
-          releaseDto.bookingId,
+          userId,
+          bookingId,
         );
 
       if (!reserveTransaction) {
         throw new NotFoundException(
-          `Reserve transaction not found for booking ${releaseDto.bookingId}`,
+          `Reserve transaction not found for booking ${bookingId}`,
         );
       }
 
       const transaction = await manager.save(Transaction, {
-        userId: releaseDto.userId,
+        userId,
         type: TransactionType.RELEASE,
-        amount: releaseDto.amount,
-        bookingId: releaseDto.bookingId,
-        description: `Release reserve for booking ${releaseDto.bookingId}`,
+        amount,
+        bookingId,
+        description: `Release reserve for booking ${bookingId}`,
       });
 
-      await this.userRepository.updateBalance(
-        releaseDto.userId,
-        releaseDto.amount,
-        manager,
-      );
+      await this.userRepository.updateBalance(userId, amount, manager);
 
-      const newBalance = oldBalance + releaseDto.amount;
+      const newBalance = oldBalance + amount;
 
       await this.eventsPublisher.publishBalanceChanged({
-        userId: releaseDto.userId,
+        userId,
         oldBalance,
         newBalance,
-        amount: releaseDto.amount,
-        description: `Release reserve for booking ${releaseDto.bookingId}`,
+        amount,
+        description: `Release reserve for booking ${bookingId}`,
       });
 
       return this.mapToResponseDto(transaction);
@@ -161,13 +155,14 @@ export class BalanceService {
   }
 
   async refund(refundDto: RefundDto): Promise<TransactionResponseDto> {
+    const { userId, amount, bookingId } = refundDto;
     return this.dataSource.transaction(async (manager) => {
-      if (!refundDto.bookingId) {
+      if (!bookingId) {
         throw new BadRequestException('Booking ID is missing');
       }
 
       const user = await this.userRepository.findByIdWithBalanceForUpdate(
-        refundDto.userId,
+        userId,
         manager,
       );
       if (!user) {
@@ -176,27 +171,23 @@ export class BalanceService {
       const oldBalance = user.balance;
 
       const transaction = await manager.save(Transaction, {
-        userId: refundDto.userId,
+        userId,
         type: TransactionType.REFUND,
-        amount: refundDto.amount,
-        bookingId: refundDto.bookingId,
-        description: `Refund for booking ${refundDto.bookingId}`,
+        amount,
+        bookingId,
+        description: `Refund for booking ${bookingId}`,
       });
 
-      await this.userRepository.updateBalance(
-        refundDto.userId,
-        refundDto.amount,
-        manager,
-      );
+      await this.userRepository.updateBalance(userId, amount, manager);
 
-      const newBalance = oldBalance + refundDto.amount;
+      const newBalance = oldBalance + amount;
 
       await this.eventsPublisher.publishBalanceChanged({
-        userId: refundDto.userId,
+        userId,
         oldBalance,
         newBalance,
-        amount: refundDto.amount,
-        description: `Refund for booking ${refundDto.bookingId}`,
+        amount,
+        description: `Refund for booking ${bookingId}`,
       });
 
       return this.mapToResponseDto(transaction);
