@@ -121,12 +121,12 @@ describe('BalanceController (e2e)', () => {
     });
 
     it('should decrease balance after reserve', async () => {
-      const depositResp = await balanceHelper.deposit(
+      await balanceHelper.deposit(
         accessToken,
         createDepositDto({ userId, amount: 1000 }),
       );
 
-      await balanceHelper.reserve(
+      const reserveResp = await balanceHelper.reserve(
         accessToken,
         createReserveDto({
           userId,
@@ -134,9 +134,9 @@ describe('BalanceController (e2e)', () => {
           amount: 100,
         }),
       );
-      expect(depositResp.status).toBe(200);
-      expect(depositResp.body.type).toBe('reserve');
-      expect(depositResp.body.amount).toBe(100);
+      expect(reserveResp.status).toBe(200);
+      expect(reserveResp.body.type).toBe('reserve');
+      expect(reserveResp.body.amount).toBe(100);
 
       const balanceResp = await balanceHelper.getBalance(accessToken);
 
