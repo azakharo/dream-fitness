@@ -7,7 +7,7 @@ import {
   LogoutResponseBody,
 } from '@app/contracts';
 
-type TestResponse<T> = Omit<Response, 'body'> & {
+export type TestResponse<T> = Omit<Response, 'body'> & {
   body: T;
 };
 
@@ -49,6 +49,18 @@ export class AuthHelper {
     return {
       registerResponse,
       loginResponse,
+    };
+  }
+
+  async registerAndLoginFlat(
+    userData: RegisterDto,
+  ): Promise<{ accessToken: string; refreshToken: string; userId: string }> {
+    const { registerResponse, loginResponse } =
+      await this.registerAndLogin(userData);
+    return {
+      accessToken: loginResponse.body.accessToken,
+      refreshToken: loginResponse.body.refreshToken,
+      userId: registerResponse.body.user.id,
     };
   }
 
