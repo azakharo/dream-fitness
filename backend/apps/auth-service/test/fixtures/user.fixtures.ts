@@ -57,8 +57,8 @@ export function createReserveDto(overrides?: Partial<ReserveDto>): ReserveDto {
 
 export function createReleaseDto(overrides?: Partial<ReleaseDto>): ReleaseDto {
   return {
-    userId: '00000000-0000-0000-0000-000000000000',
-    bookingId: '00000000-0000-0000-0000-000000000000',
+    userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+    bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
     amount: 50,
     ...overrides,
   };
@@ -66,8 +66,8 @@ export function createReleaseDto(overrides?: Partial<ReleaseDto>): ReleaseDto {
 
 export function createRefundDto(overrides?: Partial<RefundDto>): RefundDto {
   return {
-    userId: '00000000-0000-0000-0000-000000000000',
-    bookingId: '00000000-0000-0000-0000-000000000000',
+    userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+    bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
     amount: 50,
     ...overrides,
   };

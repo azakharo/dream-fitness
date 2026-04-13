@@ -184,10 +184,14 @@ describe('BalanceController (e2e)', () => {
     });
 
     it('should return 400 when bookingId is missing', async () => {
-      const response = await balanceHelper.reserve(
-        accessToken,
-        createReserveDto({ userId, amount: 100 }),
-      );
+      const response = await balanceHelper.reserve(accessToken, {
+        userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+        // Expected because the bookingId is missing
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        bookingId: undefined,
+        amount: 50,
+      });
 
       expect(response.status).toBe(400);
     });
@@ -348,10 +352,13 @@ describe('BalanceController (e2e)', () => {
     });
 
     it('should return 400 when bookingId is missing', async () => {
-      const response = await balanceHelper.refund(
-        accessToken,
-        createRefundDto({ userId, amount: 100 }),
-      );
+      const response = await balanceHelper.refund(accessToken, {
+        userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        bookingId: undefined,
+        amount: 50,
+      });
 
       expect(response.status).toBe(400);
     });

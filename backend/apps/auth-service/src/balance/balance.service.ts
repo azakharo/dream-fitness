@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TransactionRepository } from './repositories/transaction.repository';
 import { Transaction, TransactionType } from './entities/transaction.entity';
@@ -62,40 +66,42 @@ export class BalanceService {
 
   async reserve(reserveDto: ReserveDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
+      const { userId, bookingId, amount } = reserveDto;
+
+      if (!bookingId) {
+        throw new BadRequestException('Booking ID is missing');
+      }
+
       const user = await this.userRepository.findByIdWithBalanceForUpdate(
-        reserveDto.userId,
+        userId,
         manager,
       );
       if (!user) {
         throw new NotFoundException('User not found');
       }
       const oldBalance = user.balance;
-      if (oldBalance < reserveDto.amount) {
-        throw new InsufficientBalanceException(oldBalance, reserveDto.amount);
+      if (oldBalance < amount) {
+        throw new InsufficientBalanceException(oldBalance, amount);
       }
 
       const transaction = await manager.save(Transaction, {
-        userId: reserveDto.userId,
+        userId,
         type: TransactionType.RESERVE,
-        amount: reserveDto.amount,
-        bookingId: reserveDto.bookingId,
-        description: `Reserve for booking ${reserveDto.bookingId}`,
+        amount,
+        bookingId,
+        description: `Reserve for booking ${bookingId}`,
       });
 
-      await this.userRepository.updateBalance(
-        reserveDto.userId,
-        -reserveDto.amount,
-        manager,
-      );
+      await this.userRepository.updateBalance(userId, -amount, manager);
 
-      const newBalance = oldBalance - reserveDto.amount;
+      const newBalance = oldBalance - amount;
 
       await this.eventsPublisher.publishBalanceChanged({
-        userId: reserveDto.userId,
+        userId,
         oldBalance,
         newBalance,
-        amount: reserveDto.amount,
-        description: `Reserve for booking ${reserveDto.bookingId}`,
+        amount,
+        description: `Reserve for booking ${bookingId}`,
       });
 
       return this.mapToResponseDto(transaction);
@@ -156,6 +162,10 @@ export class BalanceService {
 
   async refund(refundDto: RefundDto): Promise<TransactionResponseDto> {
     return this.dataSource.transaction(async (manager) => {
+      if (!refundDto.bookingId) {
+        throw new BadRequestException('Booking ID is missing');
+      }
+
       const user = await this.userRepository.findByIdWithBalanceForUpdate(
         refundDto.userId,
         manager,
