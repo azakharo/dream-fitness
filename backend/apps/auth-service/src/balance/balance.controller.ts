@@ -5,8 +5,6 @@ import {
   Body,
   UseGuards,
   Query,
-  UsePipes,
-  ValidationPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -42,7 +40,6 @@ export class BalanceController {
   @ApiOkResponse({ type: TransactionResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: DepositDto })
-  @UsePipes(new ValidationPipe({ transform: true }))
   async deposit(
     @Body() depositDto: DepositDto,
   ): Promise<TransactionResponseDto> {
@@ -57,7 +54,6 @@ export class BalanceController {
   @ApiOkResponse({ type: TransactionResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: ReserveDto })
-  @UsePipes(new ValidationPipe({ transform: true }))
   async reserve(
     @Body() reserveDto: ReserveDto,
   ): Promise<TransactionResponseDto> {
@@ -72,7 +68,6 @@ export class BalanceController {
   @ApiOkResponse({ type: TransactionResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: ReleaseDto })
-  @UsePipes(new ValidationPipe({ transform: true }))
   async release(
     @Body() releaseDto: ReleaseDto,
   ): Promise<TransactionResponseDto> {
@@ -87,7 +82,6 @@ export class BalanceController {
   @ApiOkResponse({ type: TransactionResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: RefundDto })
-  @UsePipes(new ValidationPipe({ transform: true }))
   async refund(@Body() refundDto: RefundDto): Promise<TransactionResponseDto> {
     return this.balanceService.refund(refundDto);
   }

@@ -99,7 +99,7 @@ describe('BalanceController (e2e)', () => {
         const response = await balanceHelper.deposit(
           'invalid-token',
           createDepositDto({
-            userId: '00000000-0000-0000-0000-000000000000',
+            userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
             amount: 500,
           }),
         );
@@ -130,7 +130,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReserveDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 100,
         }),
       );
@@ -149,7 +149,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReserveDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
           amount: 100,
         }),
       );
@@ -171,7 +171,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReserveDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 200,
         }),
       );
@@ -206,8 +206,8 @@ describe('BalanceController (e2e)', () => {
         const response = await balanceHelper.reserve(
           'invalid-token',
           createReserveDto({
-            userId: '00000000-0000-0000-0000-000000000000',
-            bookingId: '00000000-0000-0000-0000-000000000001',
+            userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+            bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
             amount: 100,
           }),
         );
@@ -238,7 +238,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReserveDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 100,
         }),
       );
@@ -247,7 +247,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReleaseDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 100,
         }),
       );
@@ -266,7 +266,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReleaseDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 100,
         }),
       );
@@ -288,8 +288,8 @@ describe('BalanceController (e2e)', () => {
         const response = await balanceHelper.release(
           'invalid-token',
           createReleaseDto({
-            userId: '00000000-0000-0000-0000-000000000000',
-            bookingId: '00000000-0000-0000-0000-000000000001',
+            userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+            bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
             amount: 100,
           }),
         );
@@ -320,7 +320,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createRefundDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 100,
         }),
       );
@@ -339,7 +339,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createRefundDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 0,
         }),
       );
@@ -361,8 +361,8 @@ describe('BalanceController (e2e)', () => {
         const response = await balanceHelper.refund(
           'invalid-token',
           createRefundDto({
-            userId: '00000000-0000-0000-0000-000000000000',
-            bookingId: '00000000-0000-0000-0000-000000000001',
+            userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+            bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
             amount: 100,
           }),
         );
@@ -482,7 +482,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReserveDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 100,
         }),
       );
@@ -500,7 +500,7 @@ describe('BalanceController (e2e)', () => {
         accessToken,
         createReleaseDto({
           userId,
-          bookingId: '00000000-0000-0000-0000-000000000001',
+          bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
           amount: 100,
         }),
       );

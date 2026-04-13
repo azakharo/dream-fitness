@@ -40,7 +40,7 @@ export function createLoginDto(overrides?: {
 
 export function createDepositDto(overrides?: Partial<DepositDto>): DepositDto {
   return {
-    userId: '00000000-0000-0000-0000-000000000000',
+    userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
     amount: 100,
     ...overrides,
   };
@@ -48,8 +48,8 @@ export function createDepositDto(overrides?: Partial<DepositDto>): DepositDto {
 
 export function createReserveDto(overrides?: Partial<ReserveDto>): ReserveDto {
   return {
-    userId: '00000000-0000-0000-0000-000000000000',
-    bookingId: '00000000-0000-0000-0000-000000000000',
+    userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+    bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
     amount: 50,
     ...overrides,
   };
