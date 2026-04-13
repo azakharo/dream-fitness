@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "inputs": [
+    {
+      "id": "testName",
+      "type": "promptString",
+      "description": "Test name pattern (regex)",
+      "default": ""
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Debug Auth E2E Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.js",
+      "args": [
+        "--config",
+        "backend/apps/auth-service/test/jest-e2e.json",
+        "--runInBand"
+      ],
+      "envFile": "${workspaceFolder}/backend/.env.test",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Debug Current E2E Test File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.js",
+      "args": [
+        "--config",
+        "backend/apps/auth-service/test/jest-e2e.json",
+        "--runInBand",
+        "${relativeFile}"
+      ],
+      "envFile": "${workspaceFolder}/backend/.env.test",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Debug Single Test by Name",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.js",
+      "args": [
+        "--config",
+        "backend/apps/auth-service/test/jest-e2e.json",
+        "--runInBand",
+        "--testNamePattern",
+        "${input:testName}",
+        "${relativeFile}"
+      ],
+      "envFile": "${workspaceFolder}/backend/.env.test",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}
