@@ -17,4 +17,8 @@ export class ConfigService {
   getDatabaseConfig(): DatabaseConfig {
     return this.dbConfig;
   }
+
+  get(key: string): string | undefined {
+    return process.env[key];
+  }
 }
