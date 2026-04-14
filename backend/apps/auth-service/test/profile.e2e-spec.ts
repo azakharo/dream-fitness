@@ -115,7 +115,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(200);
       expect(response.body.name).toBe('Full Name');
       expect(response.body.phone).toBe('+79001234567');
-      expect(response.body.birthDate).toBeInstanceOf(Date);
+      expect(response.body.birthDate).toBe('1990-01-01T00:00:00.000Z');
       expect(response.body.gender).toBe(UserGender.MALE);
     });
 

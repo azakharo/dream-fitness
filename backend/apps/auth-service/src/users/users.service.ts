@@ -17,7 +17,7 @@ export class UsersService {
       email: user.email,
       name: user.name,
       phone: user.phone,
-      birthDate: user.birthDate ? user.birthDate.toISOString() : null,
+      birthDate: user.birthDate ? new Date(user.birthDate).toISOString() : null,
       gender: user.gender,
       role: user.role,
       balance: user.balance,

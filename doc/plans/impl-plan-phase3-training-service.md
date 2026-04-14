@@ -590,7 +590,7 @@ export class TrainingsModule {}
 **Логика getWeekSchedule:**
 
 ```
-1. Определить startOfWeek (понедельник) и endOfWeek (воскресенье)
+1. Определить startOfWeek (понедельник начало дня) и endOfWeek (воскресенье конец дня)
 2. Получить все тренировки в этом диапазоне через repository
 3. Сгруппировать по дням
 4. Для каждой тренировки добавить trainer info
