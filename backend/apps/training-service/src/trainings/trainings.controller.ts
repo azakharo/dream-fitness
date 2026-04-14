@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -52,7 +53,7 @@ export class TrainingsController {
   @ApiOkResponse({ type: [TrainingResponseDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(
-    @Body() filterDto: TrainingFilterDto,
+    @Query() filterDto: TrainingFilterDto,
   ): Promise<{ data: TrainingResponseDto[]; total: number }> {
     return this.trainingsService.findAll(filterDto);
   }

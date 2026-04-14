@@ -64,7 +64,7 @@ export class TrainingRepository extends Repository<Training> {
 
     const [data, total] = await queryBuilder
       .orderBy('training.scheduledAt', 'ASC')
-      .skip((filterDto.page || 1) * (filterDto.limit || 10))
+      .skip(((filterDto.page || 1) - 1) * (filterDto.limit || 10))
       .take(filterDto.limit || 10)
       .getManyAndCount();
 
