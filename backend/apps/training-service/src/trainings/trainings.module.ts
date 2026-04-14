@@ -11,6 +11,6 @@ import { EventsModule } from '../events/events.module';
   imports: [TypeOrmModule.forFeature([Training]), TrainersModule, EventsModule],
   providers: [TrainingsService, TrainingRepository],
   controllers: [TrainingsController],
-  exports: [TrainingsService],
+  exports: [TrainingsService, TrainingRepository],
 })
 export class TrainingsModule {}
