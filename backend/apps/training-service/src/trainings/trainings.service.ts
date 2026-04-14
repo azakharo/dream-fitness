@@ -125,9 +125,13 @@ export class TrainingsService {
       }
     }
 
+    // Only include fields from DTO that are defined (not undefined)
+    const updateData = Object.fromEntries(
+      Object.entries(dto).filter(([, value]) => value !== undefined),
+    );
     const updatedTraining = await this.trainingRepository.save({
       ...training,
-      ...dto,
+      ...updateData,
     } as DeepPartial<Training>);
     const response = this.toResponseDto(updatedTraining);
     await this.eventsPublisher.publishTrainingUpdated({
