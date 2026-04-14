@@ -68,10 +68,13 @@ export class TrainingsService {
       throw new ScheduleConflictException(dto.trainerId, dto.scheduledAt);
     }
 
-    const training = this.trainingRepository.create(
-      dto as DeepPartial<Training>,
-    );
+    const training = this.trainingRepository.create({
+      ...dto,
+      scheduledAt,
+    } as DeepPartial<Training>);
+
     const savedTraining = await this.trainingRepository.save(training);
+
     const response = this.toResponseDto(savedTraining);
     await this.eventsPublisher.publishTrainingCreated({
       trainingId: response.id,
