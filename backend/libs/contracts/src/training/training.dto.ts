@@ -1,97 +1,205 @@
 import {
   IsString,
   IsDateString,
-  IsNumber,
-  IsPositive,
+  IsInt,
   IsEnum,
   IsOptional,
   IsUUID,
   Min,
   Max,
+  MinLength,
+  MaxLength,
+  IsBoolean,
 } from 'class-validator';
+
+export enum TrainingType {
+  YOGA = 'yoga',
+  PILATES = 'pilates',
+  CROSSFIT = 'crossfit',
+  BOXING = 'boxing',
+  STRENGTH = 'strength',
+  CARDIO = 'cardio',
+  DANCE = 'dance',
+  STRETCHING = 'stretching',
+}
+
+export enum TrainingStatus {
+  SCHEDULED = 'scheduled',
+  CANCELLED = 'cancelled',
+  COMPLETED = 'completed',
+}
 
 export class CreateTrainingDto {
   @IsString()
+  @MinLength(2)
+  @MaxLength(255)
   title: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(1000)
   description?: string;
 
-  @IsDateString()
-  startTime: string;
-
-  @IsDateString()
-  endTime: string;
+  @IsEnum(TrainingType)
+  type: TrainingType;
 
   @IsUUID()
   trainerId: string;
 
-  @IsNumber()
-  @IsPositive()
+  @IsDateString()
+  scheduledAt: string;
+
+  @IsInt()
+  @Min(15)
+  @Max(480)
+  durationMinutes: number;
+
+  @IsInt()
   @Min(1)
   @Max(100)
-  maxParticipants: number;
+  capacity: number;
 
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  price?: number;
+  @IsInt()
+  @Min(0)
+  price: number;
 }
 
 export class UpdateTrainingDto {
   @IsOptional()
   @IsString()
+  @MinLength(2)
+  @MaxLength(255)
   title?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(1000)
   description?: string;
 
   @IsOptional()
-  @IsDateString()
-  startTime?: string;
+  @IsEnum(TrainingType)
+  type?: TrainingType;
+
+  @IsOptional()
+  @IsUUID()
+  trainerId?: string;
 
   @IsOptional()
   @IsDateString()
-  endTime?: string;
+  scheduledAt?: string;
 
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
+  @IsInt()
+  @Min(15)
+  @Max(480)
+  durationMinutes?: number;
+
+  @IsOptional()
+  @IsInt()
   @Min(1)
   @Max(100)
-  maxParticipants?: number;
+  capacity?: number;
 
   @IsOptional()
-  @IsNumber()
-  @IsPositive()
+  @IsInt()
+  @Min(0)
   price?: number;
 
   @IsOptional()
-  @IsEnum(['scheduled', 'cancelled', 'completed'])
-  status?: 'scheduled' | 'cancelled' | 'completed';
+  @IsEnum(TrainingStatus)
+  status?: TrainingStatus;
 }
 
-export class TrainingDto {
+export class TrainingResponseDto {
   id: string;
   title: string;
-  description?: string;
-  startTime: Date;
-  endTime: Date;
+  description: string | null;
+  type: TrainingType;
   trainerId: string;
-  maxParticipants: number;
+  trainerName?: string;
+  scheduledAt: string;
+  durationMinutes: number;
+  capacity: number;
   currentParticipants: number;
+  availableSlots: number;
   price: number;
-  status: 'scheduled' | 'cancelled' | 'completed';
-  createdAt: Date;
-  updatedAt: Date;
+  status: TrainingStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export class TrainerDto {
+export class CreateTrainerDto {
+  @IsString()
+  @MinLength(2)
+  @MaxLength(255)
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  bio?: string;
+
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
+}
+
+export class UpdateTrainerDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(255)
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  bio?: string;
+
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
+}
+
+export class TrainerResponseDto {
   id: string;
   name: string;
-  email: string;
-  specialization?: string;
-  createdAt: Date;
+  bio: string | null;
+  avatarUrl: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export class TrainingFilterDto {
+  @IsOptional()
+  @IsEnum(TrainingType)
+  type?: TrainingType;
+
+  @IsOptional()
+  @IsUUID()
+  trainerId?: string;
+
+  @IsOptional()
+  @IsDateString()
+  dateFrom?: string;
+
+  @IsOptional()
+  @IsDateString()
+  dateTo?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
 }
