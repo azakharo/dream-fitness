@@ -7,6 +7,6 @@ export interface JwtConfig {
 export const jwtConfig: JwtConfig = {
   JWT_SECRET:
     process.env.JWT_SECRET || 'default-secret-key-change-in-production',
-  JWT_ACCESS_TTL: '15m',
-  JWT_REFRESH_TTL: '7d',
+  JWT_ACCESS_TTL: process.env.JWT_ACCESS_TTL || '15m',
+  JWT_REFRESH_TTL: process.env.JWT_REFRESH_TTL || '7d',
 };
