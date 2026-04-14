@@ -3,7 +3,6 @@ import { TrainingRepository } from '../trainings/repositories/training.repositor
 import { TrainersService } from '../trainers/trainers.service';
 import { TrainerNotFoundException } from '../common/exceptions/trainer-not-found.exception';
 import { Training } from '../trainings/entities/training.entity';
-import { Trainer } from '../trainers/entities/trainer.entity';
 
 @Injectable()
 export class ScheduleService {
@@ -136,7 +135,7 @@ export class ScheduleService {
       capacity: training.capacity,
       price: training.price,
       trainerId: training.trainerId,
-      trainerName: (training.trainer as Trainer)?.name || 'Unknown',
+      trainerName: training.trainer?.name || 'Unknown',
     };
   }
 }

@@ -24,7 +24,8 @@ export class TrainingsService {
   ) {}
 
   private toResponseDto(training: Training): TrainingResponseDto {
-    const availableSlots = training.capacity - this.trainingRepository.countActiveBookings();
+    const availableSlots =
+      training.capacity - this.trainingRepository.countActiveBookings();
     return {
       id: training.id,
       trainerId: training.trainerId,
@@ -57,16 +58,19 @@ export class TrainingsService {
       throw new PastDateException();
     }
 
-    const trainerTrainings = await this.trainingRepository.findByTrainerAndDateRange(
-      dto.trainerId,
-      dto.scheduledAt,
-      dto.scheduledAt,
-    );
+    const trainerTrainings =
+      await this.trainingRepository.findByTrainerAndDateRange(
+        dto.trainerId,
+        dto.scheduledAt,
+        dto.scheduledAt,
+      );
     if (trainerTrainings.length > 0) {
       throw new ScheduleConflictException(dto.trainerId, dto.scheduledAt);
     }
 
-    const training = this.trainingRepository.create(dto as DeepPartial<Training>);
+    const training = this.trainingRepository.create(
+      dto as DeepPartial<Training>,
+    );
     const savedTraining = await this.trainingRepository.save(training);
     const response = this.toResponseDto(savedTraining);
     await this.eventsPublisher.publishTrainingCreated({
@@ -82,7 +86,10 @@ export class TrainingsService {
     return response;
   }
 
-  async update(id: string, dto: UpdateTrainingDto): Promise<TrainingResponseDto> {
+  async update(
+    id: string,
+    dto: UpdateTrainingDto,
+  ): Promise<TrainingResponseDto> {
     const training = await this.trainingRepository.findById(id);
     if (!training) {
       throw new TrainingNotFoundException(id);
@@ -101,13 +108,17 @@ export class TrainingsService {
         throw new TrainerNotActiveException(dto.trainerId);
       }
 
-      const trainerTrainings = await this.trainingRepository.findByTrainerAndDateRange(
-        dto.trainerId,
-        dto.scheduledAt || training.scheduledAt.toISOString(),
-        dto.scheduledAt || training.scheduledAt.toISOString(),
-      );
+      const trainerTrainings =
+        await this.trainingRepository.findByTrainerAndDateRange(
+          dto.trainerId,
+          dto.scheduledAt || training.scheduledAt.toISOString(),
+          dto.scheduledAt || training.scheduledAt.toISOString(),
+        );
       if (trainerTrainings.length > 0) {
-        throw new ScheduleConflictException(dto.trainerId, dto.scheduledAt || training.scheduledAt.toISOString());
+        throw new ScheduleConflictException(
+          dto.trainerId,
+          dto.scheduledAt || training.scheduledAt.toISOString(),
+        );
       }
     }
 
@@ -157,7 +168,8 @@ export class TrainingsService {
     page?: number;
     limit?: number;
   }): Promise<{ data: TrainingResponseDto[]; total: number }> {
-    const { data, total } = await this.trainingRepository.findWithFilters(filterDto);
+    const { data, total } =
+      await this.trainingRepository.findWithFilters(filterDto);
     return {
       data: data.map((training) => this.toResponseDto(training)),
       total,

@@ -59,9 +59,9 @@ export class TrainersService {
     } as DeepPartial<Trainer>);
   }
 
-  async findById(id: string): Promise<TrainerResponseDto | undefined> {
+  async findById(id: string): Promise<TrainerResponseDto | null> {
     const trainer = await this.trainerRepository.findById(id);
-    return trainer ? this.toResponseDto(trainer) : undefined;
+    return trainer ? this.toResponseDto(trainer) : null;
   }
 
   async findActive(): Promise<TrainerResponseDto[]> {

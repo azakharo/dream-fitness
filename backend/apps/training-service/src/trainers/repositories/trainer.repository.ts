@@ -15,17 +15,33 @@ export class TrainerRepository extends Repository<Trainer> {
     });
   }
 
-  async findById(id: string): Promise<Trainer | undefined> {
+  async findById(id: string): Promise<Trainer | null> {
     return this.findOne({
       where: { id },
-      select: ['id', 'name', 'bio', 'avatarUrl', 'isActive', 'createdAt', 'updatedAt'],
-    }) ?? undefined;
+      select: [
+        'id',
+        'name',
+        'bio',
+        'avatarUrl',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
   }
 
-  async findByName(name: string): Promise<Trainer | undefined> {
+  async findByName(name: string): Promise<Trainer | null> {
     return this.findOne({
       where: { name },
-      select: ['id', 'name', 'bio', 'avatarUrl', 'isActive', 'createdAt', 'updatedAt'],
-    }) ?? undefined;
+      select: [
+        'id',
+        'name',
+        'bio',
+        'avatarUrl',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
   }
 }

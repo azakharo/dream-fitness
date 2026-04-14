@@ -6,10 +6,11 @@ import {
   UpdateDateColumn,
   ManyToOne,
   Index,
+  JoinColumn,
 } from 'typeorm';
-import { Trainer } from '../trainers/entities/trainer.entity';
 import { TrainingType } from '@app/shared';
 import { TrainingStatus } from '@app/shared';
+import { Trainer } from '../../trainers/entities/trainer.entity';
 
 @Entity('trainings')
 @Index(['trainerId'])
@@ -32,7 +33,7 @@ export class Training {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ type: 'training_type_enum' })
+  @Column({ type: 'enum', enum: TrainingType, default: TrainingType.YOGA })
   type: TrainingType;
 
   @Column({ type: 'timestamp', name: 'scheduled_at' })
@@ -48,7 +49,8 @@ export class Training {
   price: number;
 
   @Column({
-    type: 'training_status_enum',
+    type: 'enum',
+    enum: TrainingStatus,
     default: TrainingStatus.SCHEDULED,
   })
   status: TrainingStatus;

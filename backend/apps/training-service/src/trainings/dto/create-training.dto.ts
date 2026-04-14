@@ -1,6 +1,7 @@
 import {
   IsString,
   IsOptional,
+  MinLength,
   MaxLength,
   IsEnum,
   IsUUID,
