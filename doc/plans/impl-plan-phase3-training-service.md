@@ -877,14 +877,6 @@ export class AppModule {}
 3. GET /schedule/trainer/:id → 200 OK (расписание тренера)
 4. GET /schedule/week — пустое расписание для недели без тренировок
 
-### 3.8.6. Unit тесты
-
-**Файлы:**
-
-- `backend/apps/training-service/src/trainers/trainers.service.spec.ts`
-- `backend/apps/training-service/src/trainings/trainings.service.spec.ts`
-- `backend/apps/training-service/src/schedule/schedule.service.spec.ts`
-
 ---
 
 ## Обновления shared libraries
