@@ -238,24 +238,71 @@ cd backend && npm i -S -E @nestjs/axios axios
 
 #### 4.1.1. ConfigModule и ConfigService
 
+Проект использует `@nestjs/config` для загрузки env-файлов на основе `NODE_ENV`:
+
+- `NODE_ENV` не задан → `.env.development`
+- `NODE_ENV=test` → `.env.test`
+- `NODE_ENV=production` → `.env.production`
+
+`app.module.ts` уже импортирует `ConfigModule` из `@nestjs/config` с `isGlobal: true`. Создать кастомный `ConfigService` для типизированного доступа к переменным.
+
 Создать `apps/booking-service/src/config/config.service.ts`:
 
 ```typescript
-interface ServiceUrls {
-  authServiceUrl: string;
-  trainingServiceUrl: string;
+import { Injectable } from "@nestjs/common";
+import { ConfigService as NestConfigService } from "@nestjs/config";
+
+@Injectable()
+export class ConfigService {
+  constructor(private readonly configService: NestConfigService) {}
+
+  getDatabaseConfig() {
+    return {
+      host: this.configService.get<string>("DATABASE_HOST", "localhost"),
+      port: this.configService.get<number>("DATABASE_PORT", 5432),
+      username: this.configService.get<string>("DATABASE_USER"),
+      password: this.configService.get<string>("DATABASE_PASSWORD"),
+      database: this.configService.get<string>("DATABASE_NAME", "dreamfitness"),
+    };
+  }
+
+  getAuthServiceUrl(): string {
+    return this.configService.get<string>(
+      "AUTH_SERVICE_URL",
+      "http://localhost:3001",
+    );
+  }
+
+  getTrainingServiceUrl(): string {
+    return this.configService.get<string>(
+      "TRAINING_SERVICE_URL",
+      "http://localhost:3002",
+    );
+  }
+
+  get(key: string): string | undefined {
+    return this.configService.get<string>(key);
+  }
 }
 ```
 
-ConfigService читает переменные окружения:
+Создать `apps/booking-service/src/config/config.module.ts`:
 
-- `AUTH_SERVICE_URL` (default: `http://localhost:3001`)
-- `TRAINING_SERVICE_URL` (default: `http://localhost:3002`)
-- Стандартные DB-переменные (`DATABASE_HOST`, `DATABASE_PORT`, etc.)
+```typescript
+import { Global, Module } from "@nestjs/common";
+import { ConfigService } from "./config.service";
 
-Создать `apps/booking-service/src/config/config.module.ts` — `@Global()` модуль по аналогии с auth-service.
+@Global()
+@Module({
+  providers: [ConfigService],
+  exports: [ConfigService],
+})
+export class ConfigModule {}
+```
 
-Обновить `.env.example` — добавить:
+> **Примечание:** `@nestjs/config` `ConfigModule.forRoot()` уже подключён в `app.module.ts` с `isGlobal: true`. Кастомный `ConfigModule` — это тонкая обёртка для предоставления типизированного `ConfigService`.
+
+Обновить `.env.example`, `.env.development`, `.env.test` — добавить:
 
 ```
 AUTH_SERVICE_URL=http://localhost:3001
@@ -280,10 +327,42 @@ TRAINING_SERVICE_URL=http://localhost:3002
 
 #### 4.1.5. Обновить app.module.ts
 
-Обновить `apps/booking-service/src/app.module.ts`:
+`apps/booking-service/src/app.module.ts` уже импортирует `ConfigModule` из `@nestjs/config`. Дополнить остальными модулями:
 
-- Импортировать: `ConfigModule`, `DatabaseModule`, `AuthModule`, `BookingsModule`, `WaitlistModule`, `CqrsModule`, `ClientsModule`, `EventsModule`
-- Зарегистрировать глобальные провайдеры: `HttpExceptionFilter`, `LoggingInterceptor`
+```typescript
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { DatabaseModule } from "./database/database.module";
+import { AuthModule } from "./auth/auth.module";
+import { BookingsModule } from "./bookings/bookings.module";
+import { WaitlistModule } from "./waitlist/waitlist.module";
+import { CqrsModule } from "./cqrs/cqrs.module";
+import { ClientsModule } from "./clients/clients.module";
+import { EventsModule } from "./events/events.module";
+import { HttpExceptionFilter, LoggingInterceptor } from "@app/shared";
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: `.env.${process.env.NODE_ENV || "development"}`,
+      isGlobal: true,
+    }),
+    DatabaseModule,
+    AuthModule,
+    BookingsModule,
+    WaitlistModule,
+    CqrsModule,
+    ClientsModule,
+    EventsModule,
+  ],
+  controllers: [],
+  providers: [
+    { provide: "APP_FILTER", useClass: HttpExceptionFilter },
+    { provide: "APP_INTERCEPTOR", useClass: LoggingInterceptor },
+  ],
+})
+export class AppModule {}
+```
 
 ---
 
@@ -1143,10 +1222,10 @@ export class BookingCqrsModule {}
 - `test/helpers/db.helper.ts` — очистка БД между тестами
 - `test/fixtures/booking.fixtures.ts` — тестовые данные
 - `test/mocks/events.module.mock.ts` — мок RabbitMQ для тестов
-- `test/mocks/auth-client.mock.ts` — мок AuthClientService для изолированных тестов
-- `test/mocks/training-client.mock.ts` — мок TrainingClientService
+- `test/mocks/auth-client.mock.ts` — provider-level мок AuthClientService
+- `test/mocks/training-client.mock.ts` — provider-level мок TrainingClientService
 
-> E2E тесты для booking flow требуют запущенных Auth и Training сервисов (или их моков). Для изолированных E2E тестов — использовать HTTP моки (nock или axios-mock-adapter).
+> **Стратегия мокирования:** E2E тесты booking-service используют provider-level моки для `AuthClientService` и `TrainingClientService` — по аналогии с существующим паттерном мокирования `EventsPublisher` в auth-service и training-service. Моки подключаются через `overrideProvider()` в `app-test.helper.ts`. Это позволяет тестировать полный pipeline (controller → guard → pipe → CQRS bus → handler) без запуска внешних сервисов, обеспечивая быстрые и детерминированные тесты. Сценарии ошибок (insufficient balance, timeout, service unavailable) легко эмулируются через `jest.fn().mockRejectedValue()`. Контракт между сервисами гарантируется через shared `@app/contracts` lib и TypeScript типы.
 
 **`test/jest-e2e.json`:**
 
@@ -1175,8 +1254,8 @@ export class BookingCqrsModule {}
 Добавить скрипты для E2E тестов booking-service:
 
 ```json
-"test:e2e:booking": "dotenv -e .env.test -- jest --config apps/booking-service/test/jest-e2e.json --runInBand",
-"test:e2e:booking:watch": "dotenv -e .env.test -- jest --config apps/booking-service/test/jest-e2e.json --watch --runInBand"
+"test:e2e:booking": "cross-env NODE_ENV=test jest --config apps/booking-service/test/jest-e2e.json --runInBand",
+"test:e2e:booking:watch": "cross-env NODE_ENV=test jest --config apps/booking-service/test/jest-e2e.json --watch --runInBand"
 ```
 
 ---

@@ -93,7 +93,7 @@ describe('TrainersController (e2e)', () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBe(2);
-      expect(response.body.every((t: any) => (t as any).isActive === true)).toBe(true);
+      expect(response.body.every((t: any) => t.isActive === true)).toBe(true);
     });
 
     it('should return only active trainers (exclude deactivated)', async () => {

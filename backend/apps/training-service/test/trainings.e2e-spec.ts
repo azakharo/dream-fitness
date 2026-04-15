@@ -311,7 +311,12 @@ describe('TrainingsController (e2e)', () => {
         .getRequest()
         .post('/trainings')
         .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerId, { type: TrainingType.YOGA, title: 'Yoga 1' }));
+        .send(
+          createTrainingDto(trainerId, {
+            type: TrainingType.YOGA,
+            title: 'Yoga 1',
+          }),
+        );
       await appHelper
         .getRequest()
         .post('/trainings')
@@ -326,7 +331,12 @@ describe('TrainingsController (e2e)', () => {
         .getRequest()
         .post('/trainings')
         .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerId, { type: TrainingType.YOGA, title: 'Yoga 2' }));
+        .send(
+          createTrainingDto(trainerId, {
+            type: TrainingType.YOGA,
+            title: 'Yoga 2',
+          }),
+        );
 
       const response = await appHelper
         .getRequest()

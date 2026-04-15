@@ -1,40 +1,21 @@
-import { Injectable, Inject } from '@nestjs/common';
-
-interface JwtConfig {
-  JWT_SECRET: string;
-  JWT_ACCESS_TTL: string;
-  JWT_REFRESH_TTL: string;
-}
-
-interface DatabaseConfig {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-}
+import { Injectable } from '@nestjs/common';
+import { ConfigService as NestConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConfigService {
-  constructor(
-    @Inject('JWT_CONFIG') private readonly jwtConfig: JwtConfig,
-    @Inject('DATABASE_CONFIG') private readonly dbConfig: DatabaseConfig,
-  ) {}
+  constructor(private readonly configService: NestConfigService) {}
 
   get(key: string): string {
-    if (key === 'JWT_SECRET') {
-      return this.jwtConfig.JWT_SECRET;
-    }
-    if (key === 'JWT_ACCESS_TTL') {
-      return this.jwtConfig.JWT_ACCESS_TTL;
-    }
-    if (key === 'JWT_REFRESH_TTL') {
-      return this.jwtConfig.JWT_REFRESH_TTL;
-    }
-    return '';
+    return this.configService.get<string>(key, '');
   }
 
-  getDatabaseConfig(): DatabaseConfig {
-    return this.dbConfig;
+  getDatabaseConfig() {
+    return {
+      host: this.configService.get<string>('DATABASE_HOST', 'localhost'),
+      port: this.configService.get<number>('DATABASE_PORT', 5432),
+      username: this.configService.get<string>('DATABASE_USER'),
+      password: this.configService.get<string>('DATABASE_PASSWORD'),
+      database: this.configService.get<string>('DATABASE_NAME', 'dreamfitness'),
+    };
   }
 }
