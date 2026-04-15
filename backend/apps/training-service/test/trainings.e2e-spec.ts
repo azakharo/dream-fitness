@@ -151,7 +151,7 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
-        type: 'INVALID_TYPE' as any,
+        type: 'INVALID_TYPE' as TrainingType,
       });
 
       const response = await trainingsHelper.create(token, trainingData);

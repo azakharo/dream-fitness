@@ -66,7 +66,7 @@ describe('ScheduleController (e2e)', () => {
       expect(response.body.days.length).toBe(7);
 
       const daysWithTrainings = response.body.days.filter(
-        (day: any) => day.trainings.length > 0,
+        (day) => day.trainings.length > 0,
       );
       expect(daysWithTrainings.length).toBeGreaterThan(0);
     });
@@ -107,7 +107,7 @@ describe('ScheduleController (e2e)', () => {
       expect(Array.isArray(response.body.days)).toBe(true);
       expect(response.body.days.length).toBe(7);
 
-      response.body.days.forEach((day: any) => {
+      response.body.days.forEach((day) => {
         expect(day).toHaveProperty('date');
         expect(day).toHaveProperty('dayOfWeek');
         expect(day).toHaveProperty('trainings');
