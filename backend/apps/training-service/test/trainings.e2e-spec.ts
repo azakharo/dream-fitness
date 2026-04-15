@@ -11,6 +11,7 @@ import {
 import { mockEventsPublisher } from './mocks/events.module.mock';
 import { TrainingType } from '@app/shared/enums';
 import { CreateTrainingDto } from '../src/trainings/dto';
+import { addMinutes } from 'date-fns';
 
 describe('TrainingsController (e2e)', () => {
   let appHelper: AppTestHelper;
@@ -115,14 +116,18 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes = await trainersHelper.create(token, trainerData);
       const trainerId = trainerRes.body.id;
 
+      const currentDt = new Date();
+      const training1StartDt = currentDt;
+      const training2StartDt = addMinutes(currentDt, 30);
+
       const trainingData1 = createTrainingDto(trainerId, {
-        scheduledAt: futureDate(1),
+        scheduledAt: training1StartDt.toISOString(),
         durationMinutes: 60,
       });
       await trainingsHelper.create(token, trainingData1);
 
       const trainingData2 = createTrainingDto(trainerId, {
-        scheduledAt: futureDate(1),
+        scheduledAt: training2StartDt.toISOString(),
         durationMinutes: 60,
       });
       const response = await trainingsHelper.create(token, trainingData2);
