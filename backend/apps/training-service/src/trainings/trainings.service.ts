@@ -14,6 +14,7 @@ import { ScheduleConflictException } from '../common/exceptions/schedule-conflic
 import { PastDateException } from '../common/exceptions/past-date.exception';
 import { TrainingStatus } from '@app/shared';
 import { EventsPublisher } from '../events/events.publisher';
+import { addMinutes } from 'date-fns';
 
 @Injectable()
 export class TrainingsService {
@@ -58,11 +59,14 @@ export class TrainingsService {
       throw new PastDateException();
     }
 
+    // Calculate end time by adding duration to start time
+    const endTime = addMinutes(new Date(dto.scheduledAt), dto.durationMinutes);
+
     const trainerTrainings =
       await this.trainingRepository.findByTrainerAndDateRange(
         dto.trainerId,
         dto.scheduledAt,
-        dto.scheduledAt,
+        endTime.toISOString(),
       );
     if (trainerTrainings.length > 0) {
       throw new ScheduleConflictException(dto.trainerId, dto.scheduledAt);
@@ -111,11 +115,15 @@ export class TrainingsService {
         throw new TrainerNotActiveException(dto.trainerId);
       }
 
+      // Calculate end time by adding duration to start time
+      const startTime = dto.scheduledAt || training.scheduledAt.toISOString();
+      const endTime = addMinutes(new Date(startTime), training.durationMinutes);
+
       const trainerTrainings =
         await this.trainingRepository.findByTrainerAndDateRange(
           dto.trainerId,
-          dto.scheduledAt || training.scheduledAt.toISOString(),
-          dto.scheduledAt || training.scheduledAt.toISOString(),
+          startTime,
+          endTime.toISOString(),
         );
       if (trainerTrainings.length > 0) {
         throw new ScheduleConflictException(

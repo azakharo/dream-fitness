@@ -69,7 +69,7 @@ describe('TrainingsController (e2e)', () => {
       expect(mockEventsPublisher.publishTrainingCreated).toHaveBeenCalled();
     });
 
-    it('should return 400 when trainer does not exist', async () => {
+    it('should return 404 when trainer does not exist', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
       const trainingData = createTrainingDto(
         '00000000-0000-0000-0000-000000000000',
@@ -77,7 +77,7 @@ describe('TrainingsController (e2e)', () => {
 
       const response = await trainingsHelper.create(token, trainingData);
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(404);
     });
 
     it('should return 400 when trainer is not active', async () => {
