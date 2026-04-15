@@ -3,6 +3,7 @@ import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { TrainersHelper } from './helpers/trainers.helper';
 import { createTrainerDto } from './fixtures/training.fixtures';
+import { CreateTrainerDto } from '../src/trainers/dto';
 
 describe('TrainersController (e2e)', () => {
   let appHelper: AppTestHelper;
@@ -49,7 +50,7 @@ describe('TrainersController (e2e)', () => {
       const token = authHelper.generateAdminToken('test-user-id');
       const response = await trainersHelper.create(token, {
         bio: 'test',
-      } as any);
+      } as CreateTrainerDto);
 
       expect(response.status).toBe(400);
     });
@@ -93,7 +94,7 @@ describe('TrainersController (e2e)', () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBe(2);
-      expect(response.body.every((t: any) => t.isActive === true)).toBe(true);
+      expect(response.body.every((t) => t.isActive)).toBe(true);
     });
 
     it('should return only active trainers (exclude deactivated)', async () => {
