@@ -1,5 +1,7 @@
 # План E2E тестирования Training Service (Этап 3.8)
 
+При кодировании тестовых файлов нужно использовать typescript скилл.
+
 ## Обзор
 
 Детальный план реализации e2e тестов для training service. Тесты покрывают 3 модуля: Trainers, Trainings, Schedule.

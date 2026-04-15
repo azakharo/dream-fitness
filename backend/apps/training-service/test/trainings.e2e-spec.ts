@@ -1,0 +1,782 @@
+import { AppTestHelper } from './helpers/app-test.helper';
+import { DbHelper } from './helpers/db.helper';
+import { AuthHelper } from './helpers/auth.helper';
+import { TrainersHelper } from './helpers/trainers.helper';
+import {
+  createTrainerDto,
+  createTrainingDto,
+  futureDate,
+} from './fixtures/training.fixtures';
+import { mockEventsPublisher } from './mocks/events.module.mock';
+import { TrainingType } from '@app/shared/enums';
+
+describe('TrainingsController (e2e)', () => {
+  let appHelper: AppTestHelper;
+  let dbHelper: DbHelper;
+  let authHelper: AuthHelper;
+  let trainersHelper: TrainersHelper;
+
+  beforeAll(async () => {
+    appHelper = new AppTestHelper();
+    await appHelper.init();
+    dbHelper = new DbHelper(appHelper.getDataSource());
+    authHelper = new AuthHelper();
+    trainersHelper = new TrainersHelper(appHelper.getRequest());
+  });
+
+  afterAll(async () => {
+    await appHelper.cleanup();
+  });
+
+  beforeEach(async () => {
+    await dbHelper.truncateTables();
+    jest.clearAllMocks();
+  });
+
+  describe('POST /trainings', () => {
+    it('should create a training with valid data and active trainer', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId);
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toBeDefined();
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBe(trainingData.title);
+      expect(response.body.type).toBe(trainingData.type);
+      expect(response.body.status).toBe('scheduled');
+      expect(response.body.availableSlots).toBe(trainingData.capacity);
+      expect(response.body.trainerId).toBe(trainerId);
+    });
+
+    it('should publish training.created event', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId);
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(mockEventsPublisher.publishTrainingCreated).toHaveBeenCalled();
+    });
+
+    it('should return 400 when trainer does not exist', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainingData = createTrainingDto(
+        '00000000-0000-0000-0000-000000000000',
+      );
+
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 when trainer is not active', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      await trainersHelper.remove(token, trainerId);
+
+      const trainingData = createTrainingDto(trainerId);
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 when scheduledAt is in the past', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, {
+        scheduledAt: futureDate(-1),
+      });
+
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 409 on schedule conflict', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData1 = createTrainingDto(trainerId, {
+        scheduledAt: futureDate(1),
+        durationMinutes: 60,
+      });
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData1);
+
+      const trainingData2 = createTrainingDto(trainerId, {
+        scheduledAt: futureDate(1),
+        durationMinutes: 60,
+      });
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData2);
+
+      expect(response.status).toBe(409);
+    });
+
+    it('should return 400 when title is missing', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, {
+        title: '',
+      });
+
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 when type is invalid', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, {
+        type: 'INVALID_TYPE' as any,
+      });
+
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 when capacity exceeds 100', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, {
+        capacity: 101,
+      });
+
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 when durationMinutes is less than 15', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, {
+        durationMinutes: 10,
+      });
+
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 when extra fields are provided', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const response = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          ...createTrainingDto(trainerId),
+          extraField: 'should be ignored',
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 401 when no auth token', async () => {
+      const response = await appHelper.getRequest().post('/trainings').send({});
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('GET /trainings', () => {
+    it('should return paginated list of trainings', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerId, { title: 'Training 1' }));
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerId, { title: 'Training 2' }));
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerId, { title: 'Training 3' }));
+
+      const response = await appHelper
+        .getRequest()
+        .get('/trainings')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.total).toBe(3);
+    });
+
+    it('should return empty list when no trainings exist', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+
+      const response = await appHelper
+        .getRequest()
+        .get('/trainings')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toEqual([]);
+      expect(response.body.total).toBe(0);
+    });
+
+    it('should filter by type', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerId, { type: TrainingType.YOGA, title: 'Yoga 1' }));
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(
+          createTrainingDto(trainerId, {
+            type: TrainingType.CROSSFIT,
+            title: 'Crossfit 1',
+          }),
+        );
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerId, { type: TrainingType.YOGA, title: 'Yoga 2' }));
+
+      const response = await appHelper
+        .getRequest()
+        .get('/trainings?type=YOGA')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.length).toBe(2);
+      expect(response.body.data.every((t: any) => t.type === 'YOGA')).toBe(
+        true,
+      );
+    });
+
+    it('should filter by trainerId', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData1 = createTrainerDto({ name: 'Trainer 1' });
+      const trainerData2 = createTrainerDto({ name: 'Trainer 2' });
+      const trainerRes1 = await trainersHelper.create(token, trainerData1);
+      const trainerRes2 = await trainersHelper.create(token, trainerData2);
+
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerRes1.body.id, { title: 'Training 1' }));
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerRes2.body.id, { title: 'Training 2' }));
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(createTrainingDto(trainerRes1.body.id, { title: 'Training 3' }));
+
+      const response = await appHelper
+        .getRequest()
+        .get(`/trainings?trainerId=${trainerRes1.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.length).toBe(2);
+      expect(
+        response.body.data.every(
+          (t: any) => t.trainerId === trainerRes1.body.id,
+        ),
+      ).toBe(true);
+    });
+
+    it('should filter by date range', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const date1 = futureDate(1);
+      const date2 = futureDate(2);
+      const date3 = futureDate(3);
+
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(
+          createTrainingDto(trainerId, {
+            scheduledAt: date1,
+            title: 'Training 1',
+          }),
+        );
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(
+          createTrainingDto(trainerId, {
+            scheduledAt: date2,
+            title: 'Training 2',
+          }),
+        );
+      await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(
+          createTrainingDto(trainerId, {
+            scheduledAt: date3,
+            title: 'Training 3',
+          }),
+        );
+
+      const response = await appHelper
+        .getRequest()
+        .get(`/trainings?dateFrom=${date1}&dateTo=${date2}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.length).toBe(1);
+      expect(response.body.data[0].title).toBe('Training 1');
+    });
+
+    it('should respect pagination (page, limit)', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      for (let i = 1; i <= 5; i++) {
+        await appHelper
+          .getRequest()
+          .post('/trainings')
+          .set('Authorization', `Bearer ${token}`)
+          .send(createTrainingDto(trainerId, { title: `Training ${i}` }));
+      }
+
+      const response = await appHelper
+        .getRequest()
+        .get('/trainings?page=1&limit=2')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.length).toBe(2);
+      expect(response.body.total).toBe(5);
+    });
+
+    it('should return 401 when no auth token', async () => {
+      const response = await appHelper.getRequest().get('/trainings');
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('GET /trainings/:id', () => {
+    it('should return training details by ID', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId);
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      const response = await appHelper
+        .getRequest()
+        .get(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.id).toBe(createResponse.body.id);
+      expect(response.body.title).toBe(trainingData.title);
+      expect(response.body.type).toBe(trainingData.type);
+      expect(response.body.trainerId).toBe(trainerId);
+      expect(response.body.status).toBe('scheduled');
+      expect(response.body.capacity).toBe(trainingData.capacity);
+      expect(response.body.durationMinutes).toBe(trainingData.durationMinutes);
+      expect(response.body.price).toBe(trainingData.price);
+      expect(response.body.availableSlots).toBe(trainingData.capacity);
+      expect(response.body.currentParticipants).toBe(0);
+    });
+
+    it('should return 404 for non-existent training', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+
+      const response = await appHelper
+        .getRequest()
+        .get(`/trainings/${nonExistentId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 401 when no auth token', async () => {
+      const response = await appHelper.getRequest().get('/trainings/123');
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('GET /trainings/:id/availability', () => {
+    it('should return availability info', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, { capacity: 10 });
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      const response = await appHelper
+        .getRequest()
+        .get(`/trainings/${createResponse.body.id}/availability`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.trainingId).toBe(createResponse.body.id);
+      expect(response.body.capacity).toBe(trainingData.capacity);
+      expect(response.body.currentParticipants).toBe(0);
+      expect(response.body.availableSlots).toBe(trainingData.capacity);
+      expect(response.body.isAvailable).toBe(true);
+    });
+
+    it('should return isAvailable=true when slots available', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, { capacity: 5 });
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      const response = await appHelper
+        .getRequest()
+        .get(`/trainings/${createResponse.body.id}/availability`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.isAvailable).toBe(true);
+    });
+
+    it('should return 404 for non-existent training', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+
+      const response = await appHelper
+        .getRequest()
+        .get(`/trainings/${nonExistentId}/availability`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 401 when no auth token', async () => {
+      const response = await appHelper
+        .getRequest()
+        .get('/trainings/123/availability');
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('PATCH /trainings/:id', () => {
+    it('should update training title', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, {
+        title: 'Original Title',
+      });
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      const updateData = { title: 'Updated Title' };
+      const response = await appHelper
+        .getRequest()
+        .patch(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData);
+
+      expect(response.status).toBe(200);
+      expect(response.body.title).toBe(updateData.title);
+      expect(response.body.id).toBe(createResponse.body.id);
+    });
+
+    it('should publish training.updated event', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId, {
+        title: 'Original Title',
+      });
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      const updateData = { title: 'Updated Title' };
+      await appHelper
+        .getRequest()
+        .patch(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData);
+
+      expect(mockEventsPublisher.publishTrainingUpdated).toHaveBeenCalled();
+    });
+
+    it('should return 400 when updating cancelled training', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId);
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      await appHelper
+        .getRequest()
+        .delete(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      const updateData = { title: 'Updated Title' };
+      const response = await appHelper
+        .getRequest()
+        .patch(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 404 for non-existent training', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const updateData = { title: 'Updated Title' };
+
+      const response = await appHelper
+        .getRequest()
+        .patch(`/trainings/${nonExistentId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData);
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 401 when no auth token', async () => {
+      const response = await appHelper
+        .getRequest()
+        .patch('/trainings/123')
+        .send({ title: 'Updated' });
+
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('DELETE /trainings/:id', () => {
+    it('should cancel training (set status=cancelled)', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId);
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      const response = await appHelper
+        .getRequest()
+        .delete(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(200);
+
+      const getResponse = await appHelper
+        .getRequest()
+        .get(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(getResponse.body.status).toBe('cancelled');
+    });
+
+    it('should publish training.cancelled event', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId);
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      await appHelper
+        .getRequest()
+        .delete(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(mockEventsPublisher.publishTrainingCancelled).toHaveBeenCalled();
+    });
+
+    it('should return 400 when cancelling already cancelled training', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const trainerData = createTrainerDto();
+      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerId = trainerRes.body.id;
+
+      const trainingData = createTrainingDto(trainerId);
+      const createResponse = await appHelper
+        .getRequest()
+        .post('/trainings')
+        .set('Authorization', `Bearer ${token}`)
+        .send(trainingData);
+
+      await appHelper
+        .getRequest()
+        .delete(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      const response = await appHelper
+        .getRequest()
+        .delete(`/trainings/${createResponse.body.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 404 for non-existent training', async () => {
+      const token = authHelper.generateAdminToken('test-user-id');
+      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+
+      const response = await appHelper
+        .getRequest()
+        .delete(`/trainings/${nonExistentId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 401 when no auth token', async () => {
+      const response = await appHelper.getRequest().delete('/trainings/123');
+
+      expect(response.status).toBe(401);
+    });
+  });
+});
