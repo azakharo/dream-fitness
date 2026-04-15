@@ -1105,26 +1105,7 @@ export class BookingCqrsModule {}
 
 ### Шаг 4.16. Тестирование
 
-#### 4.16.1. Unit тесты
-
-Создать spec-файлы для:
-
-| Файл                                    | Что тестируется                                                                                                  |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `book-training.handler.spec.ts`         | BookTrainingHandler: happy path, no slots, insufficient balance, duplicate booking, compensation on save failure |
-| `cancel-booking.handler.spec.ts`        | CancelBookingHandler: happy path, not found, already cancelled, refund failed + compensation                     |
-| `join-waitlist.handler.spec.ts`         | JoinWaitlistHandler: happy path, duplicate, already booked                                                       |
-| `leave-waitlist.handler.spec.ts`        | LeaveWaitlistHandler: happy path, not on waitlist                                                                |
-| `promote-from-waitlist.handler.spec.ts` | PromoteFromWaitlistHandler: happy path, empty waitlist, insufficient balance for first user → try next           |
-| `get-user-bookings.handler.spec.ts`     | GetUserBookingsHandler: pagination, filtering                                                                    |
-| `get-booking-by-id.handler.spec.ts`     | GetBookingByIdHandler: found, not found                                                                          |
-| `get-waitlist-position.handler.spec.ts` | GetWaitlistPositionHandler: position calculation                                                                 |
-| `auth-client.service.spec.ts`           | HTTP calls, error handling, timeout                                                                              |
-| `training-client.service.spec.ts`       | HTTP calls, error handling, timeout                                                                              |
-
-> Все unit тесты используют моки для HTTP clients и repositories.
-
-#### 4.16.2. E2E тесты
+#### 4.16.1. E2E тесты
 
 Создать `apps/booking-service/test/`:
 
