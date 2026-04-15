@@ -802,6 +802,13 @@ export class AppModule {}
 
 ## Этап 3.8: Testing
 
+### 3.8.0. Изучить, как реализовано тестирование в auth service
+
+Изучить подход к тестированию в указанном сервисе.
+Его нужно использовать как образец.
+Для этого нужно изучить содержимое папки `backend\apps\auth-service\test`.
+Если будет возможно, то переиспользовать код (желательно не дублировать код).
+
 ### 3.8.1. Настроить тестовое окружение
 
 **Файл:** `backend/apps/training-service/test/jest-e2e.json`
@@ -845,7 +852,7 @@ export class AppModule {}
 3. GET /trainers/:id → 200 OK (детали)
 4. PATCH /trainers/:id → 200 OK (обновление)
 5. DELETE /trainers/:id → 200 OK (деактивация)
-6. POST /trainers → 403 Forbidden (client)
+6. POST /trainers → 403 Forbidden (client user, the endpoint is available only for admins)
 7. GET /trainers → только активные (деактивированные не видны)
 8. POST /trainers с невалидными данными → 400 Bad Request
 
