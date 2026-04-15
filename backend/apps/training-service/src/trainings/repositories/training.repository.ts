@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataSource, Repository, Between } from 'typeorm';
 import { Training } from '../entities/training.entity';
 import { TrainingStatus } from '@app/shared';
+import { hasIntersection, TrainingInterval } from '../utils/training-interval';
 
 @Injectable()
 export class TrainingRepository extends Repository<Training> {
@@ -93,6 +94,42 @@ export class TrainingRepository extends Repository<Training> {
         status: TrainingStatus.SCHEDULED,
       },
       order: { scheduledAt: 'ASC' },
+    });
+  }
+
+  async findOverlappingTrainings(
+    trainerId: string,
+    scheduledAt: Date,
+    durationMinutes: number,
+  ): Promise<Training[]> {
+    const allScheduled = await this.createQueryBuilder('training')
+      .where('training.trainerId = :trainerId', { trainerId })
+      .andWhere('training.status = :status', {
+        status: TrainingStatus.SCHEDULED,
+      })
+      .getMany();
+
+    const newTraining: TrainingInterval = {
+      start: scheduledAt,
+      durationMinutes,
+    };
+
+    const existingIntervals: TrainingInterval[] = allScheduled.map((t) => ({
+      start: t.scheduledAt,
+      durationMinutes: t.durationMinutes,
+    }));
+
+    if (!hasIntersection(newTraining, existingIntervals)) {
+      return [];
+    }
+
+    return allScheduled.filter((t) => {
+      const interval: TrainingInterval = {
+        start: t.scheduledAt,
+        durationMinutes: t.durationMinutes,
+      };
+      const otherIntervals: TrainingInterval[] = [newTraining];
+      return hasIntersection(interval, otherIntervals);
     });
   }
 

@@ -14,7 +14,6 @@ import { ScheduleConflictException } from '../common/exceptions/schedule-conflic
 import { PastDateException } from '../common/exceptions/past-date.exception';
 import { TrainingStatus } from '@app/shared';
 import { EventsPublisher } from '../events/events.publisher';
-import { addMinutes } from 'date-fns';
 
 @Injectable()
 export class TrainingsService {
@@ -59,14 +58,11 @@ export class TrainingsService {
       throw new PastDateException();
     }
 
-    // Calculate end time by adding duration to start time
-    const endTime = addMinutes(new Date(dto.scheduledAt), dto.durationMinutes);
-
     const trainerTrainings =
-      await this.trainingRepository.findByTrainerAndDateRange(
+      await this.trainingRepository.findOverlappingTrainings(
         dto.trainerId,
-        dto.scheduledAt,
-        endTime.toISOString(),
+        new Date(dto.scheduledAt),
+        dto.durationMinutes,
       );
     if (trainerTrainings.length > 0) {
       throw new ScheduleConflictException(dto.trainerId, dto.scheduledAt);
@@ -115,20 +111,27 @@ export class TrainingsService {
         throw new TrainerNotActiveException(dto.trainerId);
       }
 
-      // Calculate end time by adding duration to start time
-      const startTime = dto.scheduledAt || training.scheduledAt.toISOString();
-      const endTime = addMinutes(new Date(startTime), training.durationMinutes);
+      const scheduledAt = dto.scheduledAt
+        ? new Date(dto.scheduledAt)
+        : training.scheduledAt;
+      const durationMinutes = dto.durationMinutes ?? training.durationMinutes;
 
-      const trainerTrainings =
-        await this.trainingRepository.findByTrainerAndDateRange(
+      const overlappingTrainings =
+        await this.trainingRepository.findOverlappingTrainings(
           dto.trainerId,
-          startTime,
-          endTime.toISOString(),
+          scheduledAt,
+          durationMinutes,
         );
-      if (trainerTrainings.length > 0) {
+
+      // Exclude the current training being updated from the overlap check
+      const otherOverlappingTrainings = overlappingTrainings.filter(
+        (t) => t.id !== training.id,
+      );
+
+      if (otherOverlappingTrainings.length > 0) {
         throw new ScheduleConflictException(
           dto.trainerId,
-          dto.scheduledAt || training.scheduledAt.toISOString(),
+          scheduledAt.toISOString(),
         );
       }
     }

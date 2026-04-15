@@ -116,9 +116,8 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes = await trainersHelper.create(token, trainerData);
       const trainerId = trainerRes.body.id;
 
-      const currentDt = new Date();
-      const training1StartDt = currentDt;
-      const training2StartDt = addMinutes(currentDt, 30);
+      const training1StartDt = addMinutes(new Date(), 60);
+      const training2StartDt = addMinutes(training1StartDt, 30);
 
       const trainingData1 = createTrainingDto(trainerId, {
         scheduledAt: training1StartDt.toISOString(),
