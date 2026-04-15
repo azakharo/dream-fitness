@@ -22,14 +22,16 @@ export function createTrainingDto(
   trainerId: string,
   overrides?: Partial<CreateTrainingDto>,
 ): CreateTrainingDto {
-  return {
-    title: overrides?.title || 'Morning Yoga Session',
-    description: overrides?.description || 'A relaxing morning yoga session',
-    type: overrides?.type || TrainingType.YOGA,
+  const result = {
+    title: overrides?.title ?? 'Morning Yoga Session',
+    description: overrides?.description ?? 'A relaxing morning yoga session',
+    type: overrides?.type ?? TrainingType.YOGA,
     trainerId,
-    scheduledAt: overrides?.scheduledAt || futureDate(1),
-    durationMinutes: overrides?.durationMinutes || 60,
-    capacity: overrides?.capacity || 10,
-    price: overrides?.price || 1000,
+    scheduledAt: overrides?.scheduledAt ?? futureDate(1),
+    durationMinutes: overrides?.durationMinutes ?? 60,
+    capacity: overrides?.capacity ?? 10,
+    price: overrides?.price ?? 1000,
   };
+
+  return result;
 }
