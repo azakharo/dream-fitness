@@ -5,25 +5,10 @@ export type TestResponse<T> = Omit<Response, 'body'> & {
   body: T;
 };
 
-interface WeekScheduleDay {
-  date: string;
-  dayOfWeek: string;
-  trainings: any[];
-}
-
-interface WeekScheduleResponse {
-  weekStart: string;
-  weekEnd: string;
-  days: WeekScheduleDay[];
-}
-
-interface TrainerScheduleResponse {
-  trainer: {
-    id: string;
-    name: string;
-  };
-  trainings: any[];
-}
+import {
+  WeekScheduleResponseDto,
+  TrainerScheduleResponseDto,
+} from '../../src/schedule/dto';
 
 export class ScheduleHelper {
   constructor(private request: request.SuperTest<request.Test>) {}
@@ -32,12 +17,12 @@ export class ScheduleHelper {
   async getWeekSchedule(
     token: string,
     date?: string,
-  ): Promise<TestResponse<WeekScheduleResponse>> {
+  ): Promise<TestResponse<WeekScheduleResponseDto>> {
     const url = date ? `/schedule/week?date=${date}` : '/schedule/week';
     const response = await this.request
       .get(url)
       .set('Authorization', `Bearer ${token}`);
-    return response as unknown as TestResponse<WeekScheduleResponse>;
+    return response as unknown as TestResponse<WeekScheduleResponseDto>;
   }
 
   // Get trainer schedule (optionally pass dateFrom and dateTo query params)
@@ -46,7 +31,7 @@ export class ScheduleHelper {
     trainerId: string,
     dateFrom?: string,
     dateTo?: string,
-  ): Promise<TestResponse<TrainerScheduleResponse>> {
+  ): Promise<TestResponse<TrainerScheduleResponseDto>> {
     let url = `/schedule/trainer/${trainerId}`;
     const params: string[] = [];
     if (dateFrom) params.push(`dateFrom=${dateFrom}`);
@@ -56,6 +41,6 @@ export class ScheduleHelper {
     const response = await this.request
       .get(url)
       .set('Authorization', `Bearer ${token}`);
-    return response as unknown as TestResponse<TrainerScheduleResponse>;
+    return response as unknown as TestResponse<TrainerScheduleResponseDto>;
   }
 }
