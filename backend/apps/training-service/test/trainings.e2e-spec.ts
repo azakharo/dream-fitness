@@ -10,6 +10,7 @@ import {
 } from './fixtures/training.fixtures';
 import { mockEventsPublisher } from './mocks/events.module.mock';
 import { TrainingType } from '@app/shared/enums';
+import { CreateTrainingDto } from '../src/trainings/dto';
 
 describe('TrainingsController (e2e)', () => {
   let appHelper: AppTestHelper;
@@ -198,7 +199,7 @@ describe('TrainingsController (e2e)', () => {
       const response = await trainingsHelper.create(token, {
         ...createTrainingDto(trainerId),
         extraField: 'should be ignored',
-      } as any);
+      } as CreateTrainingDto);
 
       expect(response.status).toBe(400);
     });
@@ -279,9 +280,7 @@ describe('TrainingsController (e2e)', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
-      expect(response.body.data.every((t: any) => t.type === 'YOGA')).toBe(
-        true,
-      );
+      expect(response.body.data.every((t) => t.type === 'YOGA')).toBe(true);
     });
 
     it('should filter by trainerId', async () => {
@@ -311,9 +310,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
       expect(
-        response.body.data.every(
-          (t: any) => t.trainerId === trainerRes1.body.id,
-        ),
+        response.body.data.every((t) => t.trainerId === trainerRes1.body.id),
       ).toBe(true);
     });
 
