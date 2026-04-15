@@ -24,6 +24,7 @@ import { TrainersService } from './trainers.service';
 import { CreateTrainerDto } from './dto/create-trainer.dto';
 import { UpdateTrainerDto } from './dto/update-trainer.dto';
 import { TrainerResponseDto } from './dto/trainer-response.dto';
+import { TrainerNotFoundException } from '../common/exceptions';
 
 @ApiTags('trainers')
 @Controller('trainers')
@@ -63,7 +64,7 @@ export class TrainersController {
   async findOne(@Param('id') id: string): Promise<TrainerResponseDto> {
     const trainer = await this.trainersService.findById(id);
     if (!trainer) {
-      throw new Error('Trainer not found');
+      throw new TrainerNotFoundException(id);
     }
     return trainer;
   }
