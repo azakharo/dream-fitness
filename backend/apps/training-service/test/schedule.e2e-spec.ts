@@ -2,6 +2,8 @@ import { AppTestHelper } from './helpers/app-test.helper';
 import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { TrainersHelper } from './helpers/trainers.helper';
+import { TrainingsHelper } from './helpers/trainings.helper';
+import { ScheduleHelper } from './helpers/schedule.helper';
 import {
   createTrainerDto,
   futureDate,
@@ -13,6 +15,8 @@ describe('ScheduleController (e2e)', () => {
   let dbHelper: DbHelper;
   let authHelper: AuthHelper;
   let trainersHelper: TrainersHelper;
+  let trainingsHelper: TrainingsHelper;
+  let scheduleHelper: ScheduleHelper;
 
   beforeAll(async () => {
     appHelper = new AppTestHelper();
@@ -20,6 +24,8 @@ describe('ScheduleController (e2e)', () => {
     dbHelper = new DbHelper(appHelper.getDataSource());
     authHelper = new AuthHelper();
     trainersHelper = new TrainersHelper(appHelper.getRequest());
+    trainingsHelper = new TrainingsHelper(appHelper.getRequest());
+    scheduleHelper = new ScheduleHelper(appHelper.getRequest());
   });
 
   afterAll(async () => {
@@ -47,22 +53,10 @@ describe('ScheduleController (e2e)', () => {
         title: 'Pilates Class',
       });
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(training1);
+      await trainingsHelper.create(token, training1);
+      await trainingsHelper.create(token, training2);
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(training2);
-
-      const response = await appHelper
-        .getRequest()
-        .get('/schedule/week')
-        .set('Authorization', `Bearer ${token}`);
+      const response = await scheduleHelper.getWeekSchedule(token);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('weekStart');
@@ -87,21 +81,14 @@ describe('ScheduleController (e2e)', () => {
         scheduledAt: futureDate(1),
       });
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(training);
+      await trainingsHelper.create(token, training);
 
       const nextWeekMonday = new Date();
       nextWeekMonday.setDate(nextWeekMonday.getDate() + 7);
       nextWeekMonday.setHours(0, 0, 0, 0);
       const weekDate = nextWeekMonday.toISOString();
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/schedule/week?date=${weekDate}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await scheduleHelper.getWeekSchedule(token, weekDate);
 
       expect(response.status).toBe(200);
       expect(response.body.weekStart).toBe(weekDate);
@@ -111,10 +98,7 @@ describe('ScheduleController (e2e)', () => {
     it('should return empty days for week without trainings', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
 
-      const response = await appHelper
-        .getRequest()
-        .get('/schedule/week')
-        .set('Authorization', `Bearer ${token}`);
+      const response = await scheduleHelper.getWeekSchedule(token);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('weekStart');
@@ -151,16 +135,12 @@ describe('ScheduleController (e2e)', () => {
         title: 'Personal Training',
       });
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(training);
+      await trainingsHelper.create(token, training);
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/schedule/trainer/${trainerId}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await scheduleHelper.getTrainerSchedule(
+        token,
+        trainerId,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('trainer');
@@ -175,10 +155,10 @@ describe('ScheduleController (e2e)', () => {
       const token = authHelper.generateAdminToken('test-user-id');
       const nonExistentId = '00000000-0000-0000-0000-000000000000';
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/schedule/trainer/${nonExistentId}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await scheduleHelper.getTrainerSchedule(
+        token,
+        nonExistentId,
+      );
 
       expect(response.status).toBe(404);
     });
@@ -198,27 +178,18 @@ describe('ScheduleController (e2e)', () => {
         title: 'Training 2',
       });
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(training1);
-
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(training2);
+      await trainingsHelper.create(token, training1);
+      await trainingsHelper.create(token, training2);
 
       const dateFrom = futureDate(0);
       const dateTo = futureDate(5);
 
-      const response = await appHelper
-        .getRequest()
-        .get(
-          `/schedule/trainer/${trainerId}?dateFrom=${dateFrom}&dateTo=${dateTo}`,
-        )
-        .set('Authorization', `Bearer ${token}`);
+      const response = await scheduleHelper.getTrainerSchedule(
+        token,
+        trainerId,
+        dateFrom,
+        dateTo,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.trainings.length).toBe(1);
@@ -236,16 +207,12 @@ describe('ScheduleController (e2e)', () => {
         title: 'Default Range Training',
       });
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(training);
+      await trainingsHelper.create(token, training);
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/schedule/trainer/${trainerId}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await scheduleHelper.getTrainerSchedule(
+        token,
+        trainerId,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.trainings.length).toBeGreaterThan(0);

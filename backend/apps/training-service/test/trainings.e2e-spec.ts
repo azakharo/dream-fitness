@@ -2,6 +2,7 @@ import { AppTestHelper } from './helpers/app-test.helper';
 import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { TrainersHelper } from './helpers/trainers.helper';
+import { TrainingsHelper } from './helpers/trainings.helper';
 import {
   createTrainerDto,
   createTrainingDto,
@@ -15,6 +16,7 @@ describe('TrainingsController (e2e)', () => {
   let dbHelper: DbHelper;
   let authHelper: AuthHelper;
   let trainersHelper: TrainersHelper;
+  let trainingsHelper: TrainingsHelper;
 
   beforeAll(async () => {
     appHelper = new AppTestHelper();
@@ -22,6 +24,7 @@ describe('TrainingsController (e2e)', () => {
     dbHelper = new DbHelper(appHelper.getDataSource());
     authHelper = new AuthHelper();
     trainersHelper = new TrainersHelper(appHelper.getRequest());
+    trainingsHelper = new TrainingsHelper(appHelper.getRequest());
   });
 
   afterAll(async () => {
@@ -41,11 +44,7 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(201);
       expect(response.body).toBeDefined();
@@ -64,11 +63,7 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      await trainingsHelper.create(token, trainingData);
 
       expect(mockEventsPublisher.publishTrainingCreated).toHaveBeenCalled();
     });
@@ -79,11 +74,7 @@ describe('TrainingsController (e2e)', () => {
         '00000000-0000-0000-0000-000000000000',
       );
 
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(400);
     });
@@ -97,11 +88,7 @@ describe('TrainingsController (e2e)', () => {
       await trainersHelper.remove(token, trainerId);
 
       const trainingData = createTrainingDto(trainerId);
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(400);
     });
@@ -116,11 +103,7 @@ describe('TrainingsController (e2e)', () => {
         scheduledAt: futureDate(-1),
       });
 
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(400);
     });
@@ -135,21 +118,13 @@ describe('TrainingsController (e2e)', () => {
         scheduledAt: futureDate(1),
         durationMinutes: 60,
       });
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData1);
+      await trainingsHelper.create(token, trainingData1);
 
       const trainingData2 = createTrainingDto(trainerId, {
         scheduledAt: futureDate(1),
         durationMinutes: 60,
       });
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData2);
+      const response = await trainingsHelper.create(token, trainingData2);
 
       expect(response.status).toBe(409);
     });
@@ -164,11 +139,7 @@ describe('TrainingsController (e2e)', () => {
         title: '',
       });
 
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(400);
     });
@@ -183,11 +154,7 @@ describe('TrainingsController (e2e)', () => {
         type: 'INVALID_TYPE' as any,
       });
 
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(400);
     });
@@ -202,11 +169,7 @@ describe('TrainingsController (e2e)', () => {
         capacity: 101,
       });
 
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(400);
     });
@@ -221,11 +184,7 @@ describe('TrainingsController (e2e)', () => {
         durationMinutes: 10,
       });
 
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const response = await trainingsHelper.create(token, trainingData);
 
       expect(response.status).toBe(400);
     });
@@ -236,14 +195,10 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes = await trainersHelper.create(token, trainerData);
       const trainerId = trainerRes.body.id;
 
-      const response = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          ...createTrainingDto(trainerId),
-          extraField: 'should be ignored',
-        });
+      const response = await trainingsHelper.create(token, {
+        ...createTrainingDto(trainerId),
+        extraField: 'should be ignored',
+      } as any);
 
       expect(response.status).toBe(400);
     });
@@ -262,26 +217,20 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes = await trainersHelper.create(token, trainerData);
       const trainerId = trainerRes.body.id;
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerId, { title: 'Training 1' }));
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerId, { title: 'Training 2' }));
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerId, { title: 'Training 3' }));
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, { title: 'Training 1' }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, { title: 'Training 2' }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, { title: 'Training 3' }),
+      );
 
-      const response = await appHelper
-        .getRequest()
-        .get('/trainings')
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.findAll(token);
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
@@ -291,10 +240,7 @@ describe('TrainingsController (e2e)', () => {
     it('should return empty list when no trainings exist', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
 
-      const response = await appHelper
-        .getRequest()
-        .get('/trainings')
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.findAll(token);
 
       expect(response.status).toBe(200);
       expect(response.body.data).toEqual([]);
@@ -307,41 +253,29 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes = await trainersHelper.create(token, trainerData);
       const trainerId = trainerRes.body.id;
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(
-          createTrainingDto(trainerId, {
-            type: TrainingType.YOGA,
-            title: 'Yoga 1',
-          }),
-        );
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(
-          createTrainingDto(trainerId, {
-            type: TrainingType.CROSSFIT,
-            title: 'Crossfit 1',
-          }),
-        );
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(
-          createTrainingDto(trainerId, {
-            type: TrainingType.YOGA,
-            title: 'Yoga 2',
-          }),
-        );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, {
+          type: TrainingType.YOGA,
+          title: 'Yoga 1',
+        }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, {
+          type: TrainingType.CROSSFIT,
+          title: 'Crossfit 1',
+        }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, {
+          type: TrainingType.YOGA,
+          title: 'Yoga 2',
+        }),
+      );
 
-      const response = await appHelper
-        .getRequest()
-        .get('/trainings?type=YOGA')
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.findAll(token, { type: 'YOGA' });
 
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
@@ -357,26 +291,22 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes1 = await trainersHelper.create(token, trainerData1);
       const trainerRes2 = await trainersHelper.create(token, trainerData2);
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerRes1.body.id, { title: 'Training 1' }));
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerRes2.body.id, { title: 'Training 2' }));
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(createTrainingDto(trainerRes1.body.id, { title: 'Training 3' }));
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerRes1.body.id, { title: 'Training 1' }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerRes2.body.id, { title: 'Training 2' }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerRes1.body.id, { title: 'Training 3' }),
+      );
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/trainings?trainerId=${trainerRes1.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.findAll(token, {
+        trainerId: trainerRes1.body.id,
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
@@ -397,41 +327,32 @@ describe('TrainingsController (e2e)', () => {
       const date2 = futureDate(2);
       const date3 = futureDate(3);
 
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(
-          createTrainingDto(trainerId, {
-            scheduledAt: date1,
-            title: 'Training 1',
-          }),
-        );
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(
-          createTrainingDto(trainerId, {
-            scheduledAt: date2,
-            title: 'Training 2',
-          }),
-        );
-      await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(
-          createTrainingDto(trainerId, {
-            scheduledAt: date3,
-            title: 'Training 3',
-          }),
-        );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, {
+          scheduledAt: date1,
+          title: 'Training 1',
+        }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, {
+          scheduledAt: date2,
+          title: 'Training 2',
+        }),
+      );
+      await trainingsHelper.create(
+        token,
+        createTrainingDto(trainerId, {
+          scheduledAt: date3,
+          title: 'Training 3',
+        }),
+      );
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/trainings?dateFrom=${date1}&dateTo=${date2}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.findAll(token, {
+        dateFrom: date1,
+        dateTo: date2,
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(1);
@@ -445,17 +366,16 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       for (let i = 1; i <= 5; i++) {
-        await appHelper
-          .getRequest()
-          .post('/trainings')
-          .set('Authorization', `Bearer ${token}`)
-          .send(createTrainingDto(trainerId, { title: `Training ${i}` }));
+        await trainingsHelper.create(
+          token,
+          createTrainingDto(trainerId, { title: `Training ${i}` }),
+        );
       }
 
-      const response = await appHelper
-        .getRequest()
-        .get('/trainings?page=1&limit=2')
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.findAll(token, {
+        page: 1,
+        limit: 2,
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
@@ -477,16 +397,12 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.findById(
+        token,
+        createResponse.body.id,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe(createResponse.body.id);
@@ -528,16 +444,12 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, { capacity: 10 });
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/trainings/${createResponse.body.id}/availability`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.getAvailability(
+        token,
+        createResponse.body.id,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.trainingId).toBe(createResponse.body.id);
@@ -554,16 +466,12 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, { capacity: 5 });
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
-      const response = await appHelper
-        .getRequest()
-        .get(`/trainings/${createResponse.body.id}/availability`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.getAvailability(
+        token,
+        createResponse.body.id,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.isAvailable).toBe(true);
@@ -600,18 +508,14 @@ describe('TrainingsController (e2e)', () => {
       const trainingData = createTrainingDto(trainerId, {
         title: 'Original Title',
       });
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
       const updateData = { title: 'Updated Title' };
-      const response = await appHelper
-        .getRequest()
-        .patch(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(updateData);
+      const response = await trainingsHelper.update(
+        token,
+        createResponse.body.id,
+        updateData,
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.title).toBe(updateData.title);
@@ -627,18 +531,10 @@ describe('TrainingsController (e2e)', () => {
       const trainingData = createTrainingDto(trainerId, {
         title: 'Original Title',
       });
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
       const updateData = { title: 'Updated Title' };
-      await appHelper
-        .getRequest()
-        .patch(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(updateData);
+      await trainingsHelper.update(token, createResponse.body.id, updateData);
 
       expect(mockEventsPublisher.publishTrainingUpdated).toHaveBeenCalled();
     });
@@ -650,23 +546,16 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
-      await appHelper
-        .getRequest()
-        .delete(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      await trainingsHelper.cancel(token, createResponse.body.id);
 
       const updateData = { title: 'Updated Title' };
-      const response = await appHelper
-        .getRequest()
-        .patch(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send(updateData);
+      const response = await trainingsHelper.update(
+        token,
+        createResponse.body.id,
+        updateData,
+      );
 
       expect(response.status).toBe(400);
     });
@@ -703,23 +592,19 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
-      const response = await appHelper
-        .getRequest()
-        .delete(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.cancel(
+        token,
+        createResponse.body.id,
+      );
 
       expect(response.status).toBe(200);
 
-      const getResponse = await appHelper
-        .getRequest()
-        .get(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      const getResponse = await trainingsHelper.findById(
+        token,
+        createResponse.body.id,
+      );
 
       expect(getResponse.body.status).toBe('cancelled');
     });
@@ -731,16 +616,9 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
-      await appHelper
-        .getRequest()
-        .delete(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      await trainingsHelper.cancel(token, createResponse.body.id);
 
       expect(mockEventsPublisher.publishTrainingCancelled).toHaveBeenCalled();
     });
@@ -752,21 +630,14 @@ describe('TrainingsController (e2e)', () => {
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await appHelper
-        .getRequest()
-        .post('/trainings')
-        .set('Authorization', `Bearer ${token}`)
-        .send(trainingData);
+      const createResponse = await trainingsHelper.create(token, trainingData);
 
-      await appHelper
-        .getRequest()
-        .delete(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      await trainingsHelper.cancel(token, createResponse.body.id);
 
-      const response = await appHelper
-        .getRequest()
-        .delete(`/trainings/${createResponse.body.id}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.cancel(
+        token,
+        createResponse.body.id,
+      );
 
       expect(response.status).toBe(400);
     });
@@ -775,10 +646,7 @@ describe('TrainingsController (e2e)', () => {
       const token = authHelper.generateAdminToken('test-user-id');
       const nonExistentId = '00000000-0000-0000-0000-000000000000';
 
-      const response = await appHelper
-        .getRequest()
-        .delete(`/trainings/${nonExistentId}`)
-        .set('Authorization', `Bearer ${token}`);
+      const response = await trainingsHelper.cancel(token, nonExistentId);
 
       expect(response.status).toBe(404);
     });
