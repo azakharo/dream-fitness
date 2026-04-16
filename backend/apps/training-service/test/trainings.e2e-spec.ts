@@ -274,6 +274,7 @@ describe('TrainingsController (e2e)', () => {
         createTrainingDto(trainerId, {
           type: TrainingType.YOGA,
           title: 'Yoga 1',
+          scheduledAt: futureDate(1),
         }),
       );
       await trainingsHelper.create(
@@ -281,6 +282,7 @@ describe('TrainingsController (e2e)', () => {
         createTrainingDto(trainerId, {
           type: TrainingType.CROSSFIT,
           title: 'Crossfit 1',
+          scheduledAt: futureDate(2),
         }),
       );
       await trainingsHelper.create(
@@ -288,14 +290,21 @@ describe('TrainingsController (e2e)', () => {
         createTrainingDto(trainerId, {
           type: TrainingType.YOGA,
           title: 'Yoga 2',
+          scheduledAt: futureDate(3),
         }),
       );
 
-      const response = await trainingsHelper.findAll(token, { type: 'YOGA' });
+      const response = await trainingsHelper.findAll(token, {
+        type: TrainingType.YOGA,
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
-      expect(response.body.data.every((t) => t.type === 'YOGA')).toBe(true);
+      expect(
+        response.body.data.every(
+          (t) => t.type === (TrainingType.YOGA as string),
+        ),
+      ).toBe(true);
     });
 
     it('should filter by trainerId', async () => {
@@ -307,7 +316,10 @@ describe('TrainingsController (e2e)', () => {
 
       await trainingsHelper.create(
         token,
-        createTrainingDto(trainerRes1.body.id, { title: 'Training 1' }),
+        createTrainingDto(trainerRes1.body.id, {
+          title: 'Training 1',
+          scheduledAt: futureDate(1),
+        }),
       );
       await trainingsHelper.create(
         token,
@@ -315,7 +327,10 @@ describe('TrainingsController (e2e)', () => {
       );
       await trainingsHelper.create(
         token,
-        createTrainingDto(trainerRes1.body.id, { title: 'Training 3' }),
+        createTrainingDto(trainerRes1.body.id, {
+          title: 'Training 3',
+          scheduledAt: futureDate(2),
+        }),
       );
 
       const response = await trainingsHelper.findAll(token, {
@@ -380,7 +395,10 @@ describe('TrainingsController (e2e)', () => {
       for (let i = 1; i <= 5; i++) {
         await trainingsHelper.create(
           token,
-          createTrainingDto(trainerId, { title: `Training ${i}` }),
+          createTrainingDto(trainerId, {
+            title: `Training ${i}`,
+            scheduledAt: futureDate(i),
+          }),
         );
       }
 
