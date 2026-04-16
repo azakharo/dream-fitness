@@ -21,12 +21,14 @@ import {
 import { CurrentUser, JwtAuthGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BookingResponseDto } from './dto';
+import { BookingListResponseDto } from './dto/booking-list-response.dto';
 import { BookingFilterDto } from './dto/booking-filter.dto';
 import { CreateBookingDto } from '@app/contracts/booking';
 import { CancelBookingDto } from '@app/contracts/booking';
 import { BookTrainingCommand, CancelBookingCommand } from '../cqrs/commands';
 import { GetUserBookingsQuery, GetBookingByIdQuery } from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
+import { Booking } from './entities/booking.entity';
 
 @ApiTags('Bookings')
 @ApiBearerAuth()
@@ -38,6 +40,17 @@ export class BookingsController {
     private readonly queryBus: QueryBus,
   ) {}
 
+  private toBookingResponseDto(booking: Booking): BookingResponseDto {
+    return {
+      id: booking.id,
+      userId: booking.userId,
+      trainingId: booking.trainingId,
+      status: booking.status,
+      createdAt: booking.createdAt.toISOString(),
+      updatedAt: booking.updatedAt.toISOString(),
+    };
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Book a training' })
@@ -48,9 +61,10 @@ export class BookingsController {
     @Body() dto: CreateBookingDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
-    return this.commandBus.execute(
+    const booking = await this.commandBus.execute<BookTrainingCommand, Booking>(
       new BookTrainingCommand(user.id, dto.trainingId),
     );
+    return this.toBookingResponseDto(booking);
   }
 
   @Get()
@@ -60,8 +74,17 @@ export class BookingsController {
   async findAll(
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: BookingFilterDto,
-  ): Promise<BookingResponseDto[]> {
-    return this.queryBus.execute(new GetUserBookingsQuery(user.id, filters));
+  ): Promise<BookingListResponseDto> {
+    const result = await this.queryBus.execute<
+      GetUserBookingsQuery,
+      { items: Booking[]; total: number; page: number; limit: number }
+    >(new GetUserBookingsQuery(user.id, filters));
+    return {
+      items: result.items.map((booking) => this.toBookingResponseDto(booking)),
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+    };
   }
 
   @Get(':id')
@@ -72,7 +95,10 @@ export class BookingsController {
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
-    return this.queryBus.execute(new GetBookingByIdQuery(id, user.id));
+    const booking = await this.queryBus.execute<GetBookingByIdQuery, Booking>(
+      new GetBookingByIdQuery(id, user.id),
+    );
+    return this.toBookingResponseDto(booking);
   }
 
   @Post(':id/cancel')
@@ -86,8 +112,10 @@ export class BookingsController {
     @Body() dto: CancelBookingDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
-    return this.commandBus.execute(
-      new CancelBookingCommand(id, user.id, dto.reason),
-    );
+    const booking = await this.commandBus.execute<
+      CancelBookingCommand,
+      Booking
+    >(new CancelBookingCommand(id, user.id, dto.reason));
+    return this.toBookingResponseDto(booking);
   }
 }
