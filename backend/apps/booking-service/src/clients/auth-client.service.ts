@@ -25,7 +25,7 @@ export class AuthClientService {
     bookingId: string,
   ): Promise<TransactionResponseDto> {
     try {
-      const url = `${this.configService.getAuthServiceUrl()}/balance/reserve`;
+      const url = `${this.configService.getAuthServiceUrl()}/auth/balance/reserve`;
       const body = { userId, amount, bookingId };
 
       const response = await firstValueFrom(
@@ -62,7 +62,7 @@ export class AuthClientService {
     bookingId: string,
   ): Promise<TransactionResponseDto> {
     try {
-      const url = `${this.configService.getAuthServiceUrl()}/balance/release`;
+      const url = `${this.configService.getAuthServiceUrl()}/auth/balance/release`;
       const body = { userId, amount, bookingId };
 
       const response = await firstValueFrom(
@@ -99,7 +99,7 @@ export class AuthClientService {
     bookingId: string,
   ): Promise<TransactionResponseDto> {
     try {
-      const url = `${this.configService.getAuthServiceUrl()}/balance/refund`;
+      const url = `${this.configService.getAuthServiceUrl()}/auth/balance/refund`;
       const body = { userId, amount, bookingId };
 
       const response = await firstValueFrom(
