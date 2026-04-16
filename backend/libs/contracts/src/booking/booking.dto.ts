@@ -15,6 +15,7 @@ export class BookingDto {
   status: 'confirmed' | 'cancelled' | 'completed';
   bookedAt: Date;
   cancelledAt?: Date;
+  updatedAt: Date;
 }
 
 export class WaitlistDto {
