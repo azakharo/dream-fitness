@@ -2,55 +2,38 @@
   "version": "0.2.0",
   "inputs": [
     {
+      "id": "serviceName",
+      "type": "pickString",
+      "description": "Select service to test",
+      "options": [
+        "auth-service",
+        "training-service"
+      ],
+      "default": "training-service"
+    },
+    {
       "id": "testName",
       "type": "promptString",
-      "description": "Test name pattern (regex)",
+      "description": "Test name pattern (regex, leave empty to run all tests in file)",
       "default": ""
     }
   ],
   "configurations": [
     {
-      "name": "Debug Auth E2E Tests",
+      "name": "Debug E2E Test",
       "type": "node",
       "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
       "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.js",
       "args": [
         "--config",
-        "backend/apps/auth-service/test/jest-e2e.json",
-        "--runInBand"
-      ],
-      "envFile": "${workspaceFolder}/backend/.env.test",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "name": "Debug Current E2E Test File",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.js",
-      "args": [
-        "--config",
-        "backend/apps/auth-service/test/jest-e2e.json",
-        "--runInBand",
-        "${relativeFile}"
-      ],
-      "envFile": "${workspaceFolder}/backend/.env.test",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "name": "Debug Single Test by Name",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.js",
-      "args": [
-        "--config",
-        "backend/apps/auth-service/test/jest-e2e.json",
+        "apps/${input:serviceName}/test/jest-e2e.json",
         "--runInBand",
         "--testNamePattern",
         "${input:testName}",
         "${relativeFile}"
       ],
+      "env": { "NODE_ENV": "test" },
       "envFile": "${workspaceFolder}/backend/.env.test",
       "console": "integratedTerminal",
       "internalConsoleOptions": "openOnSessionStart"
