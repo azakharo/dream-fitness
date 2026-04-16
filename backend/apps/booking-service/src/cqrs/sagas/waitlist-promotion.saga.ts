@@ -35,7 +35,7 @@ export class WaitlistPromotionSaga {
             if (result) {
               this.logger.log(`Waitlist user promoted to booking ${result.id}`);
               void this.eventsPublisher.publishWaitlistPromoted({
-                waitlistId: result.waitlistId || '',
+                waitlistId: event.waitlistId || '',
                 trainingId: event.trainingId,
                 userId: result.userId,
                 promotedAt: new Date().toISOString(),

@@ -18,9 +18,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(
-    command: JoinWaitlistCommand,
-  ): Promise<{ waitlist: Waitlist; position: number }> {
+  async execute(command: JoinWaitlistCommand) {
     const { userId, trainingId } = command;
 
     const existingBooking = await this.bookingRepository.findByUserAndTraining(
@@ -62,10 +60,6 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
         positionResult.position,
       ),
     );
-
-    return {
-      waitlist: savedEntry,
-      position: positionResult.position,
-    };
+    return savedEntry;
   }
 }

@@ -20,19 +20,19 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: PromoteFromWaitlistCommand): Promise<Booking | null> {
+  async execute(command: PromoteFromWaitlistCommand) {
     const { trainingId } = command;
 
     const availability =
       await this.trainingClientService.getAvailability(trainingId);
     if (!availability.isAvailable || availability.availableSlots <= 0) {
-      return null;
+      return;
     }
 
     let waitlistEntry =
       await this.waitlistRepository.findFirstByTrainingId(trainingId);
     if (!waitlistEntry) {
-      return null;
+      return;
     }
 
     while (waitlistEntry) {
@@ -78,7 +78,6 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
             waitlistEntry.userId,
           ),
         );
-        return savedBooking;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         await this.authClientService.releasePoints(
@@ -92,7 +91,5 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
         continue;
       }
     }
-
-    return null;
   }
 }

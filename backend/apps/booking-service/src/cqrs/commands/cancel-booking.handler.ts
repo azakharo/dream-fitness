@@ -5,7 +5,6 @@ import { TrainingClientService } from '../../clients/training-client.service';
 import { AuthClientService } from '../../clients/auth-client.service';
 import { BookingCancelledEvent } from '../events';
 import { EventBus } from '@nestjs/cqrs';
-import { Booking } from '../../bookings/entities/booking.entity';
 import { BookingStatus } from '@app/shared/enums';
 import { BookingNotFoundException } from '../../common/exceptions';
 import { ForbiddenException } from '@nestjs/common';
@@ -22,7 +21,7 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: CancelBookingCommand): Promise<Booking> {
+  async execute(command: CancelBookingCommand) {
     const { bookingId, userId, reason } = command;
 
     const booking = await this.bookingRepository.findById(bookingId);
@@ -73,7 +72,6 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
         reason,
       ),
     );
-
     return updatedBooking;
   }
 }
