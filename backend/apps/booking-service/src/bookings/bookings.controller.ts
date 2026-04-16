@@ -48,10 +48,9 @@ export class BookingsController {
     @Body() dto: CreateBookingDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
-    const result = await this.commandBus.execute(
+    return this.commandBus.execute(
       new BookTrainingCommand(user.id, dto.trainingId),
     );
-    return result;
   }
 
   @Get()
@@ -62,10 +61,7 @@ export class BookingsController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: BookingFilterDto,
   ): Promise<BookingResponseDto[]> {
-    const result = await this.queryBus.execute(
-      new GetUserBookingsQuery(user.id, filters),
-    );
-    return result;
+    return this.queryBus.execute(new GetUserBookingsQuery(user.id, filters));
   }
 
   @Get(':id')
@@ -76,10 +72,7 @@ export class BookingsController {
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
-    const result = await this.queryBus.execute(
-      new GetBookingByIdQuery(id, user.id),
-    );
-    return result;
+    return this.queryBus.execute(new GetBookingByIdQuery(id, user.id));
   }
 
   @Post(':id/cancel')
@@ -93,9 +86,8 @@ export class BookingsController {
     @Body() dto: CancelBookingDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
-    const result = await this.commandBus.execute(
+    return this.commandBus.execute(
       new CancelBookingCommand(id, user.id, dto.reason),
     );
-    return result;
   }
 }

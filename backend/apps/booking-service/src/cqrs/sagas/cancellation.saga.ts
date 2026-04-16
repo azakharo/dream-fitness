@@ -32,7 +32,8 @@ export class CancellationSaga {
           reason: event.reason,
           cancelledAt: new Date().toISOString(),
         });
-        const waitlistEntry = await this.waitlistRepository.findFirstByTrainingId(event.trainingId);
+        const waitlistEntry =
+          await this.waitlistRepository.findFirstByTrainingId(event.trainingId);
         return new CheckWaitlistPromotionEvent(
           event.trainingId,
           waitlistEntry?.id || '',

@@ -61,10 +61,9 @@ export class WaitlistController {
     @Query('trainingId') trainingId: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<WaitlistPositionResponseDto> {
-    const result = await this.queryBus.execute(
+    return this.queryBus.execute(
       new GetWaitlistPositionQuery(user.id, trainingId),
     );
-    return result as WaitlistPositionResponseDto;
   }
 
   @Delete()
