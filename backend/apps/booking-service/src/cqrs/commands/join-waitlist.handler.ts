@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ICommandHandler } from '@nestjs/cqrs';
+import { ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { TrainingClientService } from '../../clients/training-client.service';
 import { WaitlistJoinedEvent } from '../events';
-import { EventBus } from '@nestjs/cqrs';
-import { Waitlist } from '../../waitlist/entities/waitlist.entity';
 import { AlreadyOnWaitlistException } from '../../common/exceptions';
 import { JoinWaitlistCommand } from './join-waitlist.command';
+import { WaitlistResponseDto } from '../../waitlist/dto';
 
 @Injectable()
 export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand> {
@@ -60,6 +59,13 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
         positionResult.position,
       ),
     );
-    return savedEntry;
+
+    const response = new WaitlistResponseDto();
+    response.id = savedEntry.id;
+    response.userId = savedEntry.userId;
+    response.trainingId = savedEntry.trainingId;
+    response.position = positionResult.position;
+    response.joinedAt = savedEntry.createdAt.toISOString();
+    return response;
   }
 }

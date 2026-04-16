@@ -1,7 +1,7 @@
 import { Command } from '@nestjs/cqrs';
-import { Waitlist } from '../../waitlist/entities/waitlist.entity';
+import { WaitlistResponseDto } from '../../waitlist/dto';
 
-export class JoinWaitlistCommand extends Command<Waitlist> {
+export class JoinWaitlistCommand extends Command<WaitlistResponseDto> {
   constructor(
     public readonly userId: string,
     public readonly trainingId: string,
