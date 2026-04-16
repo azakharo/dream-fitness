@@ -6,7 +6,6 @@ import { TrainingClientService } from '../../clients/training-client.service';
 import { AuthClientService } from '../../clients/auth-client.service';
 import { BookingCreatedEvent, WaitlistPromotedEvent } from '../events';
 import { EventBus } from '@nestjs/cqrs';
-import { Booking } from '../../bookings/entities/booking.entity';
 import { BookingStatus } from '@app/shared/enums';
 import { PromoteFromWaitlistCommand } from './promote-from-waitlist.command';
 
