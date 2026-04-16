@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { Transaction, TransactionType } from '../entities/transaction.entity';
-import { PaginationParams, normalizePaginationParams } from '@app/shared';
+import { Transaction } from '../entities/transaction.entity';
+import {
+  PaginationParams,
+  TransactionType,
+  normalizePaginationParams,
+} from '@app/shared';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
 
 interface BalanceRawResult {

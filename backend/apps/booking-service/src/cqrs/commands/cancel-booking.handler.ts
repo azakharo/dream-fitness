@@ -11,6 +11,7 @@ import { BookingNotFoundException } from '../../common/exceptions';
 import { ForbiddenException } from '@nestjs/common';
 import { BookingAlreadyCancelledException } from '../../common/exceptions';
 import { CannotCancelPastTrainingException } from '../../common/exceptions';
+import { CancelBookingCommand } from './cancel-booking.command';
 
 @Injectable()
 export class CancelBookingHandler implements ICommandHandler<CancelBookingCommand> {

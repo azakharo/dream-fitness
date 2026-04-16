@@ -8,7 +8,7 @@ import { BookingCreatedEvent, WaitlistPromotedEvent } from '../events';
 import { EventBus } from '@nestjs/cqrs';
 import { Booking } from '../../bookings/entities/booking.entity';
 import { BookingStatus } from '@app/shared/enums';
-import { BookingNotFoundException } from '../../common/exceptions';
+import { PromoteFromWaitlistCommand } from './promote-from-waitlist.command';
 
 @Injectable()
 export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWaitlistCommand> {
@@ -46,6 +46,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
           price,
           bookingId,
         );
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         await this.waitlistRepository.remove(waitlistEntry);
         waitlistEntry =
@@ -78,6 +79,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
           ),
         );
         return savedBooking;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         await this.authClientService.releasePoints(
           waitlistEntry.userId,

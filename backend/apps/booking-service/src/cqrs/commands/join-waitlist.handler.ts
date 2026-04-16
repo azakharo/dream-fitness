@@ -7,6 +7,7 @@ import { WaitlistJoinedEvent } from '../events';
 import { EventBus } from '@nestjs/cqrs';
 import { Waitlist } from '../../waitlist/entities/waitlist.entity';
 import { AlreadyOnWaitlistException } from '../../common/exceptions';
+import { JoinWaitlistCommand } from './join-waitlist.command';
 
 @Injectable()
 export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand> {
@@ -27,17 +28,13 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       trainingId,
     );
     if (existingBooking) {
-      throw new AlreadyOnWaitlistException(
-        'User already has a booking for this training',
-      );
+      throw new AlreadyOnWaitlistException(userId, trainingId);
     }
 
     const existingWaitlistEntry =
       await this.waitlistRepository.findByUserAndTraining(userId, trainingId);
     if (existingWaitlistEntry) {
-      throw new AlreadyOnWaitlistException(
-        'User is already on the waitlist for this training',
-      );
+      throw new AlreadyOnWaitlistException(userId, trainingId);
     }
 
     await this.trainingClientService.getTraining(trainingId);

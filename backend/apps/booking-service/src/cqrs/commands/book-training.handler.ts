@@ -9,6 +9,7 @@ import { Booking } from '../../bookings/entities/booking.entity';
 import { BookingStatus } from '@app/shared/enums';
 import { DuplicateBookingException } from '../../common/exceptions';
 import { NoAvailableSlotsException } from '../../common/exceptions';
+import { BookTrainingCommand } from './book-training.command';
 
 @Injectable()
 export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand> {
@@ -30,7 +31,8 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
       throw new DuplicateBookingException(userId, trainingId);
     }
 
-    const availability = await this.trainingClientService.getAvailability(trainingId);
+    const availability =
+      await this.trainingClientService.getAvailability(trainingId);
     if (!availability.isAvailable || availability.availableSlots <= 0) {
       throw new NoAvailableSlotsException(trainingId);
     }
@@ -50,11 +52,13 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
 
     try {
       const savedBooking = await this.bookingRepository.save(booking);
-      this.eventBus.publish(new BookingCreatedEvent(
-        savedBooking.id,
-        savedBooking.trainingId,
-        savedBooking.userId,
-      ));
+      this.eventBus.publish(
+        new BookingCreatedEvent(
+          savedBooking.id,
+          savedBooking.trainingId,
+          savedBooking.userId,
+        ),
+      );
       return savedBooking;
     } catch (error) {
       await this.authClientService.releasePoints(userId, price, bookingId);
