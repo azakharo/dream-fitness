@@ -64,7 +64,7 @@ export class WaitlistController {
     const result = await this.queryBus.execute(
       new GetWaitlistPositionQuery(user.id, trainingId),
     );
-    return result;
+    return result as WaitlistPositionResponseDto;
   }
 
   @Delete()
