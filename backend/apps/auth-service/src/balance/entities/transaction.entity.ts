@@ -8,14 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-
-export enum TransactionType {
-  DEPOSIT = 'deposit',
-  WITHDRAW = 'withdraw',
-  REFUND = 'refund',
-  RESERVE = 'reserve',
-  RELEASE = 'release',
-}
+import { TransactionType } from '@app/shared/enums';
 
 @Entity('transactions')
 @Index(['userId'])

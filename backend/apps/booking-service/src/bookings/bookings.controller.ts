@@ -18,7 +18,7 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@app/shared';
+import { CurrentUser, JwtAuthGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BookingResponseDto } from './dto';
 import { BookingFilterDto } from './dto/booking-filter.dto';

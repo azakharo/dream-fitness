@@ -1,8 +1,14 @@
-import { Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@app/config';
-import { firstValueFrom, AxiosError } from 'axios';
-import { TransactionResponseDto } from '@app/auth/balance/dto/transaction-response.dto';
+import { ConfigService } from '../config';
+import { firstValueFrom } from 'rxjs';
+import { AxiosError } from 'axios';
+import { TransactionResponseDto } from '@app/contracts/auth';
 
 @Injectable()
 export class AuthClientService {
