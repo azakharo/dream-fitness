@@ -18,7 +18,7 @@ export class BookingSaga {
       ofType(BookingCreatedEvent),
       map((event: BookingCreatedEvent) => {
         this.logger.log(`Booking created: ${event.bookingId}`);
-        this.eventsPublisher.publishBookingCreated({
+        void this.eventsPublisher.publishBookingCreated({
           bookingId: event.bookingId,
           trainingId: event.trainingId,
           userId: event.userId,

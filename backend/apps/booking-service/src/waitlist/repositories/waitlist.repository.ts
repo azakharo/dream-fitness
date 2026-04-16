@@ -21,11 +21,11 @@ export class WaitlistRepository extends Repository<Waitlist> {
   }
 
   async findFirstByTrainingId(trainingId: string): Promise<Waitlist | null> {
-    return this.findOne({
+    const result = await this.findOne({
       where: { trainingId },
       order: { createdAt: 'ASC' },
-      take: 1,
-    } as any);
+    });
+    return result || null;
   }
 
   async getPositionByUserId(

@@ -301,9 +301,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
       expect(
-        response.body.data.every(
-          (t) => t.type === (TrainingType.YOGA as string),
-        ),
+        response.body.data.every((t) => t.type === TrainingType.YOGA),
       ).toBe(true);
     });
 

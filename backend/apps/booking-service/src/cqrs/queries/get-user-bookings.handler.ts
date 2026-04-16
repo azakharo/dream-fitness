@@ -8,11 +8,11 @@ import { BookingStatus } from '@app/shared/enums';
 
 @Injectable()
 export class GetUserBookingsHandler implements IQueryHandler<GetUserBookingsQuery> {
-  constructor(
-    private readonly bookingRepository: BookingRepository,
-  ) {}
+  constructor(private readonly bookingRepository: BookingRepository) {}
 
-  async execute(query: GetUserBookingsQuery): Promise<{ items: Booking[]; total: number; page: number; limit: number }> {
+  async execute(
+    query: GetUserBookingsQuery,
+  ): Promise<{ items: Booking[]; total: number; page: number; limit: number }> {
     const { userId, filters } = query;
     const normalizedFilters = filters || {};
     const { limit, skip } = normalizePaginationParams(normalizedFilters);

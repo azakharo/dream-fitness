@@ -21,7 +21,7 @@ export class CancellationSaga {
         this.logger.log(
           `Booking cancelled: ${event.bookingId}, triggering waitlist promotion check`,
         );
-        this.eventsPublisher.publishBookingCancelled({
+        void this.eventsPublisher.publishBookingCancelled({
           bookingId: event.bookingId,
           trainingId: event.trainingId,
           userId: event.userId,

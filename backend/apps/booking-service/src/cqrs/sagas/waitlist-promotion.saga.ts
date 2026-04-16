@@ -23,12 +23,18 @@ export class WaitlistPromotionSaga {
     return events$.pipe(
       ofType(CheckWaitlistPromotionEvent),
       mergeMap((event: CheckWaitlistPromotionEvent) => {
-        this.logger.log(`Checking waitlist promotion for training ${event.trainingId}`);
-        return from(this.commandBus.execute(new PromoteFromWaitlistCommand(event.trainingId))).pipe(
-          map((result: any) => {
+        this.logger.log(
+          `Checking waitlist promotion for training ${event.trainingId}`,
+        );
+        return from(
+          this.commandBus.execute(
+            new PromoteFromWaitlistCommand(event.trainingId),
+          ),
+        ).pipe(
+          map((result) => {
             if (result) {
               this.logger.log(`Waitlist user promoted to booking ${result.id}`);
-              this.eventsPublisher.publishWaitlistPromoted({
+              void this.eventsPublisher.publishWaitlistPromoted({
                 waitlistId: result.waitlistId || '',
                 trainingId: event.trainingId,
                 userId: result.userId,
@@ -38,7 +44,10 @@ export class WaitlistPromotionSaga {
             return null;
           }),
           catchError((error: any) => {
-            this.logger.error(`Waitlist promotion failed: ${error.message}`, error.stack);
+            this.logger.error(
+              `Waitlist promotion failed: ${error.message}`,
+              error.stack,
+            );
             return of(null);
           }),
         );
