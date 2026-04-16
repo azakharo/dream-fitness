@@ -47,9 +47,10 @@ export class WaitlistController {
     @Body() dto: JoinWaitlistDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<WaitlistResponseDto> {
-    const result = await this.commandBus.execute(
-      new JoinWaitlistCommand(user.id, dto.trainingId),
-    );
+    const result = await this.commandBus.execute<
+      JoinWaitlistCommand,
+      WaitlistResponseDto
+    >(new JoinWaitlistCommand(user.id, dto.trainingId));
     return result;
   }
 
@@ -61,9 +62,10 @@ export class WaitlistController {
     @Query('trainingId') trainingId: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<WaitlistPositionResponseDto> {
-    return this.queryBus.execute(
-      new GetWaitlistPositionQuery(user.id, trainingId),
-    );
+    return this.queryBus.execute<
+      GetWaitlistPositionQuery,
+      WaitlistPositionResponseDto
+    >(new GetWaitlistPositionQuery(user.id, trainingId));
   }
 
   @Delete()
@@ -78,7 +80,7 @@ export class WaitlistController {
     @Query('trainingId') trainingId: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ message: string }> {
-    await this.commandBus.execute(
+    await this.commandBus.execute<LeaveWaitlistCommand, void>(
       new LeaveWaitlistCommand(user.id, trainingId),
     );
     return { message: 'Removed from waitlist' };

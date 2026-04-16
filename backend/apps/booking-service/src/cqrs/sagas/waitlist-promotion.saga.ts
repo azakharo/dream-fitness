@@ -19,7 +19,7 @@ export class WaitlistPromotionSaga {
           `Checking waitlist promotion for training ${event.trainingId}`,
         );
         return from(
-          this.commandBus.execute(
+          this.commandBus.execute<PromoteFromWaitlistCommand, void>(
             new PromoteFromWaitlistCommand(event.trainingId),
           ),
         ).pipe(
