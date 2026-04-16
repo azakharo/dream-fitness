@@ -7,6 +7,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Body,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,13 +16,14 @@ import {
   ApiCreatedResponse,
   ApiUnauthorizedResponse,
   ApiBearerAuth,
+  ApiBody,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@app/shared';
+import { CurrentUser, JwtAuthGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { WaitlistResponseDto } from './dto';
 import { WaitlistPositionResponseDto } from './dto/waitlist-position-response.dto';
 import { JoinWaitlistDto } from '@app/contracts/booking';
-import { JoinWaitlistCommand } from '../cqrs/commands';
+import { JoinWaitlistCommand, LeaveWaitlistCommand } from '../cqrs/commands';
 import { GetWaitlistPositionQuery } from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
 

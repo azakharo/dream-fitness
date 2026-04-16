@@ -5,10 +5,10 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@app/config';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { TrainingResponseDto } from '@app/training/trainings/dto/training-response.dto';
+import { ConfigService } from '../config';
+import { TrainingResponseDto } from '@app/contracts';
 
 export interface AvailabilityResponse {
   trainingId: string;
