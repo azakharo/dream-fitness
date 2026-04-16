@@ -222,17 +222,28 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes = await trainersHelper.create(token, trainerData);
       const trainerId = trainerRes.body.id;
 
+      const firstTrainingStartDt = addMinutes(new Date(), 30);
+
       await trainingsHelper.create(
         token,
-        createTrainingDto(trainerId, { title: 'Training 1' }),
+        createTrainingDto(trainerId, {
+          title: 'Training 1',
+          scheduledAt: firstTrainingStartDt.toISOString(),
+        }),
       );
       await trainingsHelper.create(
         token,
-        createTrainingDto(trainerId, { title: 'Training 2' }),
+        createTrainingDto(trainerId, {
+          title: 'Training 2',
+          scheduledAt: addMinutes(firstTrainingStartDt, 120).toISOString(),
+        }),
       );
       await trainingsHelper.create(
         token,
-        createTrainingDto(trainerId, { title: 'Training 3' }),
+        createTrainingDto(trainerId, {
+          title: 'Training 3',
+          scheduledAt: addMinutes(firstTrainingStartDt, 240).toISOString(),
+        }),
       );
 
       const response = await trainingsHelper.findAll(token);
