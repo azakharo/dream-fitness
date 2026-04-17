@@ -27,6 +27,7 @@ import { JoinWaitlistDto } from '@app/contracts/booking';
 import { JoinWaitlistCommand, LeaveWaitlistCommand } from '../cqrs/commands';
 import { GetWaitlistPositionQuery } from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
+import type { Request as ExpressRequest } from 'express';
 
 @ApiTags('Waitlist')
 @ApiBearerAuth()
@@ -47,7 +48,7 @@ export class WaitlistController {
   async join(
     @Body() dto: JoinWaitlistDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req,
+    @Request() req: ExpressRequest,
   ): Promise<WaitlistResponseDto> {
     const result = await this.commandBus.execute<
       JoinWaitlistCommand,

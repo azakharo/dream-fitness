@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Request,
 } from '@nestjs/common';
+import type { Request as ExpressRequest } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -61,7 +62,7 @@ export class BookingsController {
   async create(
     @Body() dto: CreateBookingDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req,
+    @Request() req: ExpressRequest,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<BookTrainingCommand, Booking>(
       new BookTrainingCommand(
@@ -117,7 +118,7 @@ export class BookingsController {
     @Param('id') id: string,
     @Body() dto: CancelBookingDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req,
+    @Request() req: ExpressRequest,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<
       CancelBookingCommand,
