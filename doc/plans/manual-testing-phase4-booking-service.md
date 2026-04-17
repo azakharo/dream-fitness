@@ -137,7 +137,7 @@ http POST http://localhost:3002/trainings --session=admin title="Тестова�
 ### 14. Успешное бронирование тренировки (happy path)
 
 ```powershell
-http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_2>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_2>"
 ```
 
 **Ожидаемый результат:** 201 Created.
@@ -160,7 +160,7 @@ http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID
 - Баланс пользователя уменьшился на 300 (стоимость тренировки)
 
 ```powershell
-http GET http://localhost:3001/auth/profile --session=user
+http GET http://localhost:3001/auth/me --session=user
 ```
 
 Убедиться, что `balance` = 5000 - 300 = 4700.
@@ -201,24 +201,23 @@ http GET http://localhost:3003/bookings/<BOOKING_ID> --session=user
 
 ### 17. Повторное бронирование той же тренировки (negative — Duplicate)
 
-```powershell
-http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_2>" userId="<USER_ID>"
-```
+````powershell
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_2>"
 
 **Ожидаемый результат:** 409 Conflict — `DuplicateBookingException`.
 
 ### 18. Бронирование несуществующей тренировки (negative)
 
 ```powershell
-http POST http://localhost:3003/bookings --session=user trainingId="00000000-0000-0000-0000-000000000000" userId="<USER_ID>"
-```
+http POST http://localhost:3003/bookings --session=user trainingId="00000000-0000-0000-0000-000000000000"
+````
 
 **Ожидаемый результат:** 404 Not Found или 503 Service Unavailable (зависит от обработки ошибки в training-client).
 
 ### 19. Доступ без токена (negative)
 
 ```powershell
-http POST http://localhost:3003/bookings trainingId="<TRAINING_ID_2>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings trainingId="<TRAINING_ID_2>"
 ```
 
 **Ожидаемый результат:** 401 Unauthorized.
@@ -253,7 +252,7 @@ http POST http://localhost:3003/bookings/<BOOKING_ID>/cancel --session=user reas
 - Баланс пользователя вернулся к исходному значению (4700 + 300 = 5000):
 
 ```powershell
-http GET http://localhost:3001/auth/profile --session=user
+http GET http://localhost:3001/auth/me --session=user
 ```
 
 ### 21. Повторная отмена того же бронирования (negative)
@@ -281,7 +280,7 @@ http POST http://localhost:3003/bookings/00000000-0000-0000-0000-000000000000/ca
 ### 23. Забронировать тренировку с capacity=1 (заполнить все места)
 
 ```powershell
-http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_1>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_1>"
 ```
 
 **Ожидаемый результат:** 201 Created. Сохранить `id` как `<BOOKING_ID_WL>`.
@@ -289,7 +288,7 @@ http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID
 ### 24. Попытка забронировать заполненную тренировку (negative — No Available Slots)
 
 ```powershell
-http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_1>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_1>"
 ```
 
 **Ожидаемый результат:** 409 Conflict — `NoAvailableSlotsException` или `DuplicateBookingException` (если не прошёл шаг 17 с тем же user).
@@ -319,7 +318,7 @@ http POST http://localhost:3001/auth/balance/deposit --session=admin userId="<US
 Теперь попытаться забронировать заполненную тренировку от второго пользователя:
 
 ```powershell
-http POST http://localhost:3003/bookings "Authorization:Bearer <USER2_TOKEN>" trainingId="<TRAINING_ID_1>" userId="<USER2_ID>"
+http POST http://localhost:3003/bookings "Authorization:Bearer <USER2_TOKEN>" trainingId="<TRAINING_ID_1>"
 ```
 
 **Ожидаемый результат:** 409 Conflict — `NoAvailableSlotsException`.
@@ -374,7 +373,7 @@ http POST http://localhost:3003/bookings/<BOOKING_ID_WL>/cancel --session=user r
 Проверить баланс второго пользователя:
 
 ```powershell
-http GET http://localhost:3001/auth/profile "Authorization:Bearer <USER2_TOKEN>"
+http GET http://localhost:3001/auth/me "Authorization:Bearer <USER2_TOKEN>"
 ```
 
 Убедиться, что `balance` = 5000 - 500 = 4500.
