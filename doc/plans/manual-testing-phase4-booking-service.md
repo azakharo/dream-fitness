@@ -1,24 +1,5 @@
 # План ручного тестирования Booking Service (Фаза 4)
 
-## Известные проблемы (обратить внимание при тестировании)
-
-### 1. Маршрут auth-client → auth-service
-
-[`auth-client.service.ts`](../../backend/apps/booking-service/src/clients/auth-client.service.ts) формирует URL: `http://localhost:3001/balance/reserve`.
-Но [`BalanceController`](../../backend/apps/auth-service/src/balance/balance.controller.ts) использует `@Controller('auth')` + `@Post('balance/reserve')`, поэтому реальный путь: `/auth/balance/reserve`.
-
-Если при бронировании получаем ошибку — нужен фикс URL в `auth-client.service.ts` (добавить `/auth` префикс).
-
-### 2. Auth guard на balance endpoints
-
-[`BalanceController`](../../backend/apps/auth-service/src/balance/balance.controller.ts) использует `JwtAuthGuard`, но [`auth-client.service.ts`](../../backend/apps/booking-service/src/clients/auth-client.service.ts) не передаёт JWT токен — только заголовок `X-User-Id`. Это может вызвать 401 Unauthorized при вызовах reserve/release/refund.
-
-### 3. DTO требует userId в теле
-
-[`CreateBookingDto`](../../backend/libs/contracts/src/booking/booking.dto.ts) и [`JoinWaitlistDto`](../../backend/libs/contracts/src/booking/booking.dto.ts) требуют поле `userId` (не опциональное). Нужно передавать в теле запроса.
-
----
-
 ## Предварительные шаги
 
 ### 1. Запустить инфраструктуру (PostgreSQL + RabbitMQ)
@@ -83,7 +64,13 @@ npm run start:dev:booking-service
 http POST http://localhost:3001/auth/login email="admin@dreamfitness.com" password="admin123"
 ```
 
-**Ожидаемый результат:** 200 OK, сохранить `accessToken` как `<ADMIN_TOKEN>`.
+**Ожидаемый результат:** 200 OK.
+
+Сохранить `accessToken` в сессии `admin`.
+
+```powershell
+http --session=admin -A bearer -a <token> http://localhost:3001/auth/balance
+```
 
 ### 8. Получить JWT токен тестового пользователя
 
@@ -91,12 +78,14 @@ http POST http://localhost:3001/auth/login email="admin@dreamfitness.com" passwo
 http POST http://localhost:3001/auth/login email="test@example.com" password="test12345"
 ```
 
-**Ожидаемый результат:** 200 OK, сохранить `accessToken` как `<USER_TOKEN>`.
+**Ожидаемый результат:** 200 OK.
+
+Сохранить `accessToken` в сессии `user`.
 
 ### 9. Получить ID тестового пользователя
 
 ```powershell
-http GET http://localhost:3001/auth/profile "Authorization:Bearer <USER_TOKEN>"
+http GET http://localhost:3001/auth/profile --session=user
 ```
 
 Сохранить `id` как `<USER_ID>`.
@@ -106,7 +95,7 @@ http GET http://localhost:3001/auth/profile "Authorization:Bearer <USER_TOKEN>"
 Seed создаёт пользователей с `balance: 0`. Для бронирования нужны баллы.
 
 ```powershell
-http POST http://localhost:3001/auth/balance/deposit "Authorization:Bearer <ADMIN_TOKEN>" userId="<USER_ID>" amount:=5000
+http POST http://localhost:3001/auth/balance/deposit --session=admin userId="<USER_ID>" amount:=5000
 ```
 
 **Ожидаемый результат:** 200 OK, баланс пользователя пополнен.
@@ -114,7 +103,7 @@ http POST http://localhost:3001/auth/balance/deposit "Authorization:Bearer <ADMI
 ### 11. Создать тренера (для тренировок)
 
 ```powershell
-http POST http://localhost:3002/trainers "Authorization:Bearer <ADMIN_TOKEN>" name="Тренер Тест" bio="Для тестирования бронирования"
+http POST http://localhost:3002/trainers --session=admin name="Тренер Тест" bio="Для тестирования бронирования"
 ```
 
 Сохранить `id` как `<TRAINER_ID>`.
@@ -124,7 +113,7 @@ http POST http://localhost:3002/trainers "Authorization:Bearer <ADMIN_TOKEN>" na
 Тренировка с 1 местом позволяет быстро заполнить её и проверить waitlist.
 
 ```powershell
-http POST http://localhost:3002/trainings "Authorization:Bearer <ADMIN_TOKEN>" title="Тестовая тренировка 1 место" type="yoga" trainerId="<TRAINER_ID>" scheduledAt="2026-06-20T10:00:00Z" durationMinutes:=60 capacity:=1 price:=500
+http POST http://localhost:3002/trainings --session=admin title="Тестовая тренировка 1 место" type="yoga" trainerId="<TRAINER_ID>" scheduledAt="2026-06-20T10:00:00Z" durationMinutes:=60 capacity:=1 price:=500
 ```
 
 Сохранить `id` как `<TRAINING_ID_1>`.
@@ -132,7 +121,7 @@ http POST http://localhost:3002/trainings "Authorization:Bearer <ADMIN_TOKEN>" t
 ### 13. Создать вторую тренировку с capacity=10 (для обычного бронирования)
 
 ```powershell
-http POST http://localhost:3002/trainings "Authorization:Bearer <ADMIN_TOKEN>" title="Тестовая тренировка 10 мест" type="crossfit" trainerId="<TRAINER_ID>" scheduledAt="2026-06-21T10:00:00Z" durationMinutes:=60 capacity:=10 price:=300
+http POST http://localhost:3002/trainings --session=admin title="Тестовая тренировка 10 мест" type="crossfit" trainerId="<TRAINER_ID>" scheduledAt="2026-06-21T10:00:00Z" durationMinutes:=60 capacity:=10 price:=300
 ```
 
 Сохранить `id` как `<TRAINING_ID_2>`.
@@ -146,7 +135,7 @@ http POST http://localhost:3002/trainings "Authorization:Bearer <ADMIN_TOKEN>" t
 ### 14. Успешное бронирование тренировки (happy path)
 
 ```powershell
-http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" trainingId="<TRAINING_ID_2>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_2>" userId="<USER_ID>"
 ```
 
 **Ожидаемый результат:** 201 Created.
@@ -169,7 +158,7 @@ http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" tra
 - Баланс пользователя уменьшился на 300 (стоимость тренировки)
 
 ```powershell
-http GET http://localhost:3001/auth/profile "Authorization:Bearer <USER_TOKEN>"
+http GET http://localhost:3001/auth/profile --session=user
 ```
 
 Убедиться, что `balance` = 5000 - 300 = 4700.
@@ -177,7 +166,7 @@ http GET http://localhost:3001/auth/profile "Authorization:Bearer <USER_TOKEN>"
 ### 15. Получение списка бронирований пользователя
 
 ```powershell
-http GET http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>"
+http GET http://localhost:3003/bookings --session=user
 ```
 
 **Ожидаемый результат:** 200 OK.
@@ -203,7 +192,7 @@ http GET http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>"
 ### 16. Получение бронирования по ID
 
 ```powershell
-http GET http://localhost:3003/bookings/<BOOKING_ID> "Authorization:Bearer <USER_TOKEN>"
+http GET http://localhost:3003/bookings/<BOOKING_ID> --session=user
 ```
 
 **Ожидаемый результат:** 200 OK, данные бронирования.
@@ -211,7 +200,7 @@ http GET http://localhost:3003/bookings/<BOOKING_ID> "Authorization:Bearer <USER
 ### 17. Повторное бронирование той же тренировки (negative — Duplicate)
 
 ```powershell
-http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" trainingId="<TRAINING_ID_2>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_2>" userId="<USER_ID>"
 ```
 
 **Ожидаемый результат:** 409 Conflict — `DuplicateBookingException`.
@@ -219,7 +208,7 @@ http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" tra
 ### 18. Бронирование несуществующей тренировки (negative)
 
 ```powershell
-http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" trainingId="00000000-0000-0000-0000-000000000000" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="00000000-0000-0000-0000-000000000000" userId="<USER_ID>"
 ```
 
 **Ожидаемый результат:** 404 Not Found или 503 Service Unavailable (зависит от обработки ошибки в training-client).
@@ -241,7 +230,7 @@ http POST http://localhost:3003/bookings trainingId="<TRAINING_ID_2>" userId="<U
 Бронирование уже создано на шаге 14. Теперь отменяем:
 
 ```powershell
-http POST http://localhost:3003/bookings/<BOOKING_ID>/cancel "Authorization:Bearer <USER_TOKEN>" reason="Не смогу прийти"
+http POST http://localhost:3003/bookings/<BOOKING_ID>/cancel --session=user reason="Не смогу прийти"
 ```
 
 **Ожидаемый результат:** 200 OK.
@@ -262,13 +251,13 @@ http POST http://localhost:3003/bookings/<BOOKING_ID>/cancel "Authorization:Bear
 - Баланс пользователя вернулся к исходному значению (4700 + 300 = 5000):
 
 ```powershell
-http GET http://localhost:3001/auth/profile "Authorization:Bearer <USER_TOKEN>"
+http GET http://localhost:3001/auth/profile --session=user
 ```
 
 ### 21. Повторная отмена того же бронирования (negative)
 
 ```powershell
-http POST http://localhost:3003/bookings/<BOOKING_ID>/cancel "Authorization:Bearer <USER_TOKEN>"
+http POST http://localhost:3003/bookings/<BOOKING_ID>/cancel --session=user
 ```
 
 **Ожидаемый результат:** 409 Conflict — `BookingAlreadyCancelledException`.
@@ -276,7 +265,7 @@ http POST http://localhost:3003/bookings/<BOOKING_ID>/cancel "Authorization:Bear
 ### 22. Отмена несуществующего бронирования (negative)
 
 ```powershell
-http POST http://localhost:3003/bookings/00000000-0000-0000-0000-000000000000/cancel "Authorization:Bearer <USER_TOKEN>"
+http POST http://localhost:3003/bookings/00000000-0000-0000-0000-000000000000/cancel --session=user
 ```
 
 **Ожидаемый результат:** 404 Not Found — `BookingNotFoundException`.
@@ -290,7 +279,7 @@ http POST http://localhost:3003/bookings/00000000-0000-0000-0000-000000000000/ca
 ### 23. Забронировать тренировку с capacity=1 (заполнить все места)
 
 ```powershell
-http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" trainingId="<TRAINING_ID_1>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_1>" userId="<USER_ID>"
 ```
 
 **Ожидаемый результат:** 201 Created. Сохранить `id` как `<BOOKING_ID_WL>`.
@@ -298,7 +287,7 @@ http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" tra
 ### 24. Попытка забронировать заполненную тренировку (negative — No Available Slots)
 
 ```powershell
-http POST http://localhost:3003/bookings "Authorization:Bearer <USER_TOKEN>" trainingId="<TRAINING_ID_1>" userId="<USER_ID>"
+http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID_1>" userId="<USER_ID>"
 ```
 
 **Ожидаемый результат:** 409 Conflict — `NoAvailableSlotsException` или `DuplicateBookingException` (если не прошёл шаг 17 с тем же user).
@@ -322,7 +311,7 @@ http POST http://localhost:3001/auth/login email="test2@example.com" password="t
 Пополнить баланс второго пользователя:
 
 ```powershell
-http POST http://localhost:3001/auth/balance/deposit "Authorization:Bearer <ADMIN_TOKEN>" userId="<USER2_ID>" amount:=5000
+http POST http://localhost:3001/auth/balance/deposit --session=admin userId="<USER2_ID>" amount:=5000
 ```
 
 Теперь попытаться забронировать заполненную тренировку от второго пользователя:
@@ -370,7 +359,7 @@ http GET http://localhost:3003/waitlist/position?trainingId="<TRAINING_ID_1>" "A
 ### 27. Отменить бронирование первого пользователя (триггер waitlist promotion)
 
 ```powershell
-http POST http://localhost:3003/bookings/<BOOKING_ID_WL>/cancel "Authorization:Bearer <USER_TOKEN>" reason="Освобождаю место"
+http POST http://localhost:3003/bookings/<BOOKING_ID_WL>/cancel --session=user reason="Освобождаю место"
 ```
 
 **Ожидаемый результат:** 200 OK, бронирование отменено.
