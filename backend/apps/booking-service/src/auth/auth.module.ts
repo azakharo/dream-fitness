@@ -15,7 +15,7 @@ import type { StringValue } from 'ms';
           configService.get('JWT_SECRET') ||
           'your-super-secret-jwt-key-change-in-production',
         signOptions: {
-          expiresIn: (configService.get('JWT_EXPIRES_IN') ||
+          expiresIn: (configService.get('JWT_ACCESS_TTL') ||
             '15m') as StringValue,
         },
       }),

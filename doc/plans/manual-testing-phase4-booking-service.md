@@ -85,7 +85,7 @@ http POST http://localhost:3001/auth/login email="test@example.com" password="te
 ### 9. Получить ID тестового пользователя
 
 ```powershell
-http GET http://localhost:3001/auth/profile --session=user
+http GET http://localhost:3001/auth/me --session=user
 ```
 
 Сохранить `id` как `<USER_ID>`.
