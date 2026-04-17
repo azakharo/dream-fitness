@@ -34,7 +34,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       throw new AlreadyOnWaitlistException(userId, trainingId);
     }
 
-    await this.trainingClientService.getTraining(trainingId);
+    await this.trainingClientService.getTraining(trainingId, command.jwtToken);
 
     const waitlistEntry = this.waitlistRepository.create({
       userId,

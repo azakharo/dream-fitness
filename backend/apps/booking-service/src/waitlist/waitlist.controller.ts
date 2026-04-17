@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Body,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -46,11 +47,18 @@ export class WaitlistController {
   async join(
     @Body() dto: JoinWaitlistDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Request() req,
   ): Promise<WaitlistResponseDto> {
     const result = await this.commandBus.execute<
       JoinWaitlistCommand,
       WaitlistResponseDto
-    >(new JoinWaitlistCommand(user.id, dto.trainingId));
+    >(
+      new JoinWaitlistCommand(
+        user.id,
+        dto.trainingId,
+        req.headers.authorization,
+      ),
+    );
     return result;
   }
 

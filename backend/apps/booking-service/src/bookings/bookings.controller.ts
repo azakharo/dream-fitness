@@ -64,7 +64,11 @@ export class BookingsController {
     @Request() req,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<BookTrainingCommand, Booking>(
-      new BookTrainingCommand(user.id, dto.trainingId, req.headers.authorization),
+      new BookTrainingCommand(
+        user.id,
+        dto.trainingId,
+        req.headers.authorization,
+      ),
     );
     return this.toBookingResponseDto(booking);
   }
@@ -113,11 +117,19 @@ export class BookingsController {
     @Param('id') id: string,
     @Body() dto: CancelBookingDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Request() req,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<
       CancelBookingCommand,
       Booking
-    >(new CancelBookingCommand(id, user.id, dto.reason));
+    >(
+      new CancelBookingCommand(
+        id,
+        user.id,
+        dto.reason,
+        req.headers.authorization,
+      ),
+    );
     return this.toBookingResponseDto(booking);
   }
 }

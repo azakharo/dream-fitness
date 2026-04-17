@@ -41,6 +41,7 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
 
     const training = await this.trainingClientService.getTraining(
       booking.trainingId,
+      command.jwtToken,
     );
     const trainingDate = new Date(training.scheduledAt);
     const now = new Date();

@@ -5,6 +5,7 @@ export class JoinWaitlistCommand extends Command<WaitlistResponseDto> {
   constructor(
     public readonly userId: string,
     public readonly trainingId: string,
+    public readonly jwtToken?: string,
   ) {
     super();
   }
