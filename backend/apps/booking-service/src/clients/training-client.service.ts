@@ -27,13 +27,22 @@ export class TrainingClientService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getTraining(trainingId: string): Promise<TrainingResponseDto> {
+  async getTraining(
+    trainingId: string,
+    jwtToken?: string,
+  ): Promise<TrainingResponseDto> {
     try {
       const url = `${this.configService.getTrainingServiceUrl()}/trainings/${trainingId}`;
+
+      const headers: Record<string, string> = {};
+      if (jwtToken) {
+        headers['Authorization'] = jwtToken;
+      }
 
       const response = await firstValueFrom(
         this.httpService.get<TrainingResponseDto>(url, {
           timeout: 5000,
+          headers,
         }),
       );
 
@@ -43,6 +52,11 @@ export class TrainingClientService {
       if (error instanceof AxiosError) {
         if (error.response?.status === 404) {
           throw new NotFoundException('Training not found');
+        }
+        if (error.response?.status === 401) {
+          throw new ServiceUnavailableException(
+            'Authentication failed when accessing training service',
+          );
         }
         this.logger.error(
           `Failed to fetch training ${trainingId}: ${error.message}`,
@@ -54,13 +68,22 @@ export class TrainingClientService {
     }
   }
 
-  async getAvailability(trainingId: string): Promise<AvailabilityResponse> {
+  async getAvailability(
+    trainingId: string,
+    jwtToken?: string,
+  ): Promise<AvailabilityResponse> {
     try {
       const url = `${this.configService.getTrainingServiceUrl()}/trainings/${trainingId}/availability`;
+
+      const headers: Record<string, string> = {};
+      if (jwtToken) {
+        headers['Authorization'] = jwtToken;
+      }
 
       const response = await firstValueFrom(
         this.httpService.get<AvailabilityResponse>(url, {
           timeout: 5000,
+          headers,
         }),
       );
 
@@ -72,6 +95,11 @@ export class TrainingClientService {
       if (error instanceof AxiosError) {
         if (error.response?.status === 404) {
           throw new NotFoundException('Training not found');
+        }
+        if (error.response?.status === 401) {
+          throw new ServiceUnavailableException(
+            'Authentication failed when accessing training service',
+          );
         }
         this.logger.error(
           `Failed to fetch availability for training ${trainingId}: ${error.message}`,

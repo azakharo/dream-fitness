@@ -21,7 +21,7 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
   ) {}
 
   async execute(command: BookTrainingCommand): Promise<Booking> {
-    const { userId, trainingId } = command;
+    const { userId, trainingId, jwtToken } = command;
 
     const existingBooking = await this.bookingRepository.findByUserAndTraining(
       userId,
@@ -32,12 +32,12 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
     }
 
     const availability =
-      await this.trainingClientService.getAvailability(trainingId);
+      await this.trainingClientService.getAvailability(trainingId, jwtToken);
     if (!availability.isAvailable || availability.availableSlots <= 0) {
       throw new NoAvailableSlotsException(trainingId);
     }
 
-    const training = await this.trainingClientService.getTraining(trainingId);
+    const training = await this.trainingClientService.getTraining(trainingId, jwtToken);
     const bookingId = crypto.randomUUID();
     const price = training.price;
 

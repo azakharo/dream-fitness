@@ -8,6 +8,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -60,9 +61,10 @@ export class BookingsController {
   async create(
     @Body() dto: CreateBookingDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Request() req,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<BookTrainingCommand, Booking>(
-      new BookTrainingCommand(user.id, dto.trainingId),
+      new BookTrainingCommand(user.id, dto.trainingId, req.headers.authorization),
     );
     return this.toBookingResponseDto(booking);
   }

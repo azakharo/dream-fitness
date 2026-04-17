@@ -5,6 +5,7 @@ export class BookTrainingCommand extends Command<Booking> {
   constructor(
     public readonly userId: string,
     public readonly trainingId: string,
+    public readonly jwtToken?: string,
   ) {
     super();
   }
