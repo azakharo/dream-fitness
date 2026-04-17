@@ -4,3 +4,4 @@ export { TrainingNotFoundException } from './training-not-found.exception';
 export { TrainingAlreadyCancelledException } from './training-already-cancelled.exception';
 export { ScheduleConflictException } from './schedule-conflict.exception';
 export { PastDateException } from './past-date.exception';
+export { TrainerAlreadyExistsException } from './trainer-already-exists.exception';

@@ -6,6 +6,7 @@ import { UpdateTrainerDto } from './dto/update-trainer.dto';
 import { TrainerResponseDto } from './dto/trainer-response.dto';
 import { Trainer } from './entities/trainer.entity';
 import { TrainerNotFoundException } from '../common/exceptions/trainer-not-found.exception';
+import { TrainerAlreadyExistsException } from '../common/exceptions/trainer-already-exists.exception';
 
 @Injectable()
 export class TrainersService {
@@ -26,7 +27,7 @@ export class TrainersService {
   async create(dto: CreateTrainerDto): Promise<TrainerResponseDto> {
     const existingTrainer = await this.trainerRepository.findByName(dto.name);
     if (existingTrainer) {
-      throw new Error(`Trainer with name "${dto.name}" already exists`);
+      throw new TrainerAlreadyExistsException(dto.name);
     }
 
     const trainer = this.trainerRepository.create(dto as DeepPartial<Trainer>);
