@@ -31,18 +31,19 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
       throw new DuplicateBookingException(userId, trainingId);
     }
 
-    const availability = await this.trainingClientService.getAvailability(
-      trainingId,
-      jwtToken,
-    );
-    if (!availability.isAvailable || availability.availableSlots <= 0) {
-      throw new NoAvailableSlotsException(trainingId);
-    }
-
     const training = await this.trainingClientService.getTraining(
       trainingId,
       jwtToken,
     );
+
+    const confirmedBookingsCount =
+      await this.bookingRepository.countConfirmedByTrainingId(trainingId);
+    const availableSlots = training.capacity - confirmedBookingsCount;
+
+    if (availableSlots <= 0) {
+      throw new NoAvailableSlotsException(trainingId);
+    }
+
     const bookingId = crypto.randomUUID();
     const price = training.price;
 

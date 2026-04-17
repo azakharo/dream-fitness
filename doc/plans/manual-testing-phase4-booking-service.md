@@ -298,7 +298,7 @@ http POST http://localhost:3003/bookings --session=user trainingId="<TRAINING_ID
 ### 24а. Создать второго тестового пользователя (если нужно)
 
 ```powershell
-http POST http://localhost:3001/auth/register email="test2@example.com" password="test12345" name="Test User 2" role="client"
+http POST http://localhost:3001/auth/register email="test2@example.com" password="test12345" name="Test User 2"
 ```
 
 Получить токен:

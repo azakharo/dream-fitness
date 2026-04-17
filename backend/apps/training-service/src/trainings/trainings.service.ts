@@ -26,8 +26,6 @@ export class TrainingsService {
   private async toResponseDto(
     training: Training,
   ): Promise<TrainingResponseDto> {
-    const availableSlots =
-      training.capacity - this.trainingRepository.countActiveBookings();
     const trainer = await this.trainersService.findById(training.trainerId);
     return {
       id: training.id,
@@ -39,8 +37,8 @@ export class TrainingsService {
       scheduledAt: training.scheduledAt.toISOString(),
       durationMinutes: training.durationMinutes,
       capacity: training.capacity,
-      currentParticipants: training.capacity - availableSlots,
-      availableSlots,
+      currentParticipants: 0,
+      availableSlots: training.capacity,
       price: training.price,
       status: training.status,
       createdAt: training.createdAt.toISOString(),
@@ -212,9 +210,9 @@ export class TrainingsService {
       throw new TrainingNotFoundException(id);
     }
 
-    const currentParticipants = this.trainingRepository.countActiveBookings();
-    const availableSlots = training.capacity - currentParticipants;
-    const isAvailable = availableSlots > 0;
+    const currentParticipants = 0;
+    const availableSlots = training.capacity;
+    const isAvailable = true;
 
     return {
       trainingId: training.id,

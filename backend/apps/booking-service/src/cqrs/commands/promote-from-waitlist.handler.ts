@@ -22,9 +22,12 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
   async execute(command: PromoteFromWaitlistCommand) {
     const { trainingId } = command;
 
-    const availability =
-      await this.trainingClientService.getAvailability(trainingId);
-    if (!availability.isAvailable || availability.availableSlots <= 0) {
+    const training = await this.trainingClientService.getTraining(trainingId);
+    const confirmedBookingsCount =
+      await this.bookingRepository.countConfirmedByTrainingId(trainingId);
+    const availableSlots = training.capacity - confirmedBookingsCount;
+
+    if (availableSlots <= 0) {
       return;
     }
 
@@ -35,7 +38,6 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
     }
 
     while (waitlistEntry) {
-      const training = await this.trainingClientService.getTraining(trainingId);
       const bookingId = crypto.randomUUID();
       const price = training.price;
 
