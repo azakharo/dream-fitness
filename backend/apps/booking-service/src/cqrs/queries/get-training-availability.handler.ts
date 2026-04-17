@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { QueryHandler } from '@nestjs/cqrs';
 import { IQueryHandler } from '@nestjs/cqrs';
 import { TrainingClientService } from '../../clients/training-client.service';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { GetTrainingAvailabilityQuery } from './get-training-availability.query';
 import { AvailabilityResponse } from '../../clients/training-client.service';
 
-@Injectable()
+@QueryHandler(GetTrainingAvailabilityQuery)
 export class GetTrainingAvailabilityHandler implements IQueryHandler<GetTrainingAvailabilityQuery> {
   constructor(
     private readonly trainingClientService: TrainingClientService,

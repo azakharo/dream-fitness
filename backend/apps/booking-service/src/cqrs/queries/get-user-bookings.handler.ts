@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { QueryHandler } from '@nestjs/cqrs';
 import { IQueryHandler } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { Booking } from '../../bookings/entities/booking.entity';
@@ -6,7 +6,7 @@ import { GetUserBookingsQuery } from './get-user-bookings.query';
 import { normalizePaginationParams } from '@app/shared';
 import { BookingStatus } from '@app/shared/enums';
 
-@Injectable()
+@QueryHandler(GetUserBookingsQuery)
 export class GetUserBookingsHandler implements IQueryHandler<GetUserBookingsQuery> {
   constructor(private readonly bookingRepository: BookingRepository) {}
 

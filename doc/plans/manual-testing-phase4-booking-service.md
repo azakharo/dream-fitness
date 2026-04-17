@@ -70,6 +70,8 @@ http POST http://localhost:3001/auth/login email="admin@dreamfitness.com" passwo
 
 ```powershell
 http --session=admin -A bearer -a <token> http://localhost:3001/auth/balance
+http --session=admin -A bearer -a <token> http://localhost:3002/trainers
+http --session=admin -A bearer -a <token> http://localhost:3003/bookings
 ```
 
 ### 8. Получить JWT токен тестового пользователя

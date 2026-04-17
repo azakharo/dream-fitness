@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
@@ -8,7 +8,7 @@ import { AlreadyOnWaitlistException } from '../../common/exceptions';
 import { JoinWaitlistCommand } from './join-waitlist.command';
 import { WaitlistResponseDto } from '../../waitlist/dto';
 
-@Injectable()
+@CommandHandler(JoinWaitlistCommand)
 export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand> {
   constructor(
     private readonly bookingRepository: BookingRepository,

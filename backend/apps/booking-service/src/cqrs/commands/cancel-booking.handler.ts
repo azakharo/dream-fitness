@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { TrainingClientService } from '../../clients/training-client.service';
@@ -12,7 +12,7 @@ import { BookingAlreadyCancelledException } from '../../common/exceptions';
 import { CannotCancelPastTrainingException } from '../../common/exceptions';
 import { CancelBookingCommand } from './cancel-booking.command';
 
-@Injectable()
+@CommandHandler(CancelBookingCommand)
 export class CancelBookingHandler implements ICommandHandler<CancelBookingCommand> {
   constructor(
     private readonly bookingRepository: BookingRepository,

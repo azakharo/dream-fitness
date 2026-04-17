@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler } from '@nestjs/cqrs';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { NotOnWaitlistException } from '../../common/exceptions';
 import { LeaveWaitlistCommand } from './leave-waitlist.command';
 
-@Injectable()
+@CommandHandler(LeaveWaitlistCommand)
 export class LeaveWaitlistHandler implements ICommandHandler<LeaveWaitlistCommand> {
   constructor(private readonly waitlistRepository: WaitlistRepository) {}
 

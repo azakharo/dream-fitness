@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { QueryHandler } from '@nestjs/cqrs';
 import { IQueryHandler } from '@nestjs/cqrs';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { GetWaitlistPositionQuery } from './get-waitlist-position.query';
 import { NotOnWaitlistException } from '../../common/exceptions';
 import { WaitlistPositionResponseDto } from '../../waitlist/dto/waitlist-position-response.dto';
 
-@Injectable()
+@QueryHandler(GetWaitlistPositionQuery)
 export class GetWaitlistPositionHandler implements IQueryHandler<GetWaitlistPositionQuery> {
   constructor(private readonly waitlistRepository: WaitlistRepository) {}
 

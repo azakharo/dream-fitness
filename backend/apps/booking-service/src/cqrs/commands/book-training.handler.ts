@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { TrainingClientService } from '../../clients/training-client.service';
@@ -11,7 +11,7 @@ import { DuplicateBookingException } from '../../common/exceptions';
 import { NoAvailableSlotsException } from '../../common/exceptions';
 import { BookTrainingCommand } from './book-training.command';
 
-@Injectable()
+@CommandHandler(BookTrainingCommand)
 export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand> {
   constructor(
     private readonly bookingRepository: BookingRepository,

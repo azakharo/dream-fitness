@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
@@ -9,7 +9,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { BookingStatus } from '@app/shared/enums';
 import { PromoteFromWaitlistCommand } from './promote-from-waitlist.command';
 
-@Injectable()
+@CommandHandler(PromoteFromWaitlistCommand)
 export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWaitlistCommand> {
   constructor(
     private readonly bookingRepository: BookingRepository,
