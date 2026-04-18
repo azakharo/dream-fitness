@@ -59,8 +59,6 @@ export class TrainingsController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get training by ID' })
   @ApiOkResponse({ type: TrainingResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -95,8 +93,6 @@ export class TrainingsController {
   }
 
   @Get(':id/availability')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Check available slots for training' })
   @ApiOkResponse({
     schema: {

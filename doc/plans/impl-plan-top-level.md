@@ -345,6 +345,7 @@
 > Это создаёт дублирование: каждый сервис содержит свой JWT validation guard и auth module.
 >
 > **После реализации API Gateway:**
+>
 > - Вся аутентификация и авторизация переносится в Gateway
 > - Gateway валидирует JWT и передаёт userId/role через внутренние заголовки - X-User-Id и X-User-Role
 > - Сервисы убирают JWT validation guard и auth module, оставляя только проверку внутренних заголовков
@@ -352,6 +353,8 @@
 > - Saga в booking-service - promote-from-waitlist - потребует отдельного решения для авторизации
 >   - либо сервисный токен для внутренних вызовов через Gateway
 >   - либо доверенные внутренние заголовки без токена
+
+> **Known Issue (Phase 4):** В текущей реализации GET /trainings/:id и GET /trainings/:id/availability в training-service временно отключены для аутентификации, чтобы saga в booking-service мог вызывать их без JWT. Это quick fix для Phase 4. В Phase 6 будет реализовано правильное решение через API Gateway с сервисным токеном или доверенными заголовками.
 
 ### 6.1. Basic Setup
 
