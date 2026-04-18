@@ -1,5 +1,6 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { ICommandHandler } from '@nestjs/cqrs';
+import { Logger } from '@nestjs/common';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { TrainingClientService } from '../../clients/training-client.service';
@@ -11,6 +12,8 @@ import { PromoteFromWaitlistCommand } from './promote-from-waitlist.command';
 
 @CommandHandler(PromoteFromWaitlistCommand)
 export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWaitlistCommand> {
+  private readonly logger = new Logger(PromoteFromWaitlistHandler.name);
+
   constructor(
     private readonly bookingRepository: BookingRepository,
     private readonly waitlistRepository: WaitlistRepository,
@@ -37,7 +40,9 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
       return;
     }
 
-    while (waitlistEntry) {
+    let remainingSlots = availableSlots;
+
+    while (waitlistEntry && remainingSlots > 0) {
       const bookingId = crypto.randomUUID();
       const price = training.price;
 
@@ -47,8 +52,10 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
           price,
           bookingId,
         );
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch {
+        this.logger.warn(
+          `Failed to reserve points for waitlisted user ${waitlistEntry.userId}, skipping`,
+        );
         await this.waitlistRepository.remove(waitlistEntry);
         waitlistEntry =
           await this.waitlistRepository.findFirstByTrainingId(trainingId);
@@ -65,6 +72,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
       try {
         const savedBooking = await this.bookingRepository.save(booking);
         await this.waitlistRepository.remove(waitlistEntry);
+        remainingSlots--;
         this.eventBus.publish(
           new BookingCreatedEvent(
             savedBooking.id,
@@ -79,8 +87,10 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
             waitlistEntry.userId,
           ),
         );
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch {
+        this.logger.error(
+          `Failed to save promoted booking for user ${waitlistEntry.userId}`,
+        );
         await this.authClientService.releasePoints(
           waitlistEntry.userId,
           price,
@@ -91,6 +101,9 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
           await this.waitlistRepository.findFirstByTrainingId(trainingId);
         continue;
       }
+
+      waitlistEntry =
+        await this.waitlistRepository.findFirstByTrainingId(trainingId);
     }
   }
 }

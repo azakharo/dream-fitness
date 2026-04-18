@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { BookingCancelledEvent } from '../events';
 import { EventsPublisher } from '../../events/events.publisher';
-import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { PromoteFromWaitlistCommand } from '../commands';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class CancellationSaga {
 
   constructor(
     private readonly eventsPublisher: EventsPublisher,
-    private readonly waitlistRepository: WaitlistRepository,
     private readonly commandBus: CommandBus,
   ) {}
 
@@ -33,9 +31,15 @@ export class CancellationSaga {
           reason: event.reason,
           cancelledAt: new Date().toISOString(),
         });
-        await this.commandBus.execute(
-          new PromoteFromWaitlistCommand(event.trainingId),
-        );
+        try {
+          await this.commandBus.execute(
+            new PromoteFromWaitlistCommand(event.trainingId),
+          );
+        } catch (error) {
+          this.logger.error(
+            `Waitlist promotion failed after booking cancellation: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
       }),
     );
   };
