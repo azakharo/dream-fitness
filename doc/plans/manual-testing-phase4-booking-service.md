@@ -318,7 +318,7 @@ http POST http://localhost:3001/auth/balance/deposit --session=admin userId="<US
 Теперь попытаться забронировать заполненную тренировку от второго пользователя:
 
 ```powershell
-http POST http://localhost:3003/bookings "Authorization:Bearer <USER2_TOKEN>" trainingId="<TRAINING_ID_1>"
+http POST http://localhost:3003/bookings --session=user2 trainingId="<TRAINING_ID_1>"
 ```
 
 **Ожидаемый результат:** 409 Conflict — `NoAvailableSlotsException`.
@@ -326,7 +326,7 @@ http POST http://localhost:3003/bookings "Authorization:Bearer <USER2_TOKEN>" tr
 ### 25. Встать в waitlist на заполненную тренировку
 
 ```powershell
-http POST http://localhost:3003/waitlist "Authorization:Bearer <USER2_TOKEN>" trainingId="<TRAINING_ID_1>" userId="<USER2_ID>"
+http POST http://localhost:3003/waitlist --session=user2 trainingId="<TRAINING_ID_1>"
 ```
 
 **Ожидаемый результат:** 201 Created.
@@ -344,7 +344,7 @@ http POST http://localhost:3003/waitlist "Authorization:Bearer <USER2_TOKEN>" tr
 ### 26. Проверить позицию в waitlist
 
 ```powershell
-http GET http://localhost:3003/waitlist/position?trainingId="<TRAINING_ID_1>" "Authorization:Bearer <USER2_TOKEN>"
+http GET http://localhost:3003/waitlist/position?trainingId="<TRAINING_ID_1>" --session=user2
 ```
 
 **Ожидаемый результат:** 200 OK.
@@ -373,7 +373,7 @@ http POST http://localhost:3003/bookings/<BOOKING_ID_WL>/cancel --session=user r
 Проверить баланс второго пользователя:
 
 ```powershell
-http GET http://localhost:3001/auth/me "Authorization:Bearer <USER2_TOKEN>"
+http GET http://localhost:3001/auth/me --session=user2
 ```
 
 Убедиться, что `balance` = 5000 - 500 = 4500.
@@ -381,7 +381,7 @@ http GET http://localhost:3001/auth/me "Authorization:Bearer <USER2_TOKEN>"
 Проверить бронирования второго пользователя:
 
 ```powershell
-http GET http://localhost:3003/bookings "Authorization:Bearer <USER2_TOKEN>"
+http GET http://localhost:3003/bookings --session=user2
 ```
 
 Должно быть бронирование со `status: "confirmed"` на `<TRAINING_ID_1>`.
@@ -389,7 +389,7 @@ http GET http://localhost:3003/bookings "Authorization:Bearer <USER2_TOKEN>"
 Проверить, что waitlist пуст:
 
 ```powershell
-http GET http://localhost:3003/waitlist/position?trainingId="<TRAINING_ID_1>" "Authorization:Bearer <USER2_TOKEN>"
+http GET http://localhost:3003/waitlist/position?trainingId="<TRAINING_ID_1>" --session=user2
 ```
 
 **Ожидаемый результат:** 404 Not Found — `NotOnWaitlistException` (пользователь больше не в очереди).
