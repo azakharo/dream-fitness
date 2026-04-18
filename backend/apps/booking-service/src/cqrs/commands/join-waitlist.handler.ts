@@ -5,6 +5,7 @@ import { WaitlistRepository } from '../../waitlist/repositories/waitlist.reposit
 import { TrainingClientService } from '../../clients/training-client.service';
 import { WaitlistJoinedEvent } from '../events';
 import { AlreadyOnWaitlistException } from '../../common/exceptions';
+import { DuplicateBookingException } from '../../common/exceptions';
 import { JoinWaitlistCommand } from './join-waitlist.command';
 import { WaitlistResponseDto } from '../../waitlist/dto';
 
@@ -25,7 +26,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       trainingId,
     );
     if (existingBooking) {
-      throw new AlreadyOnWaitlistException(userId, trainingId);
+      throw new DuplicateBookingException(userId, trainingId);
     }
 
     const existingWaitlistEntry =
