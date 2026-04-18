@@ -352,8 +352,7 @@ http GET http://localhost:3003/waitlist/position?trainingId="<TRAINING_ID_1>" --
 ```json
 {
   "position": 1,
-  "totalInQueue": 1,
-  "waitlistId": "<WAITLIST_ID>"
+  "totalInQueue": 1
 }
 ```
 

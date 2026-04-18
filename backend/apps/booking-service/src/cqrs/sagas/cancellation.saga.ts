@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import { Saga, ofType } from '@nestjs/cqrs';
+import { Saga, ofType, CommandBus } from '@nestjs/cqrs';
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { BookingCancelledEvent } from '../events';
-import { CheckWaitlistPromotionEvent } from '../events';
 import { EventsPublisher } from '../../events/events.publisher';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
+import { PromoteFromWaitlistCommand } from '../commands';
 
 @Injectable()
 export class CancellationSaga {
@@ -15,6 +15,7 @@ export class CancellationSaga {
   constructor(
     private readonly eventsPublisher: EventsPublisher,
     private readonly waitlistRepository: WaitlistRepository,
+    private readonly commandBus: CommandBus,
   ) {}
 
   @Saga()
@@ -32,11 +33,8 @@ export class CancellationSaga {
           reason: event.reason,
           cancelledAt: new Date().toISOString(),
         });
-        const waitlistEntry =
-          await this.waitlistRepository.findFirstByTrainingId(event.trainingId);
-        return new CheckWaitlistPromotionEvent(
-          event.trainingId,
-          waitlistEntry?.id || '',
+        await this.commandBus.execute(
+          new PromoteFromWaitlistCommand(event.trainingId),
         );
       }),
     );
