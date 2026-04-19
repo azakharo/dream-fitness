@@ -3,7 +3,11 @@ import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { BookingHelper } from './helpers/booking.helper';
 import { WaitlistHelper } from './helpers/waitlist.helper';
-import { createTrainingMock, TEST_TRAINING } from './fixtures/booking.fixtures';
+import {
+  createTrainingMock,
+  TEST_TRAINING,
+  TEST_USERS,
+} from './fixtures/booking.fixtures';
 import { BookingStatus } from '@app/shared/enums';
 import { mockTrainingClientService } from './mocks/training-client.mock';
 import { mockAuthClientService } from './mocks/auth-client.mock';
@@ -35,6 +39,7 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
   beforeEach(async () => {
     await dbHelper.truncateTables();
+    await dbHelper.seedTestData();
     jest.clearAllMocks();
     mockTrainingClientService.getTraining.mockResolvedValue(
       createTrainingMock(),
@@ -46,8 +51,14 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
   describe('Waitlist Promotion Saga', () => {
     it('should promote first user in waitlist when booking is cancelled', async () => {
-      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
-      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
+      const token1 = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
+      const token2 = authHelper.getUserToken(
+        TEST_USERS.user2.id,
+        TEST_USERS.user2.email,
+      );
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -73,9 +84,18 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     });
 
     it('should promote multiple users from waitlist when booking is cancelled', async () => {
-      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
-      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
-      const token3 = authHelper.getUserToken('user3', 'user3@example.com');
+      const token1 = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
+      const token2 = authHelper.getUserToken(
+        TEST_USERS.user2.id,
+        TEST_USERS.user2.email,
+      );
+      const token3 = authHelper.getUserToken(
+        TEST_USERS.user3.id,
+        TEST_USERS.user3.email,
+      );
 
       const fullTraining = createTrainingMock({ capacity: 2 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -109,9 +129,18 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     });
 
     it('should skip user with insufficient balance and promote next user', async () => {
-      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
-      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
-      const token3 = authHelper.getUserToken('user3', 'user3@example.com');
+      const token1 = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
+      const token2 = authHelper.getUserToken(
+        TEST_USERS.user2.id,
+        TEST_USERS.user2.email,
+      );
+      const token3 = authHelper.getUserToken(
+        TEST_USERS.user3.id,
+        TEST_USERS.user3.email,
+      );
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -158,8 +187,14 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     });
 
     it('should not promote when no available slots', async () => {
-      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
-      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
+      const token1 = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
+      const token2 = authHelper.getUserToken(
+        TEST_USERS.user2.id,
+        TEST_USERS.user2.email,
+      );
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -189,33 +224,39 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     it('should insert booking directly into database', async () => {
       const manager = dataSource.createQueryRunner().manager;
       const booking = manager.create(Booking, {
-        id: '11111111-1111-1111-1111-111111111111',
-        userId: '11111111-1111-1111-1111-111111111111',
+        id: '11111111-1111-4111-a111-111111111111',
+        userId: '11111111-1111-4111-a111-111111111111',
         trainingId: TEST_TRAINING.id,
         status: BookingStatus.CONFIRMED,
       });
       await manager.save(booking);
 
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const response = await bookingHelper.getBookingById(
-        '11111111-1111-1111-1111-111111111111',
+        '11111111-1111-4111-a111-111111111111',
         token,
       );
 
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe('11111111-1111-1111-1111-111111111111');
+      expect(response.body.id).toBe('11111111-1111-4111-a111-111111111111');
     });
 
     it('should insert waitlist entry directly into database', async () => {
       const manager = dataSource.createQueryRunner().manager;
       const waitlist = manager.create(Waitlist, {
-        id: '22222222-2222-2222-2222-222222222222',
-        userId: '11111111-1111-1111-1111-111111111111',
+        id: '22222222-2222-4222-a222-222222222222',
+        userId: TEST_USERS.user1.id,
         trainingId: TEST_TRAINING.id,
       });
       await manager.save(waitlist);
 
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const response = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
         token,

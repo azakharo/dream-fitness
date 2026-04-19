@@ -6,6 +6,7 @@ import {
   createTrainingMock,
   createAvailabilityMock,
   TEST_TRAINING,
+  TEST_USERS,
 } from './fixtures/booking.fixtures';
 import { BookingStatus } from '@app/shared/enums';
 import { NotFoundException, ServiceUnavailableException } from '@nestjs/common';
@@ -32,6 +33,7 @@ describe('Bookings API (e2e)', () => {
 
   beforeEach(async () => {
     await dbHelper.truncateTables();
+    await dbHelper.seedTestData();
     jest.clearAllMocks();
     mockTrainingClientService.getTraining.mockResolvedValue(
       createTrainingMock(),
@@ -46,7 +48,10 @@ describe('Bookings API (e2e)', () => {
 
   describe('POST /bookings', () => {
     it('should create booking successfully', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const response = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -54,13 +59,16 @@ describe('Bookings API (e2e)', () => {
 
       expect(response.status).toBe(201);
       expect(response.body.id).toBeDefined();
-      expect(response.body.userId).toBe('user1');
+      expect(response.body.userId).toBe(TEST_USERS.user1.id);
       expect(response.body.trainingId).toBe(TEST_TRAINING.id);
       expect(response.body.status).toBe(BookingStatus.CONFIRMED);
     });
 
     it('should return 409 when no available slots', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const fullTraining = createTrainingMock({ capacity: 1 });
 
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -75,7 +83,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 409 when duplicate booking', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       await bookingHelper.createBooking(TEST_TRAINING.id, token);
 
       const response = await bookingHelper.createBooking(
@@ -87,7 +98,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 404 when training not found', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       mockTrainingClientService.getTraining.mockRejectedValue(
         new NotFoundException('Training not found'),
       );
@@ -101,7 +115,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 503 when training service unavailable', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       mockTrainingClientService.getTraining.mockRejectedValue(
         new ServiceUnavailableException('Training service unavailable'),
       );
@@ -115,7 +132,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 409 when insufficient balance', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       mockAuthClientService.reservePoints.mockRejectedValue(
         new Error('Insufficient balance'),
       );
@@ -131,7 +151,10 @@ describe('Bookings API (e2e)', () => {
 
   describe('GET /bookings', () => {
     it('should return user bookings list with pagination', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       await bookingHelper.createBooking(TEST_TRAINING.id, token);
 
       const response = await bookingHelper.getBookings(token);
@@ -144,7 +167,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return empty list when no bookings', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
 
       const response = await bookingHelper.getBookings(token);
 
@@ -154,7 +180,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should filter by status', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       await bookingHelper.createBooking(TEST_TRAINING.id, token);
 
       const response = await bookingHelper.getBookings(token, {
@@ -171,7 +200,10 @@ describe('Bookings API (e2e)', () => {
 
   describe('GET /bookings/:id', () => {
     it('should return booking by ID', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -182,12 +214,15 @@ describe('Bookings API (e2e)', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe(bookingId);
-      expect(response.body.userId).toBe('user1');
+      expect(response.body.userId).toBe(TEST_USERS.user1.id);
       expect(response.body.trainingId).toBe(TEST_TRAINING.id);
     });
 
     it('should return 404 when booking not found', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
 
       const response = await bookingHelper.getBookingById(
         'non-existent-booking-id',
@@ -198,8 +233,14 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 403 when booking belongs to another user', async () => {
-      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
-      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
+      const token1 = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
+      const token2 = authHelper.getUserToken(
+        TEST_USERS.user2.id,
+        TEST_USERS.user2.email,
+      );
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token1,
@@ -214,7 +255,10 @@ describe('Bookings API (e2e)', () => {
 
   describe('POST /bookings/:id/cancel', () => {
     it('should cancel booking successfully', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -229,7 +273,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 409 when booking already cancelled', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -243,7 +290,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 404 when booking not found', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
 
       const response = await bookingHelper.cancelBooking(
         'non-existent-booking-id',
@@ -254,7 +304,10 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 409 when trying to cancel past training', async () => {
-      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const token = authHelper.getUserToken(
+        TEST_USERS.user1.id,
+        TEST_USERS.user1.email,
+      );
       const pastTraining = createTrainingMock({
         scheduledAt: '2020-01-01T10:00:00.000Z',
       });
