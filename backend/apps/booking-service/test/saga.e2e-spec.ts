@@ -100,7 +100,7 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         TEST_USERS.user3.email,
       );
 
-      const fullTraining = createTrainingMock({ capacity: 2 });
+      const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
 
       const createBookingResp = await bookingHelper.createBooking(
