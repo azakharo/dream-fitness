@@ -1,0 +1,228 @@
+import { AppTestHelper } from './helpers/app-test.helper';
+import { DbHelper } from './helpers/db.helper';
+import { AuthHelper } from './helpers/auth.helper';
+import { BookingHelper } from './helpers/booking.helper';
+import { WaitlistHelper } from './helpers/waitlist.helper';
+import { createTrainingMock, TEST_TRAINING } from './fixtures/booking.fixtures';
+import { BookingStatus } from '@app/shared/enums';
+import { mockTrainingClientService } from './mocks/training-client.mock';
+import { mockAuthClientService } from './mocks/auth-client.mock';
+import { DataSource } from 'typeorm';
+import { Booking } from '../../src/bookings/entities/booking.entity';
+import { Waitlist } from '../../src/waitlist/entities/waitlist.entity';
+
+describe('Waitlist Promotion Saga (e2e)', () => {
+  let appHelper: AppTestHelper;
+  let dbHelper: DbHelper;
+  let authHelper: AuthHelper;
+  let bookingHelper: BookingHelper;
+  let waitlistHelper: WaitlistHelper;
+  let dataSource: DataSource;
+
+  beforeAll(async () => {
+    appHelper = new AppTestHelper();
+    await appHelper.init();
+    dbHelper = new DbHelper(appHelper.getDataSource());
+    authHelper = new AuthHelper(appHelper.getApp());
+    bookingHelper = new BookingHelper(appHelper.getRequest());
+    waitlistHelper = new WaitlistHelper(appHelper.getRequest());
+    dataSource = appHelper.getDataSource();
+  });
+
+  afterAll(async () => {
+    await appHelper.cleanup();
+  });
+
+  beforeEach(async () => {
+    await dbHelper.truncateTables();
+    jest.clearAllMocks();
+    mockTrainingClientService.getTraining.mockResolvedValue(
+      createTrainingMock(),
+    );
+    mockAuthClientService.reservePoints.mockResolvedValue(undefined);
+    mockAuthClientService.refundPoints.mockResolvedValue(undefined);
+    mockAuthClientService.releasePoints.mockResolvedValue(undefined);
+  });
+
+  describe('Waitlist Promotion Saga', () => {
+    it('should promote first user in waitlist when booking is cancelled', async () => {
+      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
+      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
+
+      const fullTraining = createTrainingMock({ capacity: 1 });
+      mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
+
+      await bookingHelper.createBooking(TEST_TRAINING.id, token1);
+
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
+
+      const cancelResponse = await bookingHelper.cancelBooking(
+        TEST_TRAINING.id,
+        token1,
+      );
+
+      expect(cancelResponse.status).toBe(200);
+      expect(cancelResponse.body.status).toBe(BookingStatus.CANCELLED);
+
+      const waitlistPosition = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token2,
+      );
+
+      expect(waitlistPosition.status).toBe(404);
+    });
+
+    it('should promote multiple users from waitlist when booking is cancelled', async () => {
+      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
+      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
+      const token3 = authHelper.getUserToken('user3', 'user3@example.com');
+
+      const fullTraining = createTrainingMock({ capacity: 2 });
+      mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
+
+      await bookingHelper.createBooking(TEST_TRAINING.id, token1);
+
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
+
+      const cancelResponse = await bookingHelper.cancelBooking(
+        TEST_TRAINING.id,
+        token1,
+      );
+
+      expect(cancelResponse.status).toBe(200);
+
+      const waitlistPosition2 = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token2,
+      );
+
+      expect(waitlistPosition2.status).toBe(404);
+
+      const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token3,
+      );
+
+      expect(waitlistPosition3.status).toBe(200);
+      expect(waitlistPosition3.body.position).toBe(1);
+    });
+
+    it('should skip user with insufficient balance and promote next user', async () => {
+      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
+      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
+      const token3 = authHelper.getUserToken('user3', 'user3@example.com');
+
+      const fullTraining = createTrainingMock({ capacity: 1 });
+      mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
+
+      await bookingHelper.createBooking(TEST_TRAINING.id, token1);
+
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token1);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
+
+      mockAuthClientService.reservePoints
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(new Error('Insufficient balance'))
+        .mockResolvedValueOnce(undefined);
+
+      const cancelResponse = await bookingHelper.cancelBooking(
+        TEST_TRAINING.id,
+        token1,
+      );
+
+      expect(cancelResponse.status).toBe(200);
+
+      const waitlistPosition1 = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token1,
+      );
+
+      expect(waitlistPosition1.status).toBe(404);
+
+      const waitlistPosition2 = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token2,
+      );
+
+      expect(waitlistPosition2.status).toBe(404);
+
+      const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token3,
+      );
+
+      expect(waitlistPosition3.status).toBe(200);
+      expect(waitlistPosition3.body.position).toBe(1);
+    });
+
+    it('should not promote when no available slots', async () => {
+      const token1 = authHelper.getUserToken('user1', 'user1@example.com');
+      const token2 = authHelper.getUserToken('user2', 'user2@example.com');
+
+      const fullTraining = createTrainingMock({ capacity: 1 });
+      mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
+
+      await bookingHelper.createBooking(TEST_TRAINING.id, token1);
+
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
+
+      const cancelResponse = await bookingHelper.cancelBooking(
+        TEST_TRAINING.id,
+        token1,
+      );
+
+      expect(cancelResponse.status).toBe(200);
+
+      const waitlistPosition = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token2,
+      );
+
+      expect(waitlistPosition.status).toBe(200);
+      expect(waitlistPosition.body.position).toBe(1);
+    });
+  });
+
+  describe('Helper methods for saga testing', () => {
+    it('should insert booking directly into database', async () => {
+      const manager = dataSource.createQueryRunner().manager;
+      const booking = manager.create(Booking, {
+        id: 'test-booking-id',
+        userId: 'user1',
+        trainingId: TEST_TRAINING.id,
+        status: BookingStatus.CONFIRMED,
+      });
+      await manager.save(booking);
+
+      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const response = await bookingHelper.getBookingById(
+        'test-booking-id',
+        token,
+      );
+
+      expect(response.status).toBe(200);
+      expect(response.body.id).toBe('test-booking-id');
+    });
+
+    it('should insert waitlist entry directly into database', async () => {
+      const manager = dataSource.createQueryRunner().manager;
+      const waitlist = manager.create(Waitlist, {
+        id: 'test-waitlist-id',
+        userId: 'user1',
+        trainingId: TEST_TRAINING.id,
+      });
+      await manager.save(waitlist);
+
+      const token = authHelper.getUserToken('user1', 'user1@example.com');
+      const response = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token,
+      );
+
+      expect(response.status).toBe(200);
+      expect(response.body.position).toBe(1);
+    });
+  });
+});

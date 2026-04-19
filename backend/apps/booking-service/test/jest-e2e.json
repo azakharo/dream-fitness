@@ -8,9 +8,9 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "@app/contracts/(.*)": "<rootDir>/../../libs/contracts/src/$1",
-    "@app/contracts": "<rootDir>/../../libs/contracts/src",
-    "@app/shared/(.*)": "<rootDir>/../../libs/shared/src/$1",
-    "@app/shared": "<rootDir>/../../libs/shared/src"
-  }
+      "@app/contracts/(.*)": "<rootDir>/../../../libs/contracts/src/$1",
+      "@app/contracts": "<rootDir>/../../../libs/contracts/src",
+      "@app/shared/(.*)": "<rootDir>/../../../libs/shared/src/$1",
+      "@app/shared": "<rootDir>/../../../libs/shared/src"
+    }
 }
