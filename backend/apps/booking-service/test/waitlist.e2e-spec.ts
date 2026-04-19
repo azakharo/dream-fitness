@@ -80,7 +80,7 @@ describe('Waitlist API (e2e)', () => {
       );
 
       const response = await waitlistHelper.joinWaitlist(
-        'non-existent-training-id',
+        'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
         token,
       );
 

@@ -107,7 +107,7 @@ describe('Bookings API (e2e)', () => {
       );
 
       const response = await bookingHelper.createBooking(
-        'non-existent-training-id',
+        '33333333-3333-4333-a333-333333333333',
         token,
       );
 
@@ -225,7 +225,7 @@ describe('Bookings API (e2e)', () => {
       );
 
       const response = await bookingHelper.getBookingById(
-        'non-existent-booking-id',
+        'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
         token,
       );
 
@@ -296,7 +296,7 @@ describe('Bookings API (e2e)', () => {
       );
 
       const response = await bookingHelper.cancelBooking(
-        'non-existent-booking-id',
+        'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
         token,
       );
 
