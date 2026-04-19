@@ -189,8 +189,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     it('should insert booking directly into database', async () => {
       const manager = dataSource.createQueryRunner().manager;
       const booking = manager.create(Booking, {
-        id: 'test-booking-id',
-        userId: 'user1',
+        id: '11111111-1111-1111-1111-111111111111',
+        userId: '11111111-1111-1111-1111-111111111111',
         trainingId: TEST_TRAINING.id,
         status: BookingStatus.CONFIRMED,
       });
@@ -198,19 +198,19 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const token = authHelper.getUserToken('user1', 'user1@example.com');
       const response = await bookingHelper.getBookingById(
-        'test-booking-id',
+        '11111111-1111-1111-1111-111111111111',
         token,
       );
 
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe('test-booking-id');
+      expect(response.body.id).toBe('11111111-1111-1111-1111-111111111111');
     });
 
     it('should insert waitlist entry directly into database', async () => {
       const manager = dataSource.createQueryRunner().manager;
       const waitlist = manager.create(Waitlist, {
-        id: 'test-waitlist-id',
-        userId: 'user1',
+        id: '22222222-2222-2222-2222-222222222222',
+        userId: '11111111-1111-1111-1111-111111111111',
         trainingId: TEST_TRAINING.id,
       });
       await manager.save(waitlist);

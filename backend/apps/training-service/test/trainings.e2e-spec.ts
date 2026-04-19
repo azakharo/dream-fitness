@@ -73,7 +73,7 @@ describe('TrainingsController (e2e)', () => {
     it('should return 404 when trainer does not exist', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
       const trainingData = createTrainingDto(
-        '00000000-0000-0000-0000-000000000000',
+        '00000000-0000-0000-0000-000000000001',
       );
 
       const response = await trainingsHelper.create(token, trainingData);
@@ -447,7 +447,7 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000002';
 
       const response = await appHelper
         .getRequest()
@@ -507,7 +507,7 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000003';
 
       const response = await appHelper
         .getRequest()
@@ -590,7 +590,7 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000004';
       const updateData = { title: 'Updated Title' };
 
       const response = await appHelper
@@ -672,7 +672,7 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000005';
 
       const response = await trainingsHelper.cancel(token, nonExistentId);
 

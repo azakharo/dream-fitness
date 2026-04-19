@@ -1,8 +1,8 @@
 export const TEST_TRAINING = {
-  id: 'a0000000-0000-0000-0000-000000000001',
+  id: '11111111-1111-1111-1111-111111111111',
   title: 'Test Training',
   type: 'yoga',
-  trainerId: 'b0000000-0000-0000-0000-000000000001',
+  trainerId: '22222222-2222-2222-2222-222222222222',
   scheduledAt: '2026-06-20T10:00:00.000Z',
   durationMinutes: 60,
   capacity: 10,
@@ -11,7 +11,7 @@ export const TEST_TRAINING = {
 
 export const TEST_TRAINING_FULL = {
   ...TEST_TRAINING,
-  id: 'a0000000-0000-0000-0000-000000000002',
+  id: '33333333-3333-3333-3333-333333333333',
   capacity: 1,
   title: 'Full Training',
 };
