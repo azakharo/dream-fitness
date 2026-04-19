@@ -8,6 +8,7 @@ import {
   TEST_USERS,
 } from './fixtures/booking.fixtures';
 import { mockTrainingClientService } from './mocks/training-client.mock';
+import { NotFoundException } from '@nestjs/common';
 
 describe('Waitlist API (e2e)', () => {
   let appHelper: AppTestHelper;
@@ -91,7 +92,7 @@ describe('Waitlist API (e2e)', () => {
         TEST_USERS.user1.email,
       );
       mockTrainingClientService.getTraining.mockRejectedValue(
-        new Error('Training not found'),
+        new NotFoundException('Training not found'),
       );
 
       const response = await waitlistHelper.joinWaitlist(
