@@ -4,6 +4,7 @@ import { BookingRepository } from '../../bookings/repositories/booking.repositor
 import { Booking } from '../../bookings/entities/booking.entity';
 import { GetBookingByIdQuery } from './get-booking-by-id.query';
 import { BookingNotFoundException } from '../../common/exceptions';
+import { ForbiddenException } from '@nestjs/common';
 
 @QueryHandler(GetBookingByIdQuery)
 export class GetBookingByIdHandler implements IQueryHandler<GetBookingByIdQuery> {
@@ -18,7 +19,9 @@ export class GetBookingByIdHandler implements IQueryHandler<GetBookingByIdQuery>
     }
 
     if (booking.userId !== userId) {
-      throw new Error('You do not have permission to view this booking');
+      throw new ForbiddenException(
+        'You do not have permission to view this booking',
+      );
     }
 
     return booking;
