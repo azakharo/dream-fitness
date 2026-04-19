@@ -103,13 +103,16 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       const fullTraining = createTrainingMock({ capacity: 2 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
 
-      await bookingHelper.createBooking(TEST_TRAINING.id, token1);
+      const createBookingResp = await bookingHelper.createBooking(
+        TEST_TRAINING.id,
+        token1,
+      );
 
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
 
       const cancelResponse = await bookingHelper.cancelBooking(
-        TEST_TRAINING.id,
+        createBookingResp.body.id,
         token1,
       );
 
@@ -148,7 +151,10 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
 
-      await bookingHelper.createBooking(TEST_TRAINING.id, token1);
+      const createBookingResp = await bookingHelper.createBooking(
+        TEST_TRAINING.id,
+        token1,
+      );
 
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token1);
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
@@ -160,7 +166,7 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         .mockResolvedValueOnce(undefined);
 
       const cancelResponse = await bookingHelper.cancelBooking(
-        TEST_TRAINING.id,
+        createBookingResp.body.id,
         token1,
       );
 
@@ -202,12 +208,15 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
 
-      await bookingHelper.createBooking(TEST_TRAINING.id, token1);
+      const createBookingResp = await bookingHelper.createBooking(
+        TEST_TRAINING.id,
+        token1,
+      );
 
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
 
       const cancelResponse = await bookingHelper.cancelBooking(
-        TEST_TRAINING.id,
+        createBookingResp.body.id,
         token1,
       );
 
