@@ -3,7 +3,6 @@ import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { WaitlistHelper } from './helpers/waitlist.helper';
 import { createTrainingMock, TEST_TRAINING } from './fixtures/booking.fixtures';
-import { BookingStatus } from '@app/shared/enums';
 import { mockTrainingClientService } from './mocks/training-client.mock';
 
 describe('Waitlist API (e2e)', () => {
@@ -64,11 +63,7 @@ describe('Waitlist API (e2e)', () => {
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token);
       await waitlistHelper.leaveWaitlist(TEST_TRAINING.id, token);
 
-      const bookingResponse = await waitlistHelper.joinWaitlist(
-        TEST_TRAINING.id,
-        token,
-      );
-      const bookingId = bookingResponse.body.id;
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token);
 
       const response = await waitlistHelper.joinWaitlist(
         TEST_TRAINING.id,

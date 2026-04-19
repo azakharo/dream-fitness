@@ -8,8 +8,8 @@ import { BookingStatus } from '@app/shared/enums';
 import { mockTrainingClientService } from './mocks/training-client.mock';
 import { mockAuthClientService } from './mocks/auth-client.mock';
 import { DataSource } from 'typeorm';
-import { Booking } from '../../src/bookings/entities/booking.entity';
-import { Waitlist } from '../../src/waitlist/entities/waitlist.entity';
+import { Waitlist } from '../src/waitlist/entities/waitlist.entity';
+import { Booking } from '../src/bookings/entities/booking.entity';
 
 describe('Waitlist Promotion Saga (e2e)', () => {
   let appHelper: AppTestHelper;

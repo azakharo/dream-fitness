@@ -163,7 +163,7 @@ describe('Bookings API (e2e)', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.items).toBeDefined();
-      response.body.items.forEach((booking: any) => {
+      response.body.items.forEach((booking) => {
         expect(booking.status).toBe(BookingStatus.CONFIRMED);
       });
     });
