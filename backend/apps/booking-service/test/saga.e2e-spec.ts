@@ -222,26 +222,22 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
   describe('Helper methods for saga testing', () => {
     it('should insert booking directly into database', async () => {
+      const userId = TEST_USERS.user1.id;
+      const bookingId = '11111111-1111-4111-a111-111111111111';
       const manager = dataSource.createQueryRunner().manager;
       const booking = manager.create(Booking, {
-        id: '11111111-1111-4111-a111-111111111111',
-        userId: '11111111-1111-4111-a111-111111111111',
+        id: bookingId,
+        userId,
         trainingId: TEST_TRAINING.id,
         status: BookingStatus.CONFIRMED,
       });
       await manager.save(booking);
 
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      const response = await bookingHelper.getBookingById(
-        '11111111-1111-4111-a111-111111111111',
-        token,
-      );
+      const token = authHelper.getUserToken(userId, TEST_USERS.user1.email);
+      const response = await bookingHelper.getBookingById(bookingId, token);
 
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe('11111111-1111-4111-a111-111111111111');
+      expect(response.body.id).toBe(bookingId);
     });
 
     it('should insert waitlist entry directly into database', async () => {
