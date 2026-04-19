@@ -14,6 +14,7 @@ import { mockAuthClientService } from './mocks/auth-client.mock';
 import { DataSource } from 'typeorm';
 import { Waitlist } from '../src/waitlist/entities/waitlist.entity';
 import { Booking } from '../src/bookings/entities/booking.entity';
+import { ConflictException } from '@nestjs/common';
 
 describe('Waitlist Promotion Saga (e2e)', () => {
   let appHelper: AppTestHelper;
@@ -156,13 +157,11 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         token1,
       );
 
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token1);
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
 
       mockAuthClientService.reservePoints
-        .mockResolvedValueOnce(undefined)
-        .mockRejectedValueOnce(new Error('Insufficient balance'))
+        .mockRejectedValueOnce(new ConflictException('Insufficient balance'))
         .mockResolvedValueOnce(undefined);
 
       const cancelResponse = await bookingHelper.cancelBooking(
@@ -191,8 +190,7 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         token3,
       );
 
-      expect(waitlistPosition3.status).toBe(200);
-      expect(waitlistPosition3.body.position).toBe(1);
+      expect(waitlistPosition3.status).toBe(404);
     });
 
     it('should not promote when no available slots', async () => {
