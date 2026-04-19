@@ -155,6 +155,10 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         TEST_USERS.user3.id,
         TEST_USERS.user3.email,
       );
+      const token4 = authHelper.getUserToken(
+        TEST_USERS.user4.id,
+        TEST_USERS.user4.email,
+      );
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -166,10 +170,11 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token4);
 
       mockAuthClientService.reservePoints
-        .mockRejectedValueOnce(new ConflictException('Insufficient balance'))
-        .mockResolvedValueOnce(undefined);
+        .mockRejectedValueOnce(new ConflictException('Insufficient balance')) // user2's promotion attempt (skipped)
+        .mockResolvedValueOnce(undefined); // user3's promotion attempt
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,
@@ -201,6 +206,14 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       );
 
       expect(waitlistPosition3.status).toBe(404);
+
+      const waitlistPosition4 = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token4,
+      );
+
+      expect(waitlistPosition4.status).toBe(200);
+      expect(waitlistPosition4.body.position).toBe(1);
     });
 
     it('should not promote when no available slots', async () => {

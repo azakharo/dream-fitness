@@ -29,6 +29,10 @@ export const TEST_USERS = {
     id: 'cccccccc-cccc-4ccc-accc-cccccccccccc',
     email: 'user3@example.com',
   },
+  user4: {
+    id: '33333333-3333-4333-a333-333333333333',
+    email: 'user4@example.com',
+  },
 };
 
 export function createTrainingMock(overrides?: Partial<typeof TEST_TRAINING>) {
