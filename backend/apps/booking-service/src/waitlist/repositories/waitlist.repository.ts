@@ -49,8 +49,8 @@ export class WaitlistRepository extends Repository<Waitlist> {
     `;
 
     const result: Array<{
-      position: number;
-      total: number;
+      position: string;
+      total: string;
       waitlistId: string;
     }> = await this.query(query, [trainingId, userId]);
 
@@ -59,8 +59,8 @@ export class WaitlistRepository extends Repository<Waitlist> {
     }
 
     return {
-      position: result[0].position,
-      totalInQueue: result[0].total,
+      position: Number.parseInt(result[0].position, 10),
+      totalInQueue: Number.parseInt(result[0].total, 10),
       waitlistId: result[0].waitlistId,
     };
   }

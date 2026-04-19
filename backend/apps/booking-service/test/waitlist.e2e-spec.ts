@@ -29,6 +29,7 @@ describe('Waitlist API (e2e)', () => {
 
   beforeEach(async () => {
     await dbHelper.truncateTables();
+    await dbHelper.seedTestData();
     jest.clearAllMocks();
     mockTrainingClientService.getTraining.mockResolvedValue(
       createTrainingMock(),
@@ -37,10 +38,8 @@ describe('Waitlist API (e2e)', () => {
 
   describe('POST /waitlist', () => {
     it('should join waitlist successfully', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const userId = TEST_USERS.user1.id;
+      const token = authHelper.getUserToken(userId, TEST_USERS.user1.email);
       const response = await waitlistHelper.joinWaitlist(
         TEST_TRAINING.id,
         token,
@@ -48,7 +47,7 @@ describe('Waitlist API (e2e)', () => {
 
       expect(response.status).toBe(201);
       expect(response.body.id).toBeDefined();
-      expect(response.body.userId).toBe('user1');
+      expect(response.body.userId).toBe(userId);
       expect(response.body.trainingId).toBe(TEST_TRAINING.id);
       expect(response.body.position).toBeGreaterThanOrEqual(1);
     });
