@@ -1,19 +1,13 @@
 import { DataSource } from 'typeorm';
-import { Booking } from '../../src/bookings/entities/booking.entity';
-import { Waitlist } from '../../src/waitlist/entities/waitlist.entity';
 import { TEST_USERS, TEST_TRAINING } from '../fixtures/booking.fixtures';
 
 export class DbHelper {
   constructor(private dataSource: DataSource) {}
 
   async truncateTables(): Promise<void> {
-    await this.dataSource.transaction(async (manager) => {
-      await manager.createQueryBuilder().delete().from(Booking).execute();
-      await manager.createQueryBuilder().delete().from(Waitlist).execute();
-      await manager.createQueryBuilder().delete().from('trainings').execute();
-      await manager.createQueryBuilder().delete().from('users').execute();
-      await manager.createQueryBuilder().delete().from('trainers').execute();
-    });
+    await this.dataSource.query(`
+      TRUNCATE TABLE bookings, waitlist, trainings, users, trainers CASCADE;
+    `);
   }
 
   async seedTestData(): Promise<void> {

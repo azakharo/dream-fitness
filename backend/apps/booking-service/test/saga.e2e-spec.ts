@@ -3,6 +3,7 @@ import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { BookingHelper } from './helpers/booking.helper';
 import { WaitlistHelper } from './helpers/waitlist.helper';
+import { wait } from './helpers/test.helper';
 import {
   createTrainingMock,
   TEST_TRAINING,
@@ -76,6 +77,9 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         token1,
       );
 
+      // Wait for async saga processing to complete before assertions
+      await wait(100);
+
       expect(cancelResponse.status).toBe(200);
       expect(cancelResponse.body.status).toBe(BookingStatus.CANCELLED);
 
@@ -116,6 +120,9 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         createBookingResp.body.id,
         token1,
       );
+
+      // Wait for async saga processing to complete before assertions
+      await wait(100);
 
       expect(cancelResponse.status).toBe(200);
 
@@ -168,6 +175,9 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         createBookingResp.body.id,
         token1,
       );
+
+      // Wait for async saga processing to complete before assertions
+      await wait(100);
 
       expect(cancelResponse.status).toBe(200);
 
@@ -222,6 +232,9 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         createBookingResp.body.id,
         token1,
       );
+
+      // Wait for async saga processing to complete before assertions
+      await wait(100);
 
       expect(cancelResponse.status).toBe(200);
 
