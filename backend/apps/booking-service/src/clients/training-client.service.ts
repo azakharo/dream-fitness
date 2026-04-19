@@ -1,0 +1,113 @@
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { AxiosError } from 'axios';
+import { ConfigService } from '../config';
+import { TrainingResponseDto } from '@app/contracts';
+
+export interface AvailabilityResponse {
+  trainingId: string;
+  capacity: number;
+  currentParticipants: number;
+  availableSlots: number;
+  isAvailable: boolean;
+}
+
+@Injectable()
+export class TrainingClientService {
+  private readonly logger = new Logger(TrainingClientService.name);
+
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  async getTraining(
+    trainingId: string,
+    jwtToken?: string,
+  ): Promise<TrainingResponseDto> {
+    try {
+      const url = `${this.configService.getTrainingServiceUrl()}/trainings/${trainingId}`;
+
+      const headers: Record<string, string> = {};
+      if (jwtToken) {
+        headers['Authorization'] = jwtToken;
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.get<TrainingResponseDto>(url, {
+          timeout: 5000,
+          headers,
+        }),
+      );
+
+      this.logger.log(`Successfully fetched training ${trainingId}`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) {
+          throw new NotFoundException('Training not found');
+        }
+        if (error.response?.status === 401) {
+          throw new ServiceUnavailableException(
+            'Authentication failed when accessing training service',
+          );
+        }
+        this.logger.error(
+          `Failed to fetch training ${trainingId}: ${error.message}`,
+          error,
+        );
+        throw new ServiceUnavailableException('Training service unavailable');
+      }
+      throw error;
+    }
+  }
+
+  async getAvailability(
+    trainingId: string,
+    jwtToken?: string,
+  ): Promise<AvailabilityResponse> {
+    try {
+      const url = `${this.configService.getTrainingServiceUrl()}/trainings/${trainingId}/availability`;
+
+      const headers: Record<string, string> = {};
+      if (jwtToken) {
+        headers['Authorization'] = jwtToken;
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.get<AvailabilityResponse>(url, {
+          timeout: 5000,
+          headers,
+        }),
+      );
+
+      this.logger.log(
+        `Successfully fetched availability for training ${trainingId}`,
+      );
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) {
+          throw new NotFoundException('Training not found');
+        }
+        if (error.response?.status === 401) {
+          throw new ServiceUnavailableException(
+            'Authentication failed when accessing training service',
+          );
+        }
+        this.logger.error(
+          `Failed to fetch availability for training ${trainingId}: ${error.message}`,
+          error,
+        );
+        throw new ServiceUnavailableException('Training service unavailable');
+      }
+      throw error;
+    }
+  }
+}

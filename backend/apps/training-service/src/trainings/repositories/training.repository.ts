@@ -132,8 +132,4 @@ export class TrainingRepository extends Repository<Training> {
       return hasIntersection(interval, otherIntervals);
     });
   }
-
-  countActiveBookings(): number {
-    return 0;
-  }
 }

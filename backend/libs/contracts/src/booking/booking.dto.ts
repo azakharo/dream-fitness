@@ -3,9 +3,6 @@ import { IsString, IsUUID, IsOptional } from 'class-validator';
 export class CreateBookingDto {
   @IsUUID()
   trainingId: string;
-
-  @IsUUID()
-  userId: string;
 }
 
 export class BookingDto {
@@ -15,6 +12,7 @@ export class BookingDto {
   status: 'confirmed' | 'cancelled' | 'completed';
   bookedAt: Date;
   cancelledAt?: Date;
+  updatedAt: Date;
 }
 
 export class WaitlistDto {
@@ -34,7 +32,4 @@ export class CancelBookingDto {
 export class JoinWaitlistDto {
   @IsUUID()
   trainingId: string;
-
-  @IsUUID()
-  userId: string;
 }

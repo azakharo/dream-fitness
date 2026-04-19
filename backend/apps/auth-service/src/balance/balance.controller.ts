@@ -3,7 +3,6 @@ import {
   Post,
   Get,
   Body,
-  UseGuards,
   Query,
   HttpCode,
   HttpStatus,
@@ -23,7 +22,6 @@ import { ReleaseDto } from './dto/release.dto';
 import { RefundDto } from './dto/refund.dto';
 import { TransactionResponseDto } from './dto/transaction-response.dto';
 import { TransactionListResponseDto } from './dto/transaction-list-response.dto';
-import { JwtAuthGuard } from '@app/shared';
 import { CurrentUser } from '@app/shared';
 import type { PaginationParams, AuthenticatedUser } from '@app/shared';
 
@@ -34,7 +32,6 @@ export class BalanceController {
 
   @Post('balance/deposit')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Deposit funds to user balance' })
   @ApiOkResponse({ type: TransactionResponseDto })
@@ -48,7 +45,6 @@ export class BalanceController {
 
   @Post('balance/reserve')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Reserve funds for a booking' })
   @ApiOkResponse({ type: TransactionResponseDto })
@@ -62,7 +58,6 @@ export class BalanceController {
 
   @Post('balance/release')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Release reserved funds back to balance' })
   @ApiOkResponse({ type: TransactionResponseDto })
@@ -76,7 +71,6 @@ export class BalanceController {
 
   @Post('balance/refund')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Refund funds to user balance' })
   @ApiOkResponse({ type: TransactionResponseDto })
@@ -87,7 +81,6 @@ export class BalanceController {
   }
 
   @Get('transactions')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user transaction history' })
   @ApiOkResponse({ type: TransactionListResponseDto })

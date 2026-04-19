@@ -12,3 +12,11 @@ export enum UserStatus {
   ACTIVE = 'active',
   BLOCKED = 'blocked',
 }
+
+export enum TransactionType {
+  DEPOSIT = 'deposit',
+  WITHDRAW = 'withdraw',
+  REFUND = 'refund',
+  RESERVE = 'reserve',
+  RELEASE = 'release',
+}

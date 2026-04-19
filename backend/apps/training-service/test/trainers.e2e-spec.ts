@@ -153,7 +153,7 @@ describe('TrainersController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000001';
 
       const response = await trainersHelper.findById(token, nonExistentId);
 
@@ -205,7 +205,7 @@ describe('TrainersController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000002';
       const updateData = { name: 'Updated Name' };
 
       const response = await trainersHelper.update(
@@ -254,7 +254,7 @@ describe('TrainersController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000003';
 
       const response = await trainersHelper.remove(token, nonExistentId);
 

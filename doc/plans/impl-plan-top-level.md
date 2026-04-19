@@ -338,6 +338,24 @@
 
 **Порт:** 3000
 
+> **Текущая архитектура (без API Gateway):**
+> Клиент обращается напрямую к портам сервисов. Каждый сервис independently валидирует JWT access token.
+> Для межсервисного взаимодействия booking-service прокидывает access token пользователя
+> в HTTP-запросах к training-service и auth-service.
+> Это создаёт дублирование: каждый сервис содержит свой JWT validation guard и auth module.
+>
+> **После реализации API Gateway:**
+>
+> - Вся аутентификация и авторизация переносится в Gateway
+> - Gateway валидирует JWT и передаёт userId/role через внутренние заголовки - X-User-Id и X-User-Role
+> - Сервисы убирают JWT validation guard и auth module, оставляя только проверку внутренних заголовков
+> - Прокидывание access token в межсервисных вызовах больше не нужно — сервисы доверяют заголовкам от Gateway
+> - Saga в booking-service - promote-from-waitlist - потребует отдельного решения для авторизации
+>   - либо сервисный токен для внутренних вызовов через Gateway
+>   - либо доверенные внутренние заголовки без токена
+
+> **Known Issue (Phase 4):** В текущей реализации GET /trainings/:id и GET /trainings/:id/availability в training-service временно отключены для аутентификации, чтобы saga в booking-service мог вызывать их без JWT. Это quick fix для Phase 4. В Phase 6 будет реализовано правильное решение через API Gateway с сервисным токеном или доверенными заголовками.
+
 ### 6.1. Basic Setup
 
 - [ ] Создать NestJS приложение
@@ -348,7 +366,9 @@
 - [ ] JWT validation guard
 - [ ] Извлечение userId и role из token
 - [ ] Передача X-User-Id и X-User-Role headers в сервисы
-- [ ] Role-based guards (client/admin)
+- [ ] Role-based guards - client/admin
+- [ ] Убрать JWT validation из сервисов, заменить на InternalGuard проверяющий X-User-Id и X-User-Role заголовки
+- [ ] Убрать прокидывание access token в межсервисных HTTP клиентах
 
 ### 6.3. Routing
 
@@ -386,6 +406,7 @@
 - Rate limiting на endpoints
 - Глобальный error handling (RFC 7807)
 - Swagger UI на `/api/docs`
+- Сервисы больше не валидируют JWT самостоятельно
 
 **Минимальные проверки:**
 

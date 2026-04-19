@@ -153,7 +153,7 @@ describe('ScheduleController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000000';
+      const nonExistentId = '00000000-0000-0000-0000-000000000001';
 
       const response = await scheduleHelper.getTrainerSchedule(
         token,

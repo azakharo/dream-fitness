@@ -29,3 +29,13 @@ export interface WaitlistJoinedEvent {
     joinedAt: string;
   };
 }
+
+export interface WaitlistPromotedEvent {
+  eventType: 'waitlist.promoted';
+  data: {
+    waitlistId: string;
+    trainingId: string;
+    userId: string;
+    promotedAt: string;
+  };
+}

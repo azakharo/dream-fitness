@@ -85,6 +85,14 @@ This command runs two scripts sequentially:
 
 > If the database already exists, the create script will report it and continue safely.
 
+#### Step 2.5: Create Test Users
+
+```bash
+npm run test:db:seed
+```
+
+This command creates admin and ordinary users.
+
 #### Step 3: Run Unit Tests
 
 ```bash

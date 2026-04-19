@@ -24,7 +24,7 @@ import { JwtAuthGuard } from '@app/shared';
 import { TrainingsService } from './trainings.service';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UpdateTrainingDto } from './dto/update-training.dto';
-import { TrainingResponseDto } from './dto/training-response.dto';
+import { TrainingResponseDto } from '@app/contracts';
 import { TrainingFilterDto } from './dto/training-filter.dto';
 
 @ApiTags('trainings')
@@ -59,8 +59,6 @@ export class TrainingsController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get training by ID' })
   @ApiOkResponse({ type: TrainingResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -95,8 +93,6 @@ export class TrainingsController {
   }
 
   @Get(':id/availability')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Check available slots for training' })
   @ApiOkResponse({
     schema: {

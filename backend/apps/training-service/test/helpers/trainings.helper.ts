@@ -2,7 +2,7 @@ import request from 'supertest';
 import { Response } from 'supertest';
 import { CreateTrainingDto } from '../../src/trainings/dto/create-training.dto';
 import { UpdateTrainingDto } from '../../src/trainings/dto/update-training.dto';
-import { TrainingResponseDto } from '../../src/trainings/dto/training-response.dto';
+import { TrainingResponseDto } from '@app/contracts';
 
 export type TestResponse<T> = Omit<Response, 'body'> & {
   body: T;

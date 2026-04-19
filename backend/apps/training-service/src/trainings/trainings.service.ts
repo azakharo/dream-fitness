@@ -3,7 +3,7 @@ import { DeepPartial } from 'typeorm';
 import { TrainingRepository } from './repositories/training.repository';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UpdateTrainingDto } from './dto/update-training.dto';
-import { TrainingResponseDto } from './dto/training-response.dto';
+import { TrainingResponseDto } from '@app/contracts';
 import { Training } from './entities/training.entity';
 import { TrainersService } from '../trainers/trainers.service';
 import { TrainerNotFoundException } from '../common/exceptions/trainer-not-found.exception';
@@ -12,8 +12,8 @@ import { TrainingNotFoundException } from '../common/exceptions/training-not-fou
 import { TrainingAlreadyCancelledException } from '../common/exceptions/training-already-cancelled.exception';
 import { ScheduleConflictException } from '../common/exceptions/schedule-conflict.exception';
 import { PastDateException } from '../common/exceptions/past-date.exception';
-import { TrainingStatus } from '@app/shared';
 import { EventsPublisher } from '../events/events.publisher';
+import { TrainingStatus } from '@app/shared';
 
 @Injectable()
 export class TrainingsService {
@@ -23,24 +23,26 @@ export class TrainingsService {
     private readonly eventsPublisher: EventsPublisher,
   ) {}
 
-  private toResponseDto(training: Training): TrainingResponseDto {
-    const availableSlots =
-      training.capacity - this.trainingRepository.countActiveBookings();
+  private async toResponseDto(
+    training: Training,
+  ): Promise<TrainingResponseDto> {
+    const trainer = await this.trainersService.findById(training.trainerId);
     return {
       id: training.id,
       trainerId: training.trainerId,
+      trainerName: trainer?.name ?? undefined,
       title: training.title,
       description: training.description,
       type: training.type,
       scheduledAt: training.scheduledAt.toISOString(),
       durationMinutes: training.durationMinutes,
       capacity: training.capacity,
+      currentParticipants: 0,
+      availableSlots: training.capacity,
       price: training.price,
       status: training.status,
       createdAt: training.createdAt.toISOString(),
       updatedAt: training.updatedAt.toISOString(),
-      availableSlots,
-      currentParticipants: training.capacity - availableSlots,
     };
   }
 
@@ -75,7 +77,7 @@ export class TrainingsService {
 
     const savedTraining = await this.trainingRepository.save(training);
 
-    const response = this.toResponseDto(savedTraining);
+    const response = await this.toResponseDto(savedTraining);
     await this.eventsPublisher.publishTrainingCreated({
       trainingId: response.id,
       title: response.title,
@@ -144,7 +146,7 @@ export class TrainingsService {
       ...training,
       ...updateData,
     } as DeepPartial<Training>);
-    const response = this.toResponseDto(updatedTraining);
+    const response = await this.toResponseDto(updatedTraining);
     await this.eventsPublisher.publishTrainingUpdated({
       trainingId: response.id,
       changes: dto as Record<string, unknown>,
@@ -175,7 +177,7 @@ export class TrainingsService {
     if (!training) {
       throw new TrainingNotFoundException(id);
     }
-    return this.toResponseDto(training);
+    return await this.toResponseDto(training);
   }
 
   async findAll(filterDto: {
@@ -189,7 +191,9 @@ export class TrainingsService {
     const { data, total } =
       await this.trainingRepository.findWithFilters(filterDto);
     return {
-      data: data.map((training) => this.toResponseDto(training)),
+      data: await Promise.all(
+        data.map((training) => this.toResponseDto(training)),
+      ),
       total,
     };
   }
@@ -206,9 +210,9 @@ export class TrainingsService {
       throw new TrainingNotFoundException(id);
     }
 
-    const currentParticipants = this.trainingRepository.countActiveBookings();
-    const availableSlots = training.capacity - currentParticipants;
-    const isAvailable = availableSlots > 0;
+    const currentParticipants = 0;
+    const availableSlots = training.capacity;
+    const isAvailable = true;
 
     return {
       trainingId: training.id,
