@@ -43,14 +43,11 @@ export class AuthClientService {
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
-        if (error.response?.status === 404) {
-          throw new NotFoundException('Auth service not found');
-        }
         this.logger.error(
           `Failed to reserve points for user ${userId}: ${error.message}`,
           error,
         );
-        throw new ServiceUnavailableException('Auth service unavailable');
+        throw error;
       }
       throw error;
     }

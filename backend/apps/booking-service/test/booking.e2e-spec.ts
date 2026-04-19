@@ -9,7 +9,11 @@ import {
   TEST_USERS,
 } from './fixtures/booking.fixtures';
 import { BookingStatus } from '@app/shared/enums';
-import { NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { mockTrainingClientService } from './mocks/training-client.mock';
 import { mockAuthClientService } from './mocks/auth-client.mock';
 
@@ -137,7 +141,7 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.email,
       );
       mockAuthClientService.reservePoints.mockRejectedValue(
-        new Error('Insufficient balance'),
+        new ConflictException('Insufficient balance'),
       );
 
       const response = await bookingHelper.createBooking(

@@ -7,9 +7,10 @@
       "description": "Select service to test",
       "options": [
         "auth-service",
-        "training-service"
+        "training-service",
+        "booking-service"
       ],
-      "default": "training-service"
+      "default": "booking-service"
     },
     {
       "id": "testName",
