@@ -204,6 +204,10 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         TEST_USERS.user2.id,
         TEST_USERS.user2.email,
       );
+      const token3 = authHelper.getUserToken(
+        TEST_USERS.user3.id,
+        TEST_USERS.user3.email,
+      );
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -214,6 +218,7 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       );
 
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,
@@ -222,13 +227,20 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       expect(cancelResponse.status).toBe(200);
 
-      const waitlistPosition = await waitlistHelper.getWaitlistPosition(
+      const waitlistPosition2 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
         token2,
       );
 
-      expect(waitlistPosition.status).toBe(200);
-      expect(waitlistPosition.body.position).toBe(1);
+      expect(waitlistPosition2.status).toBe(404);
+
+      const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
+        TEST_TRAINING.id,
+        token3,
+      );
+
+      expect(waitlistPosition3.status).toBe(200);
+      expect(waitlistPosition3.body.position).toBe(1);
     });
   });
 
