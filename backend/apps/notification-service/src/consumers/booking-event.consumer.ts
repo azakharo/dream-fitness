@@ -8,7 +8,7 @@ import type {
 } from '@app/contracts';
 import type { EventMessage } from '@app/shared';
 import { NotificationsService } from '../notifications/notifications.service';
-import { NotificationType } from '@app/shared';
+import { NotificationType, EXCHANGES, ROUTING_KEYS, QUEUES } from '@app/shared';
 
 @Injectable()
 export class BookingEventConsumer {
@@ -17,9 +17,9 @@ export class BookingEventConsumer {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @RabbitSubscribe({
-    exchange: 'dreamfitness.exchange',
-    routingKey: 'booking.created',
-    queue: 'notification.service.queue',
+    exchange: EXCHANGES.MAIN,
+    routingKey: ROUTING_KEYS.BOOKING_CREATED,
+    queue: QUEUES.NOTIFICATION_SERVICE,
   })
   async handleBookingCreated(msg: EventMessage<BookingCreatedEvent['data']>) {
     this.logger.log(`Received booking.created event: ${JSON.stringify(msg)}`);
@@ -35,9 +35,9 @@ export class BookingEventConsumer {
   }
 
   @RabbitSubscribe({
-    exchange: 'dreamfitness.exchange',
-    routingKey: 'booking.cancelled',
-    queue: 'notification.service.queue',
+    exchange: EXCHANGES.MAIN,
+    routingKey: ROUTING_KEYS.BOOKING_CANCELLED,
+    queue: QUEUES.NOTIFICATION_SERVICE,
   })
   async handleBookingCancelled(
     msg: EventMessage<BookingCancelledEvent['data']>,
@@ -59,9 +59,9 @@ export class BookingEventConsumer {
   }
 
   @RabbitSubscribe({
-    exchange: 'dreamfitness.exchange',
-    routingKey: 'waitlist.joined',
-    queue: 'notification.service.queue',
+    exchange: EXCHANGES.MAIN,
+    routingKey: ROUTING_KEYS.WAITLIST_JOINED,
+    queue: QUEUES.NOTIFICATION_SERVICE,
   })
   async handleWaitlistJoined(msg: EventMessage<WaitlistJoinedEvent['data']>) {
     this.logger.log(`Received waitlist.joined event: ${JSON.stringify(msg)}`);
@@ -77,9 +77,9 @@ export class BookingEventConsumer {
   }
 
   @RabbitSubscribe({
-    exchange: 'dreamfitness.exchange',
-    routingKey: 'waitlist.promoted',
-    queue: 'notification.service.queue',
+    exchange: EXCHANGES.MAIN,
+    routingKey: ROUTING_KEYS.WAITLIST_PROMOTED,
+    queue: QUEUES.NOTIFICATION_SERVICE,
   })
   async handleWaitlistPromoted(
     msg: EventMessage<WaitlistPromotedEvent['data']>,
