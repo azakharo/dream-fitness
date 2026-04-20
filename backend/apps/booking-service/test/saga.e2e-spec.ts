@@ -42,13 +42,20 @@ describe('Waitlist Promotion Saga (e2e)', () => {
   beforeEach(async () => {
     await dbHelper.truncateTables();
     await dbHelper.seedTestData();
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     mockTrainingClientService.getTraining.mockResolvedValue(
       createTrainingMock(),
     );
-    mockAuthClientService.reservePoints.mockResolvedValue(undefined);
-    mockAuthClientService.refundPoints.mockResolvedValue(undefined);
-    mockAuthClientService.releasePoints.mockResolvedValue(undefined);
+    // The following mocks will be called if a test is wrong (forgot to add mock)
+    mockAuthClientService.reservePoints.mockRejectedValue(
+      new Error('unexpected, should not be called'),
+    );
+    mockAuthClientService.refundPoints.mockRejectedValue(
+      new Error('unexpected, should not be called'),
+    );
+    mockAuthClientService.releasePoints.mockRejectedValue(
+      new Error('unexpected, should not be called'),
+    );
   });
 
   describe('Waitlist Promotion Saga', () => {
@@ -64,6 +71,9 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+      mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
 
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
@@ -107,6 +117,10 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+      mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
@@ -163,6 +177,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
 
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token1,
@@ -175,6 +191,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       mockAuthClientService.reservePoints
         .mockRejectedValueOnce(new ConflictException('Insufficient balance')) // user2's promotion attempt (skipped)
         .mockResolvedValueOnce(undefined); // user3's promotion attempt
+
+      mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,
@@ -233,6 +251,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
 
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token1,
@@ -240,6 +260,9 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
       await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
+
+      mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,

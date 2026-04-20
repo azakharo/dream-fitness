@@ -32,7 +32,7 @@ describe('AuthController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('register', () => {

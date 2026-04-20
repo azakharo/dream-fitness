@@ -38,16 +38,23 @@ describe('Bookings API (e2e)', () => {
   beforeEach(async () => {
     await dbHelper.truncateTables();
     await dbHelper.seedTestData();
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     mockTrainingClientService.getTraining.mockResolvedValue(
       createTrainingMock(),
     );
     mockTrainingClientService.getAvailability.mockResolvedValue(
       createAvailabilityMock(),
     );
-    mockAuthClientService.reservePoints.mockResolvedValue(undefined);
-    mockAuthClientService.refundPoints.mockResolvedValue(undefined);
-    mockAuthClientService.releasePoints.mockResolvedValue(undefined);
+    // The following mocks will be called if a test is wrong (forgot to add mock)
+    mockAuthClientService.reservePoints.mockRejectedValue(
+      new Error('unexpected, should not be called'),
+    );
+    mockAuthClientService.refundPoints.mockRejectedValue(
+      new Error('unexpected, should not be called'),
+    );
+    mockAuthClientService.releasePoints.mockRejectedValue(
+      new Error('unexpected, should not be called'),
+    );
   });
 
   describe('POST /bookings', () => {
@@ -56,6 +63,9 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.id,
         TEST_USERS.user1.email,
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       const response = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -75,7 +85,9 @@ describe('Bookings API (e2e)', () => {
       );
       const fullTraining = createTrainingMock({ capacity: 1 });
 
-      mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
+      mockTrainingClientService.getTraining.mockResolvedValueOnce(fullTraining);
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       await bookingHelper.createBooking(TEST_TRAINING.id, token);
 
       const response = await bookingHelper.createBooking(
@@ -91,6 +103,9 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.id,
         TEST_USERS.user1.email,
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       await bookingHelper.createBooking(TEST_TRAINING.id, token);
 
       const response = await bookingHelper.createBooking(
@@ -109,6 +124,8 @@ describe('Bookings API (e2e)', () => {
       mockTrainingClientService.getTraining.mockRejectedValue(
         new NotFoundException('Training not found'),
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
       const response = await bookingHelper.createBooking(
         '33333333-3333-4333-a333-333333333333',
@@ -140,7 +157,8 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.id,
         TEST_USERS.user1.email,
       );
-      mockAuthClientService.reservePoints.mockRejectedValue(
+
+      mockAuthClientService.reservePoints.mockRejectedValueOnce(
         new ConflictException('Insufficient balance'),
       );
 
@@ -161,6 +179,8 @@ describe('Bookings API (e2e)', () => {
       );
       await bookingHelper.createBooking(TEST_TRAINING.id, token);
 
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       const response = await bookingHelper.getBookings(token);
 
       expect(response.status).toBe(200);
@@ -176,6 +196,8 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.email,
       );
 
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       const response = await bookingHelper.getBookings(token);
 
       expect(response.status).toBe(200);
@@ -188,6 +210,9 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.id,
         TEST_USERS.user1.email,
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       await bookingHelper.createBooking(TEST_TRAINING.id, token);
 
       const response = await bookingHelper.getBookings(token, {
@@ -208,6 +233,9 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.id,
         TEST_USERS.user1.email,
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -245,6 +273,8 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user2.id,
         TEST_USERS.user2.email,
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token1,
@@ -263,6 +293,10 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.id,
         TEST_USERS.user1.email,
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+      mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
+
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -281,6 +315,10 @@ describe('Bookings API (e2e)', () => {
         TEST_USERS.user1.id,
         TEST_USERS.user1.email,
       );
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+      mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
+
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,
@@ -317,6 +355,10 @@ describe('Bookings API (e2e)', () => {
       });
 
       mockTrainingClientService.getTraining.mockResolvedValue(pastTraining);
+
+      mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+      mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
+
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
         token,

@@ -25,7 +25,7 @@ describe('TrainersController (e2e)', () => {
 
   beforeEach(async () => {
     await dbHelper.truncateTables();
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('POST /trainers', () => {

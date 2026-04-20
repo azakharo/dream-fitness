@@ -31,7 +31,7 @@ describe('Waitlist API (e2e)', () => {
   beforeEach(async () => {
     await dbHelper.truncateTables();
     await dbHelper.seedTestData();
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     mockTrainingClientService.getTraining.mockResolvedValue(
       createTrainingMock(),
     );

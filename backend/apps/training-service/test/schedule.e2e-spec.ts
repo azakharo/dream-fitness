@@ -34,7 +34,7 @@ describe('ScheduleController (e2e)', () => {
 
   beforeEach(async () => {
     await dbHelper.truncateTables();
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('GET /schedule/week', () => {
