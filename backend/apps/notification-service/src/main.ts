@@ -22,7 +22,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs/notification-service', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   const port = process.env.NOTIFICATION_SERVICE_PORT || 3004;
   await app.listen(port);

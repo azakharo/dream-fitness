@@ -371,7 +371,7 @@ http POST http://localhost:3004/notifications --session=user userId="<USER_ID>" 
 
 ### 31. Проверить Swagger UI
 
-Открыть: http://localhost:3004/api/docs/notification-service
+Открыть: http://localhost:3004/docs
 
 - [ ] Документация загружается
 - [ ] Отображаются все endpoints
