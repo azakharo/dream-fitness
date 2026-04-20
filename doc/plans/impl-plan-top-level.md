@@ -309,7 +309,7 @@
 - [ ] Consumer для `balance.changed` → создать уведомление
 - [ ] Consumer для `training.reminder` → создать уведомление
 
-### 5.4. Email Notifications (опционально)
+### 5.4. Email Notifications
 
 - [ ] Интеграция с nodemailer
 - [ ] Шаблоны писем
@@ -325,12 +325,9 @@
 
 **Минимальные проверки:**
 
-- [ ] Unit тесты: NotificationModule (min 70% coverage)
-- [ ] E2E тесты: создание → список → mark as read
-- [ ] Integration тесты: RabbitMQ consumers получают events
 - [ ] Контракты: event DTOs в `@app/contracts/notification` соответствуют consumers
+- [ ] `npm run ts` — без ошибок
 - [ ] `npm run lint` — без ошибок
-- [ ] `npm run test` — все тесты проходят
 
 ---
 
