@@ -117,19 +117,6 @@ backend/apps/notification-service/
 │       └── exceptions/
 │           ├── index.ts
 │           └── notification-not-found.exception.ts
-├── test/
-│   ├── jest-e2e.json
-│   ├── notification.e2e-spec.ts
-│   ├── consumer.e2e-spec.ts
-│   ├── helpers/
-│   │   ├── app-test.helper.ts
-│   │   ├── auth.helper.ts
-│   │   ├── db.helper.ts
-│   │   └── notification.helper.ts
-│   ├── fixtures/
-│   │   └── notification.fixtures.ts
-│   └── mocks/
-│       └── consumers.mock.ts
 └── tsconfig.app.json
 ```
 
@@ -558,6 +545,8 @@ export class BookingEventConsumer {
 
 ### Шаг 11. Тестирование
 
+ВАЖНО! ЭТОТ ШАГ НЕ РЕАЛИЗОВЫВАЕМ! Тестирование будет добавлено позже отдельной задачей!
+
 **Цель:** Unit и E2E тесты для notification service.
 
 **Файлы:**
@@ -753,11 +742,10 @@ getSmtpConfig() {
 
 **Проверки:**
 
-- [ ] `npm run build:notification-service` — без ошибок
 - [ ] `npm run ts` — без ошибок
 - [ ] `npm run lint` — без ошибок
-- [ ] `npm run test` — все unit тесты проходят
-- [ ] `npm run test:e2e:notification` — все E2E тесты проходят
+- [ ] `npm test` — все unit тесты проходят
+- [ ] `npm run build:notification-service` — без ошибок
 
 ---
 
@@ -807,10 +795,7 @@ graph TD
 
 **Минимальные проверки:**
 
-- [ ] `npm run build:notification-service` — без ошибок
 - [ ] `npm run ts` — без ошибок
 - [ ] `npm run lint` — без ошибок
+- [ ] `npm run build:notification-service` — без ошибок
 - [ ] Контракты: event DTOs в `@app/contracts/notification` соответствуют consumers
-- [ ] E2E тесты: REST API endpoints работают корректно
-- [ ] E2E тесты: consumer обработчики создают корректные уведомления
-- [ ] Ручная проверка: RabbitMQ management UI — notification.service.queue привязана к exchange
