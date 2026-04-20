@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RabbitMQPublisher } from '@app/shared/rabbitmq';
+import { RabbitMQPublisher, ROUTING_KEYS } from '@app/shared/rabbitmq';
 import { NotificationCreatedEvent } from '@app/contracts';
 
 @Injectable()
@@ -11,18 +11,17 @@ export class EventsPublisher {
   async publishNotificationCreated(
     data: NotificationCreatedEvent['data'],
   ): Promise<void> {
+    const eventType = ROUTING_KEYS.NOTIFICATION_CREATED;
     try {
       const event: NotificationCreatedEvent = {
-        eventType: 'notification.created',
+        eventType,
         data,
       };
-      await this.rabbitMQPublisher.publish('notification.created', event);
-      this.logger.log(
-        `Published notification.created event for user ${data.userId}`,
-      );
+      await this.rabbitMQPublisher.publish(eventType, event);
+      this.logger.log(`Published ${eventType} event for user ${data.userId}`);
     } catch (error) {
       this.logger.error(
-        `Failed to publish notification.created event for user ${data.userId}`,
+        `Failed to publish ${eventType} event for user ${data.userId}`,
         error,
       );
     }

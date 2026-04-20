@@ -1,7 +1,8 @@
 import { NotificationType } from '@app/shared/enums';
+import { ROUTING_KEYS } from '@app/shared/rabbitmq/rabbitmq.constants';
 
 export interface NotificationCreatedEvent {
-  eventType: 'notification.created';
+  eventType: (typeof ROUTING_KEYS)['NOTIFICATION_CREATED'];
   data: {
     notificationId: string;
     userId: string;
