@@ -1,14 +1,23 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule } from './config';
+import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth';
+import { NotificationsModule } from './notifications';
+import { ConsumersModule } from './consumers';
+import { EventsModule } from './events';
+import { EmailModule } from './email/email.module';
+import { RabbitMQModule } from '@app/shared';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
-      isGlobal: true,
-    }),
+    ConfigModule,
+    DatabaseModule,
+    RabbitMQModule.forRoot(),
+    AuthModule,
+    NotificationsModule,
+    ConsumersModule,
+    EventsModule,
+    EmailModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

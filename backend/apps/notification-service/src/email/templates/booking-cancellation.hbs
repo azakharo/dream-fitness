@@ -1,0 +1,12 @@
+<h1>Запись на тренировку отменена</h1>
+<p>Здравствуйте, {{userName}}!</p>
+<p>Ваша запись на тренировку была отменена.</p>
+<p><strong>Детали:</strong></p>
+<ul>
+  <li>ID записи: {{bookingId}}</li>
+  <li>ID тренировки: {{trainingId}}</li>
+</ul>
+{{#if reason}}
+<p><strong>Причина:</strong> {{reason}}</p>
+{{/if}}
+<p><em>Команда DreamFitness</em></p>

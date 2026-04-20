@@ -1,11 +1,13 @@
+import { NotificationType } from '@app/shared/enums';
+
 export interface NotificationCreatedEvent {
   eventType: 'notification.created';
   data: {
     notificationId: string;
     userId: string;
     title: string;
-    message: string;
-    type: string;
+    content: string;
+    type: NotificationType;
     metadata?: Record<string, unknown>;
   };
 }

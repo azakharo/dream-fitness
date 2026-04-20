@@ -1,0 +1,12 @@
+<h1>Изменение баланса</h1>
+<p>Здравствуйте, {{userName}}!</p>
+<p>На вашем счете произошли изменения:</p>
+<ul>
+  <li>Предыдущий баланс: {{oldBalance}}</li>
+  <li>Сумма: {{amount}}</li>
+  <li>Новый баланс: {{newBalance}}</li>
+</ul>
+{{#if description}}
+<p><strong>Описание:</strong> {{description}}</p>
+{{/if}}
+<p><em>Команда DreamFitness</em></p>
