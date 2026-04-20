@@ -45,13 +45,14 @@ describe('Bookings API (e2e)', () => {
     mockTrainingClientService.getAvailability.mockResolvedValue(
       createAvailabilityMock(),
     );
-    mockAuthClientService.reservePoints.mockResolvedValue(
+    // The following mocks will be called if a test is wrong (forgot to add mock)
+    mockAuthClientService.reservePoints.mockRejectedValue(
       new Error('unexpected, should not be called'),
     );
-    mockAuthClientService.refundPoints.mockResolvedValue(
+    mockAuthClientService.refundPoints.mockRejectedValue(
       new Error('unexpected, should not be called'),
     );
-    mockAuthClientService.releasePoints.mockResolvedValue(
+    mockAuthClientService.releasePoints.mockRejectedValue(
       new Error('unexpected, should not be called'),
     );
   });
