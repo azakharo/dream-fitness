@@ -24,9 +24,10 @@ export class BalanceEventConsumer {
   async handleBalanceChanged(msg: EventMessage<BalanceChangedEvent['data']>) {
     this.logger.log(`Received balance.changed event: ${JSON.stringify(msg)}`);
 
-    const { userId, userEmail, newBalance, amount, description } = msg.data;
+    const { userId, userEmail, newBalance, oldBalance, amount, description } =
+      msg.data;
 
-    const isIncrease = amount > 0;
+    const isIncrease = newBalance >= oldBalance;
     const changeText = isIncrease ? `+${amount}` : `${amount}`;
     const content = description
       ? `Баланс изменен на ${changeText}. ${description}`
