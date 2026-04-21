@@ -17,7 +17,22 @@ export function createRabbitMQConfig(
     // Notification service needs separate queues for each consumer type
     queueConfigs.push(
       {
-        name: QUEUES.NOTIFICATION_BOOKING,
+        name: QUEUES.NOTIFICATION_BOOKING_CREATED,
+        options: { durable: true },
+        exchange: EXCHANGES.MAIN,
+      },
+      {
+        name: QUEUES.NOTIFICATION_BOOKING_CANCELLED,
+        options: { durable: true },
+        exchange: EXCHANGES.MAIN,
+      },
+      {
+        name: QUEUES.NOTIFICATION_WAITLIST_JOINED,
+        options: { durable: true },
+        exchange: EXCHANGES.MAIN,
+      },
+      {
+        name: QUEUES.NOTIFICATION_WAITLIST_PROMOTED,
         options: { durable: true },
         exchange: EXCHANGES.MAIN,
       },
