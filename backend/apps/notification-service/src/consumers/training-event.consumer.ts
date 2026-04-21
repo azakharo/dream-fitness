@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import type { EventMessage } from '@app/shared';
+import { EXCHANGES, QUEUES, ROUTING_KEYS } from '@app/shared';
 import { NotificationsService } from '../notifications/notifications.service';
 import { EmailService } from '../email/email.service';
 import { NotificationType } from '@app/shared';
@@ -24,9 +25,9 @@ export class TrainingEventConsumer {
   ) {}
 
   @RabbitSubscribe({
-    exchange: 'dreamfitness.exchange',
-    routingKey: 'training.reminder',
-    queue: 'notification.service.queue',
+    exchange: EXCHANGES.MAIN,
+    routingKey: ROUTING_KEYS.TRAINING_REMINDER,
+    queue: QUEUES.NOTIFICATION_SERVICE,
   })
   async handleTrainingReminder(msg: EventMessage<TrainingReminderEventData>) {
     this.logger.log(`Received training.reminder event: ${JSON.stringify(msg)}`);

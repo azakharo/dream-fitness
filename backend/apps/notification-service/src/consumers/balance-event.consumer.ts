@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import type { BalanceChangedEvent } from '@app/contracts';
 import type { EventMessage } from '@app/shared';
+import { EXCHANGES, QUEUES, ROUTING_KEYS } from '@app/shared';
 import { NotificationsService } from '../notifications/notifications.service';
 import { EmailService } from '../email/email.service';
 import { NotificationType } from '@app/shared';
@@ -16,9 +17,9 @@ export class BalanceEventConsumer {
   ) {}
 
   @RabbitSubscribe({
-    exchange: 'dreamfitness.exchange',
-    routingKey: 'balance.changed',
-    queue: 'notification.service.queue',
+    exchange: EXCHANGES.MAIN,
+    routingKey: ROUTING_KEYS.BALANCE_CHANGED,
+    queue: QUEUES.NOTIFICATION_SERVICE,
   })
   async handleBalanceChanged(msg: EventMessage<BalanceChangedEvent['data']>) {
     this.logger.log(`Received balance.changed event: ${JSON.stringify(msg)}`);
