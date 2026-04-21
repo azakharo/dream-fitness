@@ -3,11 +3,13 @@ import { ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { TrainingClientService } from '../../clients/training-client.service';
+import { AuthClientService } from '../../clients/auth-client.service';
 import { WaitlistJoinedEvent } from '../events';
 import { AlreadyOnWaitlistException } from '../../common/exceptions';
 import { DuplicateBookingException } from '../../common/exceptions';
 import { JoinWaitlistCommand } from './join-waitlist.command';
 import { WaitlistResponseDto } from '../../waitlist/dto';
+import { formatDateTime } from '@app/shared';
 
 @CommandHandler(JoinWaitlistCommand)
 export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand> {
@@ -15,6 +17,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
     private readonly bookingRepository: BookingRepository,
     private readonly waitlistRepository: WaitlistRepository,
     private readonly trainingClientService: TrainingClientService,
+    private readonly authClientService: AuthClientService,
     private readonly eventBus: EventBus,
   ) {}
 
@@ -35,7 +38,12 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       throw new AlreadyOnWaitlistException(userId, trainingId);
     }
 
-    await this.trainingClientService.getTraining(trainingId, command.jwtToken);
+    const training = await this.trainingClientService.getTraining(
+      trainingId,
+      command.jwtToken,
+    );
+
+    const trainingDateTime = formatDateTime(training.scheduledAt);
 
     const waitlistEntry = this.waitlistRepository.create({
       userId,
@@ -52,12 +60,20 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       throw new Error('Failed to get waitlist position');
     }
 
+    const userEmail = await this.authClientService.getUserEmail(userId);
+    const userName = await this.authClientService.getUserName(userId);
+
     this.eventBus.publish(
       new WaitlistJoinedEvent(
         savedEntry.id,
         savedEntry.trainingId,
         savedEntry.userId,
+        userEmail,
+        userName,
         positionResult.position,
+        training.title,
+        trainingDateTime,
+        training.trainerName || 'Тренер',
       ),
     );
 

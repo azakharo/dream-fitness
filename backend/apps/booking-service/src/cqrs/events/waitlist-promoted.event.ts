@@ -5,5 +5,10 @@ export class WaitlistPromotedEvent implements IEvent {
     public readonly waitlistId: string,
     public readonly trainingId: string,
     public readonly userId: string,
+    public readonly userEmail: string,
+    public readonly userName: string,
+    public readonly trainingName: string,
+    public readonly trainingDateTime: string,
+    public readonly trainerName: string,
   ) {}
 }

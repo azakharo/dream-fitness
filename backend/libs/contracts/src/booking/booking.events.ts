@@ -4,7 +4,12 @@ export interface BookingCreatedEvent {
     bookingId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
+    userName: string;
     bookedAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   };
 }
 
@@ -14,8 +19,13 @@ export interface BookingCancelledEvent {
     bookingId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
+    userName: string;
     reason?: string;
     cancelledAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   };
 }
 
@@ -25,8 +35,13 @@ export interface WaitlistJoinedEvent {
     waitlistId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
+    userName: string;
     position: number;
     joinedAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   };
 }
 
@@ -36,6 +51,11 @@ export interface WaitlistPromotedEvent {
     waitlistId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
+    userName: string;
     promotedAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   };
 }

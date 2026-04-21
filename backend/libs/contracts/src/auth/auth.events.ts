@@ -12,6 +12,8 @@ export interface BalanceChangedEvent {
   eventType: 'user.balance_changed';
   data: {
     userId: string;
+    userEmail: string;
+    userName: string;
     oldBalance: number;
     newBalance: number;
     amount: number;

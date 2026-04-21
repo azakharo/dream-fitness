@@ -2,10 +2,12 @@ import {
   Controller,
   Get,
   Patch,
+  Param,
   UseGuards,
   Body,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -77,5 +79,27 @@ export class UsersController {
   ): Promise<BalanceResponseDto> {
     const balance = await this.usersService.getUserBalance(user.id);
     return { balance: balance.balance, userId: user.id };
+  }
+
+  @Get('users/:id/email')
+  @ApiOperation({ summary: 'Get user email by ID (internal endpoint)' })
+  @ApiOkResponse({ description: 'Returns user email' })
+  async getUserEmail(@Param('id') id: string): Promise<{ email: string }> {
+    const email = await this.usersService.getUserEmailById(id);
+    if (!email) {
+      throw new NotFoundException('User not found');
+    }
+    return { email };
+  }
+
+  @Get('users/:id/name')
+  @ApiOperation({ summary: 'Get user name by ID (internal endpoint)' })
+  @ApiOkResponse({ description: 'Returns user name' })
+  async getUserName(@Param('id') id: string): Promise<{ name: string }> {
+    const name = await this.usersService.getUserNameById(id);
+    if (!name) {
+      throw new NotFoundException('User not found');
+    }
+    return { name };
   }
 }

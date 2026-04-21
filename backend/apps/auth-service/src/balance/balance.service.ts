@@ -51,10 +51,12 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
+        userName: user.name,
         oldBalance,
         newBalance,
         amount,
-        description: description || 'Deposit',
+        description: description || 'Пополнение баланса',
       });
 
       return this.mapToResponseDto(transaction);
@@ -95,10 +97,12 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
+        userName: user.name,
         oldBalance,
         newBalance,
         amount,
-        description: `Reserve for booking ${bookingId}`,
+        description: 'Резервирование средств для записи на тренировку',
       });
 
       return this.mapToResponseDto(transaction);
@@ -144,10 +148,12 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
+        userName: user.name,
         oldBalance,
         newBalance,
         amount,
-        description: `Release reserve for booking ${bookingId}`,
+        description: 'Возврат средств за отмененную запись',
       });
 
       return this.mapToResponseDto(transaction);
@@ -184,10 +190,12 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
+        userName: user.name,
         oldBalance,
         newBalance,
         amount,
-        description: `Refund for booking ${bookingId}`,
+        description: 'Возврат средств за тренировку',
       });
 
       return this.mapToResponseDto(transaction);

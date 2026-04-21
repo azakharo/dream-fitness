@@ -28,8 +28,13 @@ export class CancellationSaga {
           bookingId: event.bookingId,
           trainingId: event.trainingId,
           userId: event.userId,
+          userEmail: event.userEmail,
+          userName: event.userName || '',
           reason: event.reason,
           cancelledAt: new Date().toISOString(),
+          trainingName: event.trainingName || '',
+          trainingDateTime: event.trainingDateTime || '',
+          trainerName: event.trainerName || '',
         });
         try {
           await this.commandBus.execute(

@@ -9,6 +9,7 @@ import { BookingCreatedEvent, WaitlistPromotedEvent } from '../events';
 import { EventBus } from '@nestjs/cqrs';
 import { BookingStatus } from '@app/shared/enums';
 import { PromoteFromWaitlistCommand } from './promote-from-waitlist.command';
+import { formatDateTime } from '@app/shared';
 
 @CommandHandler(PromoteFromWaitlistCommand)
 export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWaitlistCommand> {
@@ -70,14 +71,29 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
       });
 
       try {
+        const trainingDateTime = formatDateTime(training.scheduledAt);
+
         const savedBooking = await this.bookingRepository.save(booking);
         await this.waitlistRepository.remove(waitlistEntry);
         remainingSlots--;
+
+        const userEmail = await this.authClientService.getUserEmail(
+          waitlistEntry.userId,
+        );
+        const userName = await this.authClientService.getUserName(
+          waitlistEntry.userId,
+        );
+
         this.eventBus.publish(
           new BookingCreatedEvent(
             savedBooking.id,
             savedBooking.trainingId,
             savedBooking.userId,
+            userEmail,
+            userName,
+            training.title,
+            trainingDateTime,
+            training.trainerName || 'Тренер',
           ),
         );
         this.eventBus.publish(
@@ -85,6 +101,11 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
             waitlistEntry.id,
             waitlistEntry.trainingId,
             waitlistEntry.userId,
+            userEmail,
+            userName,
+            training.title,
+            trainingDateTime,
+            training.trainerName || 'Тренер',
           ),
         );
       } catch {

@@ -6,19 +6,20 @@ import {
   IsBoolean,
   IsObject,
 } from 'class-validator';
+import { NotificationType } from '@app/shared/enums';
 
 export class CreateNotificationDto {
   @IsUUID()
   userId: string;
 
+  @IsEnum(NotificationType)
+  type: NotificationType;
+
   @IsString()
   title: string;
 
   @IsString()
-  message: string;
-
-  @IsEnum(['info', 'warning', 'success', 'error'])
-  type: 'info' | 'warning' | 'success' | 'error';
+  content: string;
 
   @IsOptional()
   @IsObject()
@@ -28,9 +29,9 @@ export class CreateNotificationDto {
 export class NotificationDto {
   id: string;
   userId: string;
+  type: NotificationType;
   title: string;
-  message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
+  content: string;
   isRead: boolean;
   metadata?: Record<string, unknown>;
   createdAt: Date;
