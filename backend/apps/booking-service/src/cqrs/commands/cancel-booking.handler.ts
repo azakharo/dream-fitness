@@ -68,11 +68,15 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
     const trainingDateTime = formatDateTime(training.scheduledAt);
 
     const updatedBooking = await this.bookingRepository.save(booking);
+
+    const userEmail = await this.authClientService.getUserEmail(userId);
+
     this.eventBus.publish(
       new BookingCancelledEvent(
         updatedBooking.id,
         updatedBooking.trainingId,
         updatedBooking.userId,
+        userEmail,
         reason,
         training.title,
         trainingDateTime,

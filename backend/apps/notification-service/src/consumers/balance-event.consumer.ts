@@ -3,13 +3,17 @@ import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import type { BalanceChangedEvent } from '@app/contracts';
 import type { EventMessage } from '@app/shared';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EmailService } from '../email/email.service';
 import { NotificationType } from '@app/shared';
 
 @Injectable()
 export class BalanceEventConsumer {
   private readonly logger = new Logger(BalanceEventConsumer.name);
 
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly notificationsService: NotificationsService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @RabbitSubscribe({
     exchange: 'dreamfitness.exchange',
@@ -19,7 +23,7 @@ export class BalanceEventConsumer {
   async handleBalanceChanged(msg: EventMessage<BalanceChangedEvent['data']>) {
     this.logger.log(`Received balance.changed event: ${JSON.stringify(msg)}`);
 
-    const { userId, newBalance, amount, description } = msg.data;
+    const { userId, userEmail, newBalance, amount, description } = msg.data;
 
     const isIncrease = amount > 0;
     const changeText = isIncrease ? `+${amount}` : `${amount}`;
@@ -33,5 +37,18 @@ export class BalanceEventConsumer {
       title: 'Изменение баланса',
       content,
     });
+
+    this.emailService
+      .sendTemplatedEmail(userEmail, 'balance-change', {
+        amount: changeText,
+        newBalance,
+        description: description || '',
+      })
+      .catch((err) =>
+        this.logger.error(
+          `Failed to send balance change email to ${userEmail}`,
+          err,
+        ),
+      );
   }
 }

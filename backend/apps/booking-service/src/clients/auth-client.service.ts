@@ -126,4 +126,23 @@ export class AuthClientService {
       throw error;
     }
   }
+
+  async getUserEmail(userId: string): Promise<string> {
+    try {
+      const url = `${this.configService.getAuthServiceUrl()}/auth/users/${userId}/email`;
+      const response = await firstValueFrom(
+        this.httpService.get<{ email: string }>(url, { timeout: 3000 }),
+      );
+      return response.data.email;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        this.logger.error(
+          `Failed to get email for user ${userId}: ${error.message}`,
+          error,
+        );
+        throw new ServiceUnavailableException('Auth service unavailable');
+      }
+      throw error;
+    }
+  }
 }

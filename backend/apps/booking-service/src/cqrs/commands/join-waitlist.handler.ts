@@ -3,6 +3,7 @@ import { ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { BookingRepository } from '../../bookings/repositories/booking.repository';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { TrainingClientService } from '../../clients/training-client.service';
+import { AuthClientService } from '../../clients/auth-client.service';
 import { WaitlistJoinedEvent } from '../events';
 import { AlreadyOnWaitlistException } from '../../common/exceptions';
 import { DuplicateBookingException } from '../../common/exceptions';
@@ -16,6 +17,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
     private readonly bookingRepository: BookingRepository,
     private readonly waitlistRepository: WaitlistRepository,
     private readonly trainingClientService: TrainingClientService,
+    private readonly authClientService: AuthClientService,
     private readonly eventBus: EventBus,
   ) {}
 
@@ -58,11 +60,14 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       throw new Error('Failed to get waitlist position');
     }
 
+    const userEmail = await this.authClientService.getUserEmail(userId);
+
     this.eventBus.publish(
       new WaitlistJoinedEvent(
         savedEntry.id,
         savedEntry.trainingId,
         savedEntry.userId,
+        userEmail,
         positionResult.position,
         training.title,
         trainingDateTime,

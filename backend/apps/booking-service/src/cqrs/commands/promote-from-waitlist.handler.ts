@@ -76,11 +76,17 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
         const savedBooking = await this.bookingRepository.save(booking);
         await this.waitlistRepository.remove(waitlistEntry);
         remainingSlots--;
+
+        const userEmail = await this.authClientService.getUserEmail(
+          waitlistEntry.userId,
+        );
+
         this.eventBus.publish(
           new BookingCreatedEvent(
             savedBooking.id,
             savedBooking.trainingId,
             savedBooking.userId,
+            userEmail,
             training.title,
             trainingDateTime,
             training.trainerName || 'Тренер',
@@ -91,6 +97,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
             waitlistEntry.id,
             waitlistEntry.trainingId,
             waitlistEntry.userId,
+            userEmail,
             training.title,
             trainingDateTime,
             training.trainerName || 'Тренер',

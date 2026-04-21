@@ -8,13 +8,17 @@ import type {
 } from '@app/contracts';
 import type { EventMessage } from '@app/shared';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EmailService } from '../email/email.service';
 import { NotificationType, EXCHANGES, ROUTING_KEYS, QUEUES } from '@app/shared';
 
 @Injectable()
 export class BookingEventConsumer {
   private readonly logger = new Logger(BookingEventConsumer.name);
 
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly notificationsService: NotificationsService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @RabbitSubscribe({
     exchange: EXCHANGES.MAIN,
@@ -24,7 +28,8 @@ export class BookingEventConsumer {
   async handleBookingCreated(msg: EventMessage<BookingCreatedEvent['data']>) {
     this.logger.log(`Received booking.created event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingName, trainingDateTime, trainerName } = msg.data;
+    const { userId, userEmail, trainingName, trainingDateTime, trainerName } =
+      msg.data;
 
     await this.notificationsService.createNotification({
       userId,
@@ -32,6 +37,19 @@ export class BookingEventConsumer {
       title: 'Запись на тренировку подтверждена',
       content: `Вы успешно записаны на тренировку "${trainingName}". ${trainingDateTime}, тренер: ${trainerName}`,
     });
+
+    this.emailService
+      .sendTemplatedEmail(userEmail, 'booking-confirmation', {
+        trainingName,
+        trainingDateTime,
+        trainerName,
+      })
+      .catch((err) =>
+        this.logger.error(
+          `Failed to send booking confirmation email to ${userEmail}`,
+          err,
+        ),
+      );
   }
 
   @RabbitSubscribe({
@@ -44,8 +62,14 @@ export class BookingEventConsumer {
   ) {
     this.logger.log(`Received booking.cancelled event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingName, trainingDateTime, trainerName, reason } =
-      msg.data;
+    const {
+      userId,
+      userEmail,
+      trainingName,
+      trainingDateTime,
+      trainerName,
+      reason,
+    } = msg.data;
 
     const content = reason
       ? `Запись на тренировку "${trainingName}" отменена: ${reason}. ${trainingDateTime}, тренер: ${trainerName}`
@@ -57,6 +81,20 @@ export class BookingEventConsumer {
       title: 'Запись на тренировку отменена',
       content,
     });
+
+    this.emailService
+      .sendTemplatedEmail(userEmail, 'booking-cancellation', {
+        trainingName,
+        trainingDateTime,
+        trainerName,
+        reason,
+      })
+      .catch((err) =>
+        this.logger.error(
+          `Failed to send booking cancellation email to ${userEmail}`,
+          err,
+        ),
+      );
   }
 
   @RabbitSubscribe({
@@ -67,8 +105,14 @@ export class BookingEventConsumer {
   async handleWaitlistJoined(msg: EventMessage<WaitlistJoinedEvent['data']>) {
     this.logger.log(`Received waitlist.joined event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingName, trainingDateTime, trainerName, position } =
-      msg.data;
+    const {
+      userId,
+      userEmail,
+      trainingName,
+      trainingDateTime,
+      trainerName,
+      position,
+    } = msg.data;
 
     await this.notificationsService.createNotification({
       userId,
@@ -76,6 +120,20 @@ export class BookingEventConsumer {
       title: 'Вы добавлены в лист ожидания',
       content: `Вы добавлены в лист ожидания на тренировку "${trainingName}". ${trainingDateTime}, тренер: ${trainerName}. Ваша позиция: ${position}`,
     });
+
+    this.emailService
+      .sendTemplatedEmail(userEmail, 'waitlist-joined', {
+        trainingName,
+        trainingDateTime,
+        trainerName,
+        position,
+      })
+      .catch((err) =>
+        this.logger.error(
+          `Failed to send waitlist joined email to ${userEmail}`,
+          err,
+        ),
+      );
   }
 
   @RabbitSubscribe({
@@ -88,7 +146,8 @@ export class BookingEventConsumer {
   ) {
     this.logger.log(`Received waitlist.promoted event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingName, trainingDateTime, trainerName } = msg.data;
+    const { userId, userEmail, trainingName, trainingDateTime, trainerName } =
+      msg.data;
 
     await this.notificationsService.createNotification({
       userId,
@@ -96,5 +155,18 @@ export class BookingEventConsumer {
       title: 'Место освободилось! Вы записаны',
       content: `Поздравляем! Место на тренировке "${trainingName}" освободилось, и вы были записаны автоматически. ${trainingDateTime}, тренер: ${trainerName}`,
     });
+
+    this.emailService
+      .sendTemplatedEmail(userEmail, 'waitlist-promoted', {
+        trainingName,
+        trainingDateTime,
+        trainerName,
+      })
+      .catch((err) =>
+        this.logger.error(
+          `Failed to send waitlist promoted email to ${userEmail}`,
+          err,
+        ),
+      );
   }
 }

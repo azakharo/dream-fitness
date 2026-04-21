@@ -81,4 +81,12 @@ export class UsersService {
     const user = await this.userRepository.findByIdWithBalance(id);
     return { balance: user?.balance || 0 };
   }
+
+  async getUserEmailById(id: string): Promise<string | null> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['email'],
+    });
+    return user?.email || null;
+  }
 }

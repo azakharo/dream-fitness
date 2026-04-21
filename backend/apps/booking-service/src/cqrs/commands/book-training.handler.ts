@@ -61,11 +61,15 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
       const trainingDateTime = formatDateTime(training.scheduledAt);
 
       const savedBooking = await this.bookingRepository.save(booking);
+
+      const userEmail = await this.authClientService.getUserEmail(userId);
+
       this.eventBus.publish(
         new BookingCreatedEvent(
           savedBooking.id,
           savedBooking.trainingId,
           savedBooking.userId,
+          userEmail,
           training.title,
           trainingDateTime,
           training.trainerName || 'Тренер',

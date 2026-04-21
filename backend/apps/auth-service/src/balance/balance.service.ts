@@ -51,6 +51,7 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
         oldBalance,
         newBalance,
         amount,
@@ -95,6 +96,7 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
         oldBalance,
         newBalance,
         amount,
@@ -144,6 +146,7 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
         oldBalance,
         newBalance,
         amount,
@@ -184,6 +187,7 @@ export class BalanceService {
 
       await this.eventsPublisher.publishBalanceChanged({
         userId,
+        userEmail: user.email,
         oldBalance,
         newBalance,
         amount,

@@ -12,7 +12,11 @@ export class EventsPublisher {
     bookingId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
     bookedAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   }): Promise<void> {
     try {
       await this.rabbitMQPublisher.publish(ROUTING_KEYS.BOOKING_CREATED, data);
@@ -31,8 +35,12 @@ export class EventsPublisher {
     bookingId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
     reason?: string;
     cancelledAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   }): Promise<void> {
     try {
       await this.rabbitMQPublisher.publish(
@@ -54,8 +62,12 @@ export class EventsPublisher {
     waitlistId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
     position: number;
     joinedAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   }): Promise<void> {
     try {
       await this.rabbitMQPublisher.publish(ROUTING_KEYS.WAITLIST_JOINED, data);
@@ -74,7 +86,11 @@ export class EventsPublisher {
     waitlistId: string;
     trainingId: string;
     userId: string;
+    userEmail: string;
     promotedAt: string;
+    trainingName: string;
+    trainingDateTime: string;
+    trainerName: string;
   }): Promise<void> {
     try {
       await this.rabbitMQPublisher.publish(
