@@ -407,13 +407,9 @@
 
 **Минимальные проверки:**
 
-- [ ] E2E тесты: proxy routing для каждого сервиса
-- [ ] E2E тесты: JWT validation (valid/invalid/expired tokens)
-- [ ] E2E тесты: role-based access (client vs admin)
-- [ ] Integration тесты: rate limiting работает
-- [ ] Ручная проверка: Swagger UI доступен и содержит все endpoints
+- [ ] `npm run ts` — без ошибок
 - [ ] `npm run lint` — без ошибок
-- [ ] `npm run test` — все тесты проходят
+- [ ] Ручная проверка: Swagger UI доступен и содержит все endpoints
 
 ---
 
