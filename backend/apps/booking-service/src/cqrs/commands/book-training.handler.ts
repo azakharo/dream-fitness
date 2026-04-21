@@ -10,6 +10,8 @@ import { BookingStatus } from '@app/shared/enums';
 import { DuplicateBookingException } from '../../common/exceptions';
 import { NoAvailableSlotsException } from '../../common/exceptions';
 import { BookTrainingCommand } from './book-training.command';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 
 @CommandHandler(BookTrainingCommand)
 export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand> {
@@ -57,12 +59,21 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
     });
 
     try {
+      const trainingDateTime = format(
+        new Date(training.scheduledAt),
+        'd MMMM yyyy, HH:mm',
+        { locale: ru },
+      );
+
       const savedBooking = await this.bookingRepository.save(booking);
       this.eventBus.publish(
         new BookingCreatedEvent(
           savedBooking.id,
           savedBooking.trainingId,
           savedBooking.userId,
+          training.title,
+          trainingDateTime,
+          training.trainerName || 'Тренер',
         ),
       );
       return savedBooking;

@@ -8,6 +8,8 @@ import { AlreadyOnWaitlistException } from '../../common/exceptions';
 import { DuplicateBookingException } from '../../common/exceptions';
 import { JoinWaitlistCommand } from './join-waitlist.command';
 import { WaitlistResponseDto } from '../../waitlist/dto';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 
 @CommandHandler(JoinWaitlistCommand)
 export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand> {
@@ -35,7 +37,16 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       throw new AlreadyOnWaitlistException(userId, trainingId);
     }
 
-    await this.trainingClientService.getTraining(trainingId, command.jwtToken);
+    const training = await this.trainingClientService.getTraining(
+      trainingId,
+      command.jwtToken,
+    );
+
+    const trainingDateTime = format(
+      new Date(training.scheduledAt),
+      'd MMMM yyyy, HH:mm',
+      { locale: ru },
+    );
 
     const waitlistEntry = this.waitlistRepository.create({
       userId,
@@ -58,6 +69,9 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
         savedEntry.trainingId,
         savedEntry.userId,
         positionResult.position,
+        training.title,
+        trainingDateTime,
+        training.trainerName || 'Тренер',
       ),
     );
 

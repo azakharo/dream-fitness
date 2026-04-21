@@ -24,13 +24,13 @@ export class BookingEventConsumer {
   async handleBookingCreated(msg: EventMessage<BookingCreatedEvent['data']>) {
     this.logger.log(`Received booking.created event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingId } = msg.data;
+    const { userId, trainingName, trainingDateTime, trainerName } = msg.data;
 
     await this.notificationsService.createNotification({
       userId,
       type: NotificationType.BOOKING_CONFIRMATION,
       title: 'Запись на тренировку подтверждена',
-      content: `Вы успешно записаны на тренировку #${trainingId}`,
+      content: `Вы успешно записаны на тренировку "${trainingName}". ${trainingDateTime}, тренер: ${trainerName}`,
     });
   }
 
@@ -44,11 +44,12 @@ export class BookingEventConsumer {
   ) {
     this.logger.log(`Received booking.cancelled event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingId, reason } = msg.data;
+    const { userId, trainingName, trainingDateTime, trainerName, reason } =
+      msg.data;
 
     const content = reason
-      ? `Запись на тренировку #${trainingId} отменена: ${reason}`
-      : `Ваша запись на тренировку #${trainingId} отменена`;
+      ? `Запись на тренировку "${trainingName}" отменена: ${reason}. ${trainingDateTime}, тренер: ${trainerName}`
+      : `Ваша запись на тренировку "${trainingName}" отменена. ${trainingDateTime}, тренер: ${trainerName}`;
 
     await this.notificationsService.createNotification({
       userId,
@@ -66,13 +67,14 @@ export class BookingEventConsumer {
   async handleWaitlistJoined(msg: EventMessage<WaitlistJoinedEvent['data']>) {
     this.logger.log(`Received waitlist.joined event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingId, position } = msg.data;
+    const { userId, trainingName, trainingDateTime, trainerName, position } =
+      msg.data;
 
     await this.notificationsService.createNotification({
       userId,
       type: NotificationType.WAITLIST_JOINED,
       title: 'Вы добавлены в лист ожидания',
-      content: `Вы добавлены в лист ожидания на тренировку #${trainingId}. Ваша позиция: ${position}`,
+      content: `Вы добавлены в лист ожидания на тренировку "${trainingName}". ${trainingDateTime}, тренер: ${trainerName}. Ваша позиция: ${position}`,
     });
   }
 
@@ -86,13 +88,13 @@ export class BookingEventConsumer {
   ) {
     this.logger.log(`Received waitlist.promoted event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingId } = msg.data;
+    const { userId, trainingName, trainingDateTime, trainerName } = msg.data;
 
     await this.notificationsService.createNotification({
       userId,
       type: NotificationType.WAITLIST_PROMOTED,
       title: 'Место освободилось! Вы записаны',
-      content: `Поздравляем! Место на тренировке #${trainingId} освободилось, и вы были записаны автоматически`,
+      content: `Поздравляем! Место на тренировке "${trainingName}" освободилось, и вы были записаны автоматически. ${trainingDateTime}, тренер: ${trainerName}`,
     });
   }
 }

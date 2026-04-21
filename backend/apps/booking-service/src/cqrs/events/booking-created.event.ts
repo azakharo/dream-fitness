@@ -5,5 +5,8 @@ export class BookingCreatedEvent implements IEvent {
     public readonly bookingId: string,
     public readonly trainingId: string,
     public readonly userId: string,
+    public readonly trainingName: string,
+    public readonly trainingDateTime: string,
+    public readonly trainerName: string,
   ) {}
 }

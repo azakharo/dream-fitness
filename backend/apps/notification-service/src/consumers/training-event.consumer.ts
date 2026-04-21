@@ -7,8 +7,9 @@ import { NotificationType } from '@app/shared';
 interface TrainingReminderEventData {
   trainingId: string;
   userId: string;
-  title: string;
-  scheduledAt: string;
+  trainingName: string;
+  trainingDateTime: string;
+  trainerName: string;
 }
 
 @Injectable()
@@ -25,13 +26,13 @@ export class TrainingEventConsumer {
   async handleTrainingReminder(msg: EventMessage<TrainingReminderEventData>) {
     this.logger.log(`Received training.reminder event: ${JSON.stringify(msg)}`);
 
-    const { userId, trainingId, title } = msg.data;
+    const { userId, trainingId, trainingName } = msg.data;
 
     await this.notificationsService.createNotification({
       userId,
       type: NotificationType.TRAINING_REMINDER,
       title: 'Напоминание о тренировке',
-      content: `Напоминаем о предстоящей тренировке "${title}" (#${trainingId})`,
+      content: `Напоминаем о предстоящей тренировке "${trainingName}" (#${trainingId})`,
     });
   }
 }
