@@ -1,46 +1,87 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import type { SentMessageInfo } from 'nodemailer';
+import type { Transporter } from 'nodemailer';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
+import type { SendMailOptions } from 'nodemailer';
 import * as hbs from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
 
+interface SendEmailResult {
+  messageId: string;
+  accepted: string[];
+  rejected: string[];
+}
+
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private readonly transporter: nodemailer.Transporter;
+  private readonly transporter: Transporter<SMTPTransport.SentMessageInfo>;
   private readonly templateCache: Map<string, hbs.TemplateDelegate> = new Map();
 
   constructor() {
+    const smtpHost = process.env.SMTP_HOST || 'smtp.ethereal.email';
+    const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+    const smtpSecure = process.env.SMTP_SECURE === 'true';
+
+    this.logger.debug(
+      `SMTP config: host=${smtpHost}, port=${smtpPort}, secure=${smtpSecure}`,
+    );
+
     this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-      port: parseInt(process.env.SMTP_PORT || '587', 10),
-      secure: process.env.SMTP_SECURE === 'true',
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
       },
     });
+
+    this.logger.debug('EmailService transporter initialized');
   }
 
   async sendNotificationEmail(
     to: string,
     subject: string,
     html: string,
-  ): Promise<void> {
+  ): Promise<SendEmailResult> {
+    const mailOptions: SendMailOptions = {
+      from: process.env.SMTP_FROM || 'DreamFitness <noreply@dreamfitness.club>',
+      to,
+      subject,
+      html,
+    };
+
+    this.logger.debug(`Sending email to ${to} with subject: ${subject}`);
+
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const result: SentMessageInfo = await this.transporter.sendMail({
-        from:
-          process.env.SMTP_FROM || 'DreamFitness <noreply@dreamfitness.club>',
-        to,
-        subject,
-        html,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      this.logger.log(`Email sent to ${to}: ${result.messageId}`);
+      const rawResult = await this.transporter.sendMail(mailOptions);
+
+      const emailResult: SendEmailResult = {
+        messageId: rawResult.messageId,
+        accepted: rawResult.accepted.map((a) =>
+          typeof a === 'string' ? a : a.address,
+        ),
+        rejected: rawResult.rejected.map((r) =>
+          typeof r === 'string' ? r : r.address,
+        ),
+      };
+
+      this.logger.log(`Email sent to ${to}: ${emailResult.messageId}`);
+
+      if (emailResult.rejected.length > 0) {
+        this.logger.warn(
+          `Email rejected for: ${emailResult.rejected.join(', ')}`,
+        );
+      }
+
+      return emailResult;
     } catch (error) {
-      this.logger.error(`Failed to send email to ${to}`, error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to send email to ${to}: ${errorMessage}`);
+      throw error;
     }
   }
 
