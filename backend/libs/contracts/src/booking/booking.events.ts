@@ -5,6 +5,7 @@ export interface BookingCreatedEvent {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     bookedAt: string;
     trainingName: string;
     trainingDateTime: string;
@@ -19,6 +20,7 @@ export interface BookingCancelledEvent {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     reason?: string;
     cancelledAt: string;
     trainingName: string;
@@ -34,6 +36,7 @@ export interface WaitlistJoinedEvent {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     position: number;
     joinedAt: string;
     trainingName: string;
@@ -49,6 +52,7 @@ export interface WaitlistPromotedEvent {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     promotedAt: string;
     trainingName: string;
     trainingDateTime: string;

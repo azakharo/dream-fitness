@@ -63,6 +63,7 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
       const savedBooking = await this.bookingRepository.save(booking);
 
       const userEmail = await this.authClientService.getUserEmail(userId);
+      const userName = await this.authClientService.getUserName(userId);
 
       this.eventBus.publish(
         new BookingCreatedEvent(
@@ -70,6 +71,7 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
           savedBooking.trainingId,
           savedBooking.userId,
           userEmail,
+          userName,
           training.title,
           trainingDateTime,
           training.trainerName || 'Тренер',

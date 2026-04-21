@@ -29,6 +29,7 @@ export class CancellationSaga {
           trainingId: event.trainingId,
           userId: event.userId,
           userEmail: event.userEmail,
+          userName: event.userName || '',
           reason: event.reason,
           cancelledAt: new Date().toISOString(),
           trainingName: event.trainingName || '',

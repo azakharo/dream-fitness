@@ -80,6 +80,9 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
         const userEmail = await this.authClientService.getUserEmail(
           waitlistEntry.userId,
         );
+        const userName = await this.authClientService.getUserName(
+          waitlistEntry.userId,
+        );
 
         this.eventBus.publish(
           new BookingCreatedEvent(
@@ -87,6 +90,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
             savedBooking.trainingId,
             savedBooking.userId,
             userEmail,
+            userName,
             training.title,
             trainingDateTime,
             training.trainerName || 'Тренер',
@@ -98,6 +102,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
             waitlistEntry.trainingId,
             waitlistEntry.userId,
             userEmail,
+            userName,
             training.title,
             trainingDateTime,
             training.trainerName || 'Тренер',

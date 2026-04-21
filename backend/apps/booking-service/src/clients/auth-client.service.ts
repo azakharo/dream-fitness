@@ -145,4 +145,22 @@ export class AuthClientService {
       throw error;
     }
   }
+
+  async getUserName(userId: string): Promise<string> {
+    try {
+      const url = `${this.configService.getAuthServiceUrl()}/auth/users/${userId}/name`;
+      const response = await firstValueFrom(
+        this.httpService.get<{ name: string }>(url, { timeout: 3000 }),
+      );
+      return response.data.name;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        this.logger.error(
+          `Failed to get name for user ${userId}: ${error.message}`,
+        );
+        throw new ServiceUnavailableException('Auth service unavailable');
+      }
+      throw error;
+    }
+  }
 }

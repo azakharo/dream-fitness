@@ -10,6 +10,7 @@ interface TrainingReminderEventData {
   trainingId: string;
   userId: string;
   userEmail: string;
+  userName: string;
   trainingName: string;
   trainingDateTime: string;
   trainerName: string;
@@ -35,6 +36,7 @@ export class TrainingEventConsumer {
     const {
       userId,
       userEmail,
+      userName,
       trainingId,
       trainingName,
       trainingDateTime,
@@ -50,6 +52,7 @@ export class TrainingEventConsumer {
 
     this.emailService
       .sendTemplatedEmail(userEmail, 'training-reminder', {
+        userName,
         trainingName,
         trainingDateTime,
         trainerName,

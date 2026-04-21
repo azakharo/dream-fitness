@@ -28,8 +28,14 @@ export class BookingEventConsumer {
   async handleBookingCreated(msg: EventMessage<BookingCreatedEvent['data']>) {
     this.logger.log(`Received booking.created event: ${JSON.stringify(msg)}`);
 
-    const { userId, userEmail, trainingName, trainingDateTime, trainerName } =
-      msg.data;
+    const {
+      userId,
+      userEmail,
+      userName,
+      trainingName,
+      trainingDateTime,
+      trainerName,
+    } = msg.data;
 
     await this.notificationsService.createNotification({
       userId,
@@ -40,6 +46,7 @@ export class BookingEventConsumer {
 
     this.emailService
       .sendTemplatedEmail(userEmail, 'booking-confirmation', {
+        userName,
         trainingName,
         trainingDateTime,
         trainerName,
@@ -65,6 +72,7 @@ export class BookingEventConsumer {
     const {
       userId,
       userEmail,
+      userName,
       trainingName,
       trainingDateTime,
       trainerName,
@@ -84,6 +92,7 @@ export class BookingEventConsumer {
 
     this.emailService
       .sendTemplatedEmail(userEmail, 'booking-cancellation', {
+        userName,
         trainingName,
         trainingDateTime,
         trainerName,
@@ -108,6 +117,7 @@ export class BookingEventConsumer {
     const {
       userId,
       userEmail,
+      userName,
       trainingName,
       trainingDateTime,
       trainerName,
@@ -123,6 +133,7 @@ export class BookingEventConsumer {
 
     this.emailService
       .sendTemplatedEmail(userEmail, 'waitlist-joined', {
+        userName,
         trainingName,
         trainingDateTime,
         trainerName,
@@ -146,8 +157,14 @@ export class BookingEventConsumer {
   ) {
     this.logger.log(`Received waitlist.promoted event: ${JSON.stringify(msg)}`);
 
-    const { userId, userEmail, trainingName, trainingDateTime, trainerName } =
-      msg.data;
+    const {
+      userId,
+      userEmail,
+      userName,
+      trainingName,
+      trainingDateTime,
+      trainerName,
+    } = msg.data;
 
     await this.notificationsService.createNotification({
       userId,
@@ -158,6 +175,7 @@ export class BookingEventConsumer {
 
     this.emailService
       .sendTemplatedEmail(userEmail, 'waitlist-promoted', {
+        userName,
         trainingName,
         trainingDateTime,
         trainerName,

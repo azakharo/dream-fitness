@@ -13,6 +13,7 @@ export interface BalanceChangedEvent {
   data: {
     userId: string;
     userEmail: string;
+    userName: string;
     oldBalance: number;
     newBalance: number;
     amount: number;

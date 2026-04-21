@@ -89,4 +89,12 @@ export class UsersService {
     });
     return user?.email || null;
   }
+
+  async getUserNameById(id: string): Promise<string | null> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['name'],
+    });
+    return user?.name || null;
+  }
 }

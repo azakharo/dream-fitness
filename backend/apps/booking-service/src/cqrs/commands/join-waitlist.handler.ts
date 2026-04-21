@@ -61,6 +61,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
     }
 
     const userEmail = await this.authClientService.getUserEmail(userId);
+    const userName = await this.authClientService.getUserName(userId);
 
     this.eventBus.publish(
       new WaitlistJoinedEvent(
@@ -68,6 +69,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
         savedEntry.trainingId,
         savedEntry.userId,
         userEmail,
+        userName,
         positionResult.position,
         training.title,
         trainingDateTime,

@@ -70,6 +70,7 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
     const updatedBooking = await this.bookingRepository.save(booking);
 
     const userEmail = await this.authClientService.getUserEmail(userId);
+    const userName = await this.authClientService.getUserName(userId);
 
     this.eventBus.publish(
       new BookingCancelledEvent(
@@ -77,6 +78,7 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
         updatedBooking.trainingId,
         updatedBooking.userId,
         userEmail,
+        userName,
         reason,
         training.title,
         trainingDateTime,

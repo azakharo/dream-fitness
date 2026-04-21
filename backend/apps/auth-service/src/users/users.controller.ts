@@ -91,4 +91,15 @@ export class UsersController {
     }
     return { email };
   }
+
+  @Get('users/:id/name')
+  @ApiOperation({ summary: 'Get user name by ID (internal endpoint)' })
+  @ApiOkResponse({ description: 'Returns user name' })
+  async getUserName(@Param('id') id: string): Promise<{ name: string }> {
+    const name = await this.usersService.getUserNameById(id);
+    if (!name) {
+      throw new NotFoundException('User not found');
+    }
+    return { name };
+  }
 }

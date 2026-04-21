@@ -6,6 +6,7 @@ export class WaitlistJoinedEvent implements IEvent {
     public readonly trainingId: string,
     public readonly userId: string,
     public readonly userEmail: string,
+    public readonly userName: string,
     public readonly position: number,
     public readonly trainingName: string,
     public readonly trainingDateTime: string,

@@ -13,6 +13,7 @@ export class EventsPublisher {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     bookedAt: string;
     trainingName: string;
     trainingDateTime: string;
@@ -36,6 +37,7 @@ export class EventsPublisher {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     reason?: string;
     cancelledAt: string;
     trainingName: string;
@@ -63,6 +65,7 @@ export class EventsPublisher {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     position: number;
     joinedAt: string;
     trainingName: string;
@@ -87,6 +90,7 @@ export class EventsPublisher {
     trainingId: string;
     userId: string;
     userEmail: string;
+    userName: string;
     promotedAt: string;
     trainingName: string;
     trainingDateTime: string;

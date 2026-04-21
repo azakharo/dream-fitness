@@ -23,6 +23,7 @@ export class BookingSaga {
           trainingId: event.trainingId,
           userId: event.userId,
           userEmail: event.userEmail,
+          userName: event.userName || '',
           bookedAt: new Date().toISOString(),
           trainingName: event.trainingName || '',
           trainingDateTime: event.trainingDateTime || '',
