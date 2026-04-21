@@ -104,8 +104,10 @@ export class EmailService {
     if (!template) {
       // Try multiple possible template locations to support both webpack and tsc builds
       const possiblePaths = [
-        // For tsc build (non-webpack): templates are copied alongside the JS files
+        // For webpack build: templates are copied to dist/apps/notification-service/templates/
         path.join(__dirname, 'templates', `${name}.hbs`),
+        // For tsc build (non-webpack): templates are copied alongside the JS files
+        path.join(__dirname, '..', 'templates', `${name}.hbs`),
         // For webpack build: templates are copied to the root of dist folder
         path.join(process.cwd(), 'email', 'templates', `${name}.hbs`),
         // Alternative location for monorepo structure

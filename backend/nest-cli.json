@@ -52,8 +52,8 @@
       "sourceRoot": "apps/notification-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/notification-service/tsconfig.app.json",
-        "webpack": false,
-        "assets": ["**/*.hbs"]
+        "webpack": true,
+        "webpackConfigPath": "apps/notification-service/webpack.config.js"
       }
     },
     "contracts": {
