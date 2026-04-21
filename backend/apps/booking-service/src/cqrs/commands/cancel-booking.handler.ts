@@ -11,8 +11,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { BookingAlreadyCancelledException } from '../../common/exceptions';
 import { CannotCancelPastTrainingException } from '../../common/exceptions';
 import { CancelBookingCommand } from './cancel-booking.command';
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { formatDateTime } from '@app/shared';
 
 @CommandHandler(CancelBookingCommand)
 export class CancelBookingHandler implements ICommandHandler<CancelBookingCommand> {
@@ -66,11 +65,7 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
       throw error;
     }
 
-    const trainingDateTime = format(
-      new Date(training.scheduledAt),
-      'd MMMM yyyy, HH:mm',
-      { locale: ru },
-    );
+    const trainingDateTime = formatDateTime(training.scheduledAt);
 
     const updatedBooking = await this.bookingRepository.save(booking);
     this.eventBus.publish(

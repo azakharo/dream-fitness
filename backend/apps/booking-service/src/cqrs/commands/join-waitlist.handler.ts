@@ -8,8 +8,7 @@ import { AlreadyOnWaitlistException } from '../../common/exceptions';
 import { DuplicateBookingException } from '../../common/exceptions';
 import { JoinWaitlistCommand } from './join-waitlist.command';
 import { WaitlistResponseDto } from '../../waitlist/dto';
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { formatDateTime } from '@app/shared';
 
 @CommandHandler(JoinWaitlistCommand)
 export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand> {
@@ -42,11 +41,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
       command.jwtToken,
     );
 
-    const trainingDateTime = format(
-      new Date(training.scheduledAt),
-      'd MMMM yyyy, HH:mm',
-      { locale: ru },
-    );
+    const trainingDateTime = formatDateTime(training.scheduledAt);
 
     const waitlistEntry = this.waitlistRepository.create({
       userId,

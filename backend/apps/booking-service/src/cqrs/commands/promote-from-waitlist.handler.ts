@@ -9,8 +9,7 @@ import { BookingCreatedEvent, WaitlistPromotedEvent } from '../events';
 import { EventBus } from '@nestjs/cqrs';
 import { BookingStatus } from '@app/shared/enums';
 import { PromoteFromWaitlistCommand } from './promote-from-waitlist.command';
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { formatDateTime } from '@app/shared';
 
 @CommandHandler(PromoteFromWaitlistCommand)
 export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWaitlistCommand> {
@@ -72,11 +71,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
       });
 
       try {
-        const trainingDateTime = format(
-          new Date(training.scheduledAt),
-          'd MMMM yyyy, HH:mm',
-          { locale: ru },
-        );
+        const trainingDateTime = formatDateTime(training.scheduledAt);
 
         const savedBooking = await this.bookingRepository.save(booking);
         await this.waitlistRepository.remove(waitlistEntry);
