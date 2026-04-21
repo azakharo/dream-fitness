@@ -23,7 +23,7 @@ export class BookingEventConsumer {
   @RabbitSubscribe({
     exchange: EXCHANGES.MAIN,
     routingKey: ROUTING_KEYS.BOOKING_CREATED,
-    queue: QUEUES.NOTIFICATION_SERVICE,
+    queue: QUEUES.NOTIFICATION_BOOKING,
   })
   async handleBookingCreated(msg: EventMessage<BookingCreatedEvent['data']>) {
     this.logger.log(`Received booking.created event: ${JSON.stringify(msg)}`);
@@ -55,7 +55,7 @@ export class BookingEventConsumer {
   @RabbitSubscribe({
     exchange: EXCHANGES.MAIN,
     routingKey: ROUTING_KEYS.BOOKING_CANCELLED,
-    queue: QUEUES.NOTIFICATION_SERVICE,
+    queue: QUEUES.NOTIFICATION_BOOKING,
   })
   async handleBookingCancelled(
     msg: EventMessage<BookingCancelledEvent['data']>,
@@ -100,7 +100,7 @@ export class BookingEventConsumer {
   @RabbitSubscribe({
     exchange: EXCHANGES.MAIN,
     routingKey: ROUTING_KEYS.WAITLIST_JOINED,
-    queue: QUEUES.NOTIFICATION_SERVICE,
+    queue: QUEUES.NOTIFICATION_BOOKING,
   })
   async handleWaitlistJoined(msg: EventMessage<WaitlistJoinedEvent['data']>) {
     this.logger.log(`Received waitlist.joined event: ${JSON.stringify(msg)}`);
@@ -139,7 +139,7 @@ export class BookingEventConsumer {
   @RabbitSubscribe({
     exchange: EXCHANGES.MAIN,
     routingKey: ROUTING_KEYS.WAITLIST_PROMOTED,
-    queue: QUEUES.NOTIFICATION_SERVICE,
+    queue: QUEUES.NOTIFICATION_BOOKING,
   })
   async handleWaitlistPromoted(
     msg: EventMessage<WaitlistPromotedEvent['data']>,

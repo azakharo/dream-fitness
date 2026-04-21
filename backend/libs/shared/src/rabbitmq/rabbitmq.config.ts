@@ -1,9 +1,45 @@
 import { RabbitMQConfig } from '@golevelup/nestjs-rabbitmq';
-import { EXCHANGES } from './rabbitmq.constants';
+import { EXCHANGES, QUEUES } from './rabbitmq.constants';
+
+interface QueueConfig {
+  name: string;
+  options: { durable: boolean };
+  exchange: string;
+}
 
 export function createRabbitMQConfig(
   serviceName: string,
 ): Partial<RabbitMQConfig> {
+  // Define queues based on service name
+  const queueConfigs: QueueConfig[] = [];
+
+  if (serviceName === 'notification') {
+    // Notification service needs separate queues for each consumer type
+    queueConfigs.push(
+      {
+        name: QUEUES.NOTIFICATION_BOOKING,
+        options: { durable: true },
+        exchange: EXCHANGES.MAIN,
+      },
+      {
+        name: QUEUES.NOTIFICATION_BALANCE,
+        options: { durable: true },
+        exchange: EXCHANGES.MAIN,
+      },
+      {
+        name: QUEUES.NOTIFICATION_TRAINING,
+        options: { durable: true },
+        exchange: EXCHANGES.MAIN,
+      },
+    );
+  } else {
+    queueConfigs.push({
+      name: `${serviceName}.queue`,
+      options: { durable: true },
+      exchange: EXCHANGES.MAIN,
+    });
+  }
+
   return {
     exchanges: [
       {
@@ -12,13 +48,7 @@ export function createRabbitMQConfig(
         options: { durable: true },
       },
     ],
-    queues: [
-      {
-        name: `${serviceName}.queue`,
-        options: { durable: true },
-        exchange: EXCHANGES.MAIN,
-      },
-    ],
+    queues: queueConfigs,
     uri:
       process.env.RABBITMQ_URL ||
       'amqp://dreamfitness:dreamfitness123@localhost:5672',

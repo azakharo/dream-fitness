@@ -27,7 +27,7 @@ export class TrainingEventConsumer {
   @RabbitSubscribe({
     exchange: EXCHANGES.MAIN,
     routingKey: ROUTING_KEYS.TRAINING_REMINDER,
-    queue: QUEUES.NOTIFICATION_SERVICE,
+    queue: QUEUES.NOTIFICATION_TRAINING,
   })
   async handleTrainingReminder(msg: EventMessage<TrainingReminderEventData>) {
     this.logger.log(`Received training.reminder event: ${JSON.stringify(msg)}`);

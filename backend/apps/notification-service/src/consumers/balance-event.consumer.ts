@@ -19,7 +19,7 @@ export class BalanceEventConsumer {
   @RabbitSubscribe({
     exchange: EXCHANGES.MAIN,
     routingKey: ROUTING_KEYS.BALANCE_CHANGED,
-    queue: QUEUES.NOTIFICATION_SERVICE,
+    queue: QUEUES.NOTIFICATION_BALANCE,
   })
   async handleBalanceChanged(msg: EventMessage<BalanceChangedEvent['data']>) {
     this.logger.log(`Received balance.changed event: ${JSON.stringify(msg)}`);

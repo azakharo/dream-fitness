@@ -38,11 +38,7 @@ export class EventsPublisher {
     description: string;
   }): Promise<void> {
     try {
-      const event = {
-        eventType: 'user.balance_changed',
-        data,
-      };
-      await this.rabbitMQPublisher.publish('balance.changed', event);
+      await this.rabbitMQPublisher.publish('balance.changed', data);
       this.logger.log(
         `Published balance.changed event for user ${data.userId}: ${data.oldBalance} -> ${data.newBalance}`,
       );

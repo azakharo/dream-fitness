@@ -45,6 +45,9 @@ export const QUEUES = {
   // Booking service listens to
   BOOKING_SERVICE: 'booking.service.queue',
 
-  // Notification service listens to all events
+  // Notification service - separate queues for each consumer type
   NOTIFICATION_SERVICE: 'notification.service.queue',
+  NOTIFICATION_BOOKING: 'notification.booking.queue',
+  NOTIFICATION_BALANCE: 'notification.balance.queue',
+  NOTIFICATION_TRAINING: 'notification.training.queue',
 } as const;
