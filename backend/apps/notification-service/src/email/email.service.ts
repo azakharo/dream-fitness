@@ -102,7 +102,38 @@ export class EmailService {
     let template = this.templateCache.get(name);
 
     if (!template) {
-      const templatePath = path.join(__dirname, 'templates', `${name}.hbs`);
+      // Try multiple possible template locations to support both webpack and tsc builds
+      const possiblePaths = [
+        // For tsc build (non-webpack): templates are copied alongside the JS files
+        path.join(__dirname, 'templates', `${name}.hbs`),
+        // For webpack build: templates are copied to the root of dist folder
+        path.join(process.cwd(), 'email', 'templates', `${name}.hbs`),
+        // Alternative location for monorepo structure
+        path.join(
+          process.cwd(),
+          'apps',
+          'notification-service',
+          'src',
+          'email',
+          'templates',
+          `${name}.hbs`,
+        ),
+      ];
+
+      let templatePath: string | null = null;
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          templatePath = p;
+          break;
+        }
+      }
+
+      if (!templatePath) {
+        throw new Error(
+          `Template '${name}.hbs' not found. Searched paths: ${possiblePaths.join(', ')}`,
+        );
+      }
+
       const templateString = fs.readFileSync(templatePath, 'utf-8');
       template = hbs.compile(templateString);
       this.templateCache.set(name, template);
