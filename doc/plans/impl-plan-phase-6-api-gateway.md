@@ -243,7 +243,7 @@ export class RolesGuard implements CanActivate {
 
 #### 6.3.1. Proxy Architecture
 
-Использовать `@nestjs/axios` или нативный `HttpService` для проксирования запросов.
+Использовать `@nestjs/axios` для проксирования запросов.
 
 **Ключевые принципы:**
 
