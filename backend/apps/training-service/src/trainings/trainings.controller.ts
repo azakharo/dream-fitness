@@ -20,7 +20,7 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@app/shared';
+import { InternalGuard } from '@app/shared';
 import { TrainingsService } from './trainings.service';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UpdateTrainingDto } from './dto/update-training.dto';
@@ -34,7 +34,7 @@ export class TrainingsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new training' })
   @ApiCreatedResponse({ type: TrainingResponseDto })
@@ -47,7 +47,7 @@ export class TrainingsController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get list of trainings with filters' })
   @ApiOkResponse({ type: [TrainingResponseDto] })
@@ -68,7 +68,7 @@ export class TrainingsController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update training' })
   @ApiOkResponse({ type: TrainingResponseDto })
@@ -83,7 +83,7 @@ export class TrainingsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cancel training' })
   @ApiOkResponse({ description: 'Training cancelled successfully' })

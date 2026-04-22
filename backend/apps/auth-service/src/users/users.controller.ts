@@ -17,13 +17,17 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { CurrentUser } from '@app/shared';
-import { JwtAuthGuard } from '@app/shared';
+import { InternalUser } from '@app/shared';
+import { InternalGuard } from '@app/shared';
 import { UsersService } from './users.service';
 import { BalanceResponseDto } from './dto/balance-response.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import type { AuthenticatedUser } from '@app/shared';
+
+interface AuthUser {
+  id: string;
+  role: string;
+}
 
 @ApiTags('Users')
 @Controller('auth')
@@ -31,13 +35,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiOkResponse({ type: UserResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProfile(
-    @CurrentUser() user: AuthenticatedUser,
+    @InternalUser() user: AuthUser,
   ): Promise<UserResponseDto> {
     const userProfile = await this.usersService.getUserById(user.id);
     if (!userProfile) {
@@ -48,14 +52,14 @@ export class UsersController {
 
   @Patch('me')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update current user profile' })
   @ApiOkResponse({ type: UserResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: UpdateUserDto })
   async updateProfile(
-    @CurrentUser() user: AuthenticatedUser,
+    @InternalUser() user: AuthUser,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto> {
     const updatedUser = await this.usersService.updateUserProfile(
@@ -69,13 +73,13 @@ export class UsersController {
   }
 
   @Get('balance')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user balance' })
   @ApiOkResponse({ type: BalanceResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getBalance(
-    @CurrentUser() user: AuthenticatedUser,
+    @InternalUser() user: AuthUser,
   ): Promise<BalanceResponseDto> {
     const balance = await this.usersService.getUserBalance(user.id);
     return { balance: balance.balance, userId: user.id };

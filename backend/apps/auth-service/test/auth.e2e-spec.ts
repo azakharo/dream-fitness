@@ -274,17 +274,19 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('POST /auth/logout', () => {
-    it('should logout successfully with valid access token', async () => {
+    it('should logout successfully with internal headers', async () => {
       const userData = createRegisterDto();
       const regResp = await authHelper.register(userData);
+      const userId = regResp.body.user.id;
 
-      const response = await authHelper.logout(regResp.body.tokens.accessToken);
+      const headers = authHelper.getUserHeaders(userId);
+      const response = await authHelper.logoutWithHeaders(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Logout successful');
     });
 
-    it('should throw 401 when no access token is provided', async () => {
+    it('should throw 401 when no internal headers are provided', async () => {
       const response = await appHelper
         .getRequest()
         .post('/auth/logout')
@@ -293,11 +295,11 @@ describe('AuthController (e2e)', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should throw 401 when access token is invalid', async () => {
-      const response = await appHelper
-        .getRequest()
-        .post('/auth/logout')
-        .set('Authorization', 'Bearer invalid-token');
+    it('should throw 401 when using JWT token instead of internal headers', async () => {
+      const userData = createRegisterDto();
+      const regResp = await authHelper.register(userData);
+
+      const response = await authHelper.logout(regResp.body.tokens.accessToken);
 
       expect(response.status).toBe(401);
     });

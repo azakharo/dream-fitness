@@ -4,10 +4,12 @@ import { UserRole } from '../enums';
 /**
  * Represents the authenticated user object extracted from JWT payload
  * This is the actual shape of data returned by JwtStrategy.validate()
+ * or InternalGuard
  */
 export interface AuthenticatedUser {
   id: string;
   email: string;
+  role: UserRole;
 }
 
 /**

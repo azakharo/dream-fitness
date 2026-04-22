@@ -43,6 +43,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
 
     let remainingSlots = availableSlots;
 
+    const systemRole = 'system';
     while (waitlistEntry && remainingSlots > 0) {
       const bookingId = crypto.randomUUID();
       const price = training.price;
@@ -50,6 +51,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
       try {
         await this.authClientService.reservePoints(
           waitlistEntry.userId,
+          systemRole,
           price,
           bookingId,
         );
@@ -114,6 +116,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
         );
         await this.authClientService.releasePoints(
           waitlistEntry.userId,
+          systemRole,
           price,
           bookingId,
         );

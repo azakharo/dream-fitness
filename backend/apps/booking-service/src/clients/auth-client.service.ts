@@ -21,6 +21,7 @@ export class AuthClientService {
 
   async reservePoints(
     userId: string,
+    userRole: string,
     amount: number,
     bookingId: string,
   ): Promise<TransactionResponseDto> {
@@ -32,6 +33,7 @@ export class AuthClientService {
         this.httpService.post<TransactionResponseDto>(url, body, {
           headers: {
             'X-User-Id': userId,
+            'X-User-Role': userRole,
           },
           timeout: 5000,
         }),
@@ -55,6 +57,7 @@ export class AuthClientService {
 
   async releasePoints(
     userId: string,
+    userRole: string,
     amount: number,
     bookingId: string,
   ): Promise<TransactionResponseDto> {
@@ -66,6 +69,7 @@ export class AuthClientService {
         this.httpService.post<TransactionResponseDto>(url, body, {
           headers: {
             'X-User-Id': userId,
+            'X-User-Role': userRole,
           },
           timeout: 5000,
         }),
@@ -92,6 +96,7 @@ export class AuthClientService {
 
   async refundPoints(
     userId: string,
+    userRole: string,
     amount: number,
     bookingId: string,
   ): Promise<TransactionResponseDto> {
@@ -103,6 +108,7 @@ export class AuthClientService {
         this.httpService.post<TransactionResponseDto>(url, body, {
           headers: {
             'X-User-Id': userId,
+            'X-User-Role': userRole,
           },
           timeout: 5000,
         }),

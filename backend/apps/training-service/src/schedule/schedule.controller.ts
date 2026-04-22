@@ -6,7 +6,7 @@ import {
   ApiUnauthorizedResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@app/shared';
+import { InternalGuard } from '@app/shared';
 import { ScheduleService } from './schedule.service';
 import { WeekScheduleResponseDto, TrainerScheduleResponseDto } from './dto';
 
@@ -16,7 +16,7 @@ export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
   @Get('week')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get weekly schedule' })
   @ApiOkResponse({ type: WeekScheduleResponseDto })
@@ -26,7 +26,7 @@ export class ScheduleController {
   }
 
   @Get('trainer/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get trainer schedule' })
   @ApiOkResponse({ type: TrainerScheduleResponseDto })

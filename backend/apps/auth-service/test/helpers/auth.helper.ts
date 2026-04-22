@@ -64,10 +64,37 @@ export class AuthHelper {
     };
   }
 
+  /**
+   * Returns headers for internal authentication with role 'user'
+   */
+  getUserHeaders(userId: string): Record<string, string> {
+    return {
+      'X-User-Id': userId,
+      'X-User-Role': 'user',
+    };
+  }
+
+  /**
+   * Returns headers for internal authentication with role 'admin'
+   */
+  getAdminHeaders(userId: string): Record<string, string> {
+    return {
+      'X-User-Id': userId,
+      'X-User-Role': 'admin',
+    };
+  }
+
   async logout(accessToken: string): Promise<TestResponse<LogoutResponseBody>> {
     const response = await this.request
       .post('/auth/logout')
       .set('Authorization', `Bearer ${accessToken}`);
+    return response as unknown as TestResponse<LogoutResponseBody>;
+  }
+
+  async logoutWithHeaders(
+    headers: Record<string, string>,
+  ): Promise<TestResponse<LogoutResponseBody>> {
+    const response = await this.request.post('/auth/logout').set(headers);
     return response as unknown as TestResponse<LogoutResponseBody>;
   }
 }

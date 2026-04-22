@@ -17,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, RefreshTokenDto } from '@app/contracts';
-import { JwtAuthGuard } from '@app/shared';
+import { InternalGuard } from '@app/shared';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -66,7 +66,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(InternalGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout user and invalidate refresh token' })
   @ApiOkResponse({

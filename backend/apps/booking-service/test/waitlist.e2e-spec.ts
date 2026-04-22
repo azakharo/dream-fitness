@@ -20,7 +20,7 @@ describe('Waitlist API (e2e)', () => {
     appHelper = new AppTestHelper();
     await appHelper.init();
     dbHelper = new DbHelper(appHelper.getDataSource());
-    authHelper = new AuthHelper(appHelper.getApp());
+    authHelper = new AuthHelper();
     waitlistHelper = new WaitlistHelper(appHelper.getRequest());
   });
 
@@ -40,10 +40,10 @@ describe('Waitlist API (e2e)', () => {
   describe('POST /waitlist', () => {
     it('should join waitlist successfully', async () => {
       const userId = TEST_USERS.user1.id;
-      const token = authHelper.getUserToken(userId, TEST_USERS.user1.email);
+      const headers = authHelper.getUserHeaders(userId);
       const response = await waitlistHelper.joinWaitlist(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(201);
@@ -54,50 +54,41 @@ describe('Waitlist API (e2e)', () => {
     });
 
     it('should return 409 when already on waitlist', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token);
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers);
 
       const response = await waitlistHelper.joinWaitlist(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(409);
     });
 
     it('should return 409 when already has booking for this training', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token);
-      await waitlistHelper.leaveWaitlist(TEST_TRAINING.id, token);
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers);
+      await waitlistHelper.leaveWaitlist(TEST_TRAINING.id, headers);
 
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers);
 
       const response = await waitlistHelper.joinWaitlist(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(409);
     });
 
     it('should return 404 when training not found', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
       mockTrainingClientService.getTraining.mockRejectedValue(
         new NotFoundException('Training not found'),
       );
 
       const response = await waitlistHelper.joinWaitlist(
         'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
-        token,
+        headers,
       );
 
       expect(response.status).toBe(404);
@@ -106,15 +97,12 @@ describe('Waitlist API (e2e)', () => {
 
   describe('GET /waitlist/position', () => {
     it('should return waitlist position', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token);
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers);
 
       const response = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(200);
@@ -122,14 +110,11 @@ describe('Waitlist API (e2e)', () => {
     });
 
     it('should return 404 when not on waitlist', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       const response = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(404);
@@ -138,15 +123,12 @@ describe('Waitlist API (e2e)', () => {
 
   describe('DELETE /waitlist', () => {
     it('should leave waitlist successfully', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token);
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers);
 
       const response = await waitlistHelper.leaveWaitlist(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(200);
@@ -154,14 +136,11 @@ describe('Waitlist API (e2e)', () => {
     });
 
     it('should return 404 when not on waitlist', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       const response = await waitlistHelper.leaveWaitlist(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(404);

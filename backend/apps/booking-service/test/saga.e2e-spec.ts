@@ -29,7 +29,7 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     appHelper = new AppTestHelper();
     await appHelper.init();
     dbHelper = new DbHelper(appHelper.getDataSource());
-    authHelper = new AuthHelper(appHelper.getApp());
+    authHelper = new AuthHelper();
     bookingHelper = new BookingHelper(appHelper.getRequest());
     waitlistHelper = new WaitlistHelper(appHelper.getRequest());
     dataSource = appHelper.getDataSource();
@@ -60,14 +60,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
   describe('Waitlist Promotion Saga', () => {
     it('should promote first user in waitlist when booking is cancelled', async () => {
-      const token1 = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      const token2 = authHelper.getUserToken(
-        TEST_USERS.user2.id,
-        TEST_USERS.user2.email,
-      );
+      const headers1 = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      const headers2 = authHelper.getUserHeaders(TEST_USERS.user2.id);
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -77,14 +71,14 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token1,
+        headers1,
       );
 
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers2);
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,
-        token1,
+        headers1,
       );
 
       // Wait for async saga processing to complete before assertions
@@ -95,25 +89,16 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const waitlistPosition = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token2,
+        headers2,
       );
 
       expect(waitlistPosition.status).toBe(404);
     });
 
     it('should promote multiple users from waitlist when booking is cancelled', async () => {
-      const token1 = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      const token2 = authHelper.getUserToken(
-        TEST_USERS.user2.id,
-        TEST_USERS.user2.email,
-      );
-      const token3 = authHelper.getUserToken(
-        TEST_USERS.user3.id,
-        TEST_USERS.user3.email,
-      );
+      const headers1 = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      const headers2 = authHelper.getUserHeaders(TEST_USERS.user2.id);
+      const headers3 = authHelper.getUserHeaders(TEST_USERS.user3.id);
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -124,15 +109,15 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token1,
+        headers1,
       );
 
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers2);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers3);
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,
-        token1,
+        headers1,
       );
 
       // Wait for async saga processing to complete before assertions
@@ -142,14 +127,14 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const waitlistPosition2 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token2,
+        headers2,
       );
 
       expect(waitlistPosition2.status).toBe(404);
 
       const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token3,
+        headers3,
       );
 
       expect(waitlistPosition3.status).toBe(200);
@@ -157,22 +142,10 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     });
 
     it('should skip user with insufficient balance and promote next user', async () => {
-      const token1 = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      const token2 = authHelper.getUserToken(
-        TEST_USERS.user2.id,
-        TEST_USERS.user2.email,
-      );
-      const token3 = authHelper.getUserToken(
-        TEST_USERS.user3.id,
-        TEST_USERS.user3.email,
-      );
-      const token4 = authHelper.getUserToken(
-        TEST_USERS.user4.id,
-        TEST_USERS.user4.email,
-      );
+      const headers1 = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      const headers2 = authHelper.getUserHeaders(TEST_USERS.user2.id);
+      const headers3 = authHelper.getUserHeaders(TEST_USERS.user3.id);
+      const headers4 = authHelper.getUserHeaders(TEST_USERS.user4.id);
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -181,12 +154,12 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token1,
+        headers1,
       );
 
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token4);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers2);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers3);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers4);
 
       mockAuthClientService.reservePoints
         .mockRejectedValueOnce(new ConflictException('Insufficient balance')) // user2's promotion attempt (skipped)
@@ -196,7 +169,7 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,
-        token1,
+        headers1,
       );
 
       // Wait for async saga processing to complete before assertions
@@ -206,28 +179,28 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const waitlistPosition1 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token1,
+        headers1,
       );
 
       expect(waitlistPosition1.status).toBe(404);
 
       const waitlistPosition2 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token2,
+        headers2,
       );
 
       expect(waitlistPosition2.status).toBe(404);
 
       const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token3,
+        headers3,
       );
 
       expect(waitlistPosition3.status).toBe(404);
 
       const waitlistPosition4 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token4,
+        headers4,
       );
 
       expect(waitlistPosition4.status).toBe(200);
@@ -235,18 +208,9 @@ describe('Waitlist Promotion Saga (e2e)', () => {
     });
 
     it('should not promote when no available slots', async () => {
-      const token1 = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      const token2 = authHelper.getUserToken(
-        TEST_USERS.user2.id,
-        TEST_USERS.user2.email,
-      );
-      const token3 = authHelper.getUserToken(
-        TEST_USERS.user3.id,
-        TEST_USERS.user3.email,
-      );
+      const headers1 = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      const headers2 = authHelper.getUserHeaders(TEST_USERS.user2.id);
+      const headers3 = authHelper.getUserHeaders(TEST_USERS.user3.id);
 
       const fullTraining = createTrainingMock({ capacity: 1 });
       mockTrainingClientService.getTraining.mockResolvedValue(fullTraining);
@@ -255,18 +219,18 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const createBookingResp = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token1,
+        headers1,
       );
 
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token2);
-      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, token3);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers2);
+      await waitlistHelper.joinWaitlist(TEST_TRAINING.id, headers3);
 
       mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
       const cancelResponse = await bookingHelper.cancelBooking(
         createBookingResp.body.id,
-        token1,
+        headers1,
       );
 
       // Wait for async saga processing to complete before assertions
@@ -276,14 +240,14 @@ describe('Waitlist Promotion Saga (e2e)', () => {
 
       const waitlistPosition2 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token2,
+        headers2,
       );
 
       expect(waitlistPosition2.status).toBe(404);
 
       const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token3,
+        headers3,
       );
 
       expect(waitlistPosition3.status).toBe(200);
@@ -304,8 +268,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       });
       await manager.save(booking);
 
-      const token = authHelper.getUserToken(userId, TEST_USERS.user1.email);
-      const response = await bookingHelper.getBookingById(bookingId, token);
+      const headers = authHelper.getUserHeaders(userId);
+      const response = await bookingHelper.getBookingById(bookingId, headers);
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe(bookingId);
@@ -320,13 +284,10 @@ describe('Waitlist Promotion Saga (e2e)', () => {
       });
       await manager.save(waitlist);
 
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
       const response = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(200);

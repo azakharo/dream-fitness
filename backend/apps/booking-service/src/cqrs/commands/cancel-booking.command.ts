@@ -5,8 +5,8 @@ export class CancelBookingCommand extends Command<Booking> {
   constructor(
     public readonly bookingId: string,
     public readonly userId: string,
+    public readonly userRole: string,
     public readonly reason?: string,
-    public readonly jwtToken?: string,
   ) {
     super();
   }

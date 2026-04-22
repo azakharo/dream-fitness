@@ -8,9 +8,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  Request,
 } from '@nestjs/common';
-import type { Request as ExpressRequest } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -20,7 +18,7 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard } from '@app/shared';
+import { CurrentUser, InternalGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BookingResponseDto } from './dto';
 import { BookingListResponseDto } from './dto/booking-list-response.dto';
@@ -35,7 +33,7 @@ import { Booking } from './entities/booking.entity';
 @ApiTags('Bookings')
 @ApiBearerAuth()
 @Controller('bookings')
-@UseGuards(JwtAuthGuard)
+@UseGuards(InternalGuard)
 export class BookingsController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -62,13 +60,12 @@ export class BookingsController {
   async create(
     @Body() dto: CreateBookingDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req: ExpressRequest,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<BookTrainingCommand, Booking>(
       new BookTrainingCommand(
         user.id,
+        user.role,
         dto.trainingId,
-        req.headers.authorization,
       ),
     );
     return this.toBookingResponseDto(booking);
@@ -118,7 +115,6 @@ export class BookingsController {
     @Param('id') id: string,
     @Body() dto: CancelBookingDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req: ExpressRequest,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<
       CancelBookingCommand,
@@ -127,8 +123,8 @@ export class BookingsController {
       new CancelBookingCommand(
         id,
         user.id,
+        user.role,
         dto.reason,
-        req.headers.authorization,
       ),
     );
     return this.toBookingResponseDto(booking);

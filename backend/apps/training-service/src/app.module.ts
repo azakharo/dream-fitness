@@ -5,7 +5,6 @@ import { TrainersModule } from './trainers/trainers.module';
 import { TrainingsModule } from './trainings/trainings.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { EventsModule } from './events/events.module';
-import { AuthModule } from './auth/auth.module';
 import { HttpExceptionFilter } from '@app/shared';
 import { LoggingInterceptor } from '@app/shared';
 
@@ -17,7 +16,6 @@ import { LoggingInterceptor } from '@app/shared';
     TrainingsModule,
     ScheduleModule,
     EventsModule,
-    AuthModule,
   ],
   controllers: [],
   providers: [
