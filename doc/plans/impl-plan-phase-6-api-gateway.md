@@ -546,6 +546,7 @@ export class ProxyExceptionFilter implements ExceptionFilter {
       401: "Unauthorized",
       403: "Forbidden",
       404: "Not Found",
+      409: "Conflict",
       500: "Internal Server Error",
       503: "Service Unavailable",
     };
@@ -620,7 +621,7 @@ async function bootstrap() {
 2. **Доверенные заголовки** — сервисы доверяют заголовкам от других сервисов
 3. **Прямой вызов** — сервисы вызывают друг друга напрямую без Gateway
 
-**Рекомендуемое решение:** Прямой вызов с доверенными заголовками
+**Выбранное решение:** Прямой вызов с доверенными заголовками
 
 ```
 Booking Service → Training Service (прямой вызов)
@@ -683,6 +684,8 @@ headers: {
 
 ### Этап 6: Testing
 
+Пункты 19 и 20 пока не делаем (пропускаем).
+
 19. [ ] E2E тесты для Gateway
 20. [ ] Интеграционные тесты для всей системы
 21. [ ] Обновить существующие тесты
@@ -703,11 +706,10 @@ headers: {
 
 ### Минимальные проверки
 
-- [ ] `npm run build` — успешная сборка всех приложений
+- [ ] `npm run ts` — без ошибок
 - [ ] `npm run lint` — без ошибок
-- [ ] E2E тесты: login → access protected endpoint → success
-- [ ] E2E тесты: access protected endpoint without token → 401
-- [ ] E2E тесты: access admin endpoint as client → 403
+- [ ] `npm run build` — успешная сборка всех сервисов. Нужно проверить, что эта команда выполняется и все сервисы реально собираются.
+- [ ] E2E тесты выполняются без ошибок для других сервисов
 - [ ] Ручная проверка: Swagger UI доступен и содержит все endpoints
 - [ ] Ручная проверка: rate limiting работает
 - [ ] Ручная проверка: booking saga работает через Gateway
