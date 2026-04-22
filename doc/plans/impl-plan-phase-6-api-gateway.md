@@ -647,6 +647,184 @@ headers: {
 
 ---
 
+### 6.10. Обновление существующих тестов
+
+После внедрения API Gateway сервисы будут использовать `InternalGuard`, который ожидает заголовки `X-User-Id` и `X-User-Role` вместо JWT токенов. Существующие e2e тесты должны быть обновлены.
+
+#### 6.10.1. Стратегия тестирования
+
+**Выбранный подход: Прямое тестирование сервисов**
+
+Тесты вызывают сервисы напрямую, передавая внутренние заголовки `X-User-Id` и `X-User-Role`.
+
+**Преимущества:**
+
+- Изолированные тесты — не требуют запуска Gateway
+- Быстрое выполнение
+- Тестируют бизнес-логику сервисов независимо
+
+#### 6.10.2. Изменения в AuthHelper классах
+
+Заменить генерацию JWT токенов на формирование внутренних заголовков.
+
+**booking-service/test/helpers/auth.helper.ts:**
+
+```typescript
+// Было:
+import { JwtService } from "@nestjs/jwt";
+import { INestApplication } from "@nestjs/common";
+
+export class AuthHelper {
+  constructor(private app: INestApplication) {}
+  private jwtService: JwtService;
+
+  private getJwtService(): JwtService {
+    if (!this.jwtService) {
+      this.jwtService = this.app.get<JwtService>(JwtService);
+    }
+    return this.jwtService;
+  }
+
+  private generateToken(userId: string, email: string, role: string): string {
+    return this.getJwtService().sign(
+      { sub: userId, email, role },
+      { secret: process.env.JWT_SECRET || "test-jwt-secret-key-for-e2e-tests" },
+    );
+  }
+
+  getUserToken(userId: string, email: string): string {
+    return this.generateToken(userId, email, "user");
+  }
+
+  getAdminToken(userId: string, email: string): string {
+    return this.generateToken(userId, email, "admin");
+  }
+}
+
+// Станет:
+export class AuthHelper {
+  /**
+   * Возвращает заголовки для аутентификации пользователя с ролью user
+   */
+  getUserHeaders(userId: string): Record<string, string> {
+    return {
+      "X-User-Id": userId,
+      "X-User-Role": "user",
+    };
+  }
+
+  /**
+   * Возвращает заголовки для аутентификации пользователя с ролью admin
+   */
+  getAdminHeaders(userId: string): Record<string, string> {
+    return {
+      "X-User-Id": userId,
+      "X-User-Role": "admin",
+    };
+  }
+}
+```
+
+**training-service/test/helpers/auth.helper.ts:**
+
+Аналогичные изменения — заменить `generateAdminToken()` на `getAdminHeaders()`.
+
+#### 6.10.3. Изменения в тестах
+
+Заменить использование токенов на заголовки.
+
+**Пример изменения в booking-service/test/booking.e2e-spec.ts:**
+
+```typescript
+// Было:
+it("should create booking successfully", async () => {
+  const token = authHelper.getUserToken(
+    TEST_USERS.user1.id,
+    TEST_USERS.user1.email,
+  );
+
+  const response = await bookingHelper.createBooking(TEST_TRAINING.id, token);
+  // ...
+});
+
+// Станет:
+it("should create booking successfully", async () => {
+  const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
+
+  const response = await bookingHelper.createBooking(TEST_TRAINING.id, headers);
+  // ...
+});
+```
+
+**Пример изменения в booking helper:**
+
+```typescript
+// Было:
+async createBooking(trainingId: string, token: string) {
+  return this.request
+    .post('/bookings')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ trainingId });
+}
+
+// Станет:
+async createBooking(trainingId: string, headers: Record<string, string>) {
+  return this.request
+    .post('/bookings')
+    .set(headers)
+    .send({ trainingId });
+}
+```
+
+#### 6.10.4. Файлы для изменения
+
+| Сервис           | Файл                             | Тип изменения              |
+| ---------------- | -------------------------------- | -------------------------- |
+| booking-service  | test/helpers/auth.helper.ts      | Переписать класс           |
+| booking-service  | test/helpers/booking.helper.ts   | Изменить сигнатуры методов |
+| booking-service  | test/helpers/waitlist.helper.ts  | Изменить сигнатуры методов |
+| booking-service  | test/booking.e2e-spec.ts         | ~17 тестов                 |
+| booking-service  | test/saga.e2e-spec.ts            | ~6 тестов                  |
+| booking-service  | test/waitlist.e2e-spec.ts        | ~8 тестов                  |
+| training-service | test/helpers/auth.helper.ts      | Переписать класс           |
+| training-service | test/helpers/trainers.helper.ts  | Изменить сигнатуры методов |
+| training-service | test/helpers/trainings.helper.ts | Изменить сигнатуры методов |
+| training-service | test/trainers.e2e-spec.ts        | ~10 тестов                 |
+| training-service | test/trainings.e2e-spec.ts       | ~30 тестов                 |
+| training-service | test/schedule.e2e-spec.ts        | ~5 тестов                  |
+
+#### 6.10.5. Особые случаи
+
+**auth-service тесты:**
+
+Тесты auth-service используют реальный flow регистрации/логина для получения токенов. После рефакторинга auth-service будет использовать `InternalGuard` для защищенных endpoints.
+
+Для тестов auth-service нужно:
+
+- Публичные endpoints (`/auth/register`, `/auth/login`, `/auth/refresh`) — остаются без изменений
+- Защищенные endpoints (`/auth/me`, `/auth/logout`, `/auth/balance/*`) — использовать внутренние заголовки
+
+**Тесты 401 Unauthorized:**
+
+Тесты, проверяющие отсутствие токена, должны проверять отсутствие внутренних заголовков:
+
+```typescript
+// Было:
+it("should return 401 when no auth token", async () => {
+  const response = await appHelper.getRequest().get("/bookings");
+  expect(response.status).toBe(401);
+});
+
+// Станет (то же самое, но с другим сообщением об ошибке):
+it("should return 401 when no auth headers", async () => {
+  const response = await appHelper.getRequest().get("/bookings");
+  expect(response.status).toBe(401);
+  expect(response.body.message).toBe("Missing internal auth headers");
+});
+```
+
+---
+
 ## Порядок реализации
 
 ### Этап 1: API Gateway Foundation
@@ -688,7 +866,17 @@ headers: {
 
 19. [ ] E2E тесты для Gateway
 20. [ ] Интеграционные тесты для всей системы
-21. [ ] Обновить существующие тесты
+
+### Этап 7: Обновление существующих тестов
+
+21. [ ] Обновить AuthHelper в booking-service
+22. [ ] Обновить helper классы в booking-service (booking.helper.ts, waitlist.helper.ts)
+23. [ ] Обновить e2e тесты booking-service (booking.e2e-spec.ts, saga.e2e-spec.ts, waitlist.e2e-spec.ts)
+24. [ ] Обновить AuthHelper в training-service
+25. [ ] Обновить helper классы в training-service (trainers.helper.ts, trainings.helper.ts)
+26. [ ] Обновить e2e тесты training-service (trainers.e2e-spec.ts, trainings.e2e-spec.ts, schedule.e2e-spec.ts)
+27. [ ] Обновить тесты auth-service для защищенных endpoints
+28. [ ] Запустить все e2e тесты и убедиться, что они проходят
 
 ---
 
