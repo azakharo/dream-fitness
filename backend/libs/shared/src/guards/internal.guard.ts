@@ -5,13 +5,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 
 @Injectable()
 export class InternalGuard implements CanActivate {
   constructor(private configService: ConfigService) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
 
     // Check for internal headers from Gateway
     const userId = request.headers['x-user-id'];

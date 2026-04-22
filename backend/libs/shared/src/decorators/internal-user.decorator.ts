@@ -1,8 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
 
 export const InternalUser = createParamDecorator(
   (data: string | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
+    const request = ctx.switchToHttp().getRequest<Request>();
     const userId = request.headers['x-user-id'];
     const userRole = request.headers['x-user-role'];
 

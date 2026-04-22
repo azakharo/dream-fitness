@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { AxiosError } from 'axios';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 interface ProblemDetails {
   type: string;
@@ -21,7 +21,7 @@ export class ProxyExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest();
+    const request = ctx.getRequest<Request>();
 
     if (exception instanceof AxiosError) {
       const status =
