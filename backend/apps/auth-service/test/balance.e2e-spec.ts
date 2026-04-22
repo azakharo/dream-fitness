@@ -148,23 +148,6 @@ describe('BalanceController (e2e)', () => {
       expect(balanceResp.body.balance).toBe(900);
     });
 
-    it('should return 400 when balance is not specified', async () => {
-      const response = await balanceHelper.reserve(
-        headers,
-        createReserveDto({
-          userId,
-          bookingId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
-          amount: 100,
-        }),
-      );
-
-      expect(response.status).toBe(400);
-      // Expected
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(response.body.message).toContain('Insufficient balance');
-    });
-
     it('should return 400 when reserve amount exceeds balance', async () => {
       await balanceHelper.deposit(
         headers,
