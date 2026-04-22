@@ -49,7 +49,12 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
     const bookingId = crypto.randomUUID();
     const price = training.price;
 
-    await this.authClientService.reservePoints(userId, userRole, price, bookingId);
+    await this.authClientService.reservePoints(
+      userId,
+      userRole,
+      price,
+      bookingId,
+    );
 
     const booking = this.bookingRepository.create({
       id: bookingId,
@@ -80,7 +85,12 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
       );
       return savedBooking;
     } catch (error) {
-      await this.authClientService.releasePoints(userId, userRole, price, bookingId);
+      await this.authClientService.releasePoints(
+        userId,
+        userRole,
+        price,
+        bookingId,
+      );
       throw error;
     }
   }

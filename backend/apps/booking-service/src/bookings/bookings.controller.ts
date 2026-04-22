@@ -62,11 +62,7 @@ export class BookingsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<BookTrainingCommand, Booking>(
-      new BookTrainingCommand(
-        user.id,
-        user.role,
-        dto.trainingId,
-      ),
+      new BookTrainingCommand(user.id, user.role, dto.trainingId),
     );
     return this.toBookingResponseDto(booking);
   }
@@ -119,14 +115,7 @@ export class BookingsController {
     const booking = await this.commandBus.execute<
       CancelBookingCommand,
       Booking
-    >(
-      new CancelBookingCommand(
-        id,
-        user.id,
-        user.role,
-        dto.reason,
-      ),
-    );
+    >(new CancelBookingCommand(id, user.id, user.role, dto.reason));
     return this.toBookingResponseDto(booking);
   }
 }

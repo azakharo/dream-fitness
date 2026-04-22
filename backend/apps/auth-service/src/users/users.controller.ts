@@ -40,9 +40,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiOkResponse({ type: UserResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProfile(
-    @InternalUser() user: AuthUser,
-  ): Promise<UserResponseDto> {
+  async getProfile(@InternalUser() user: AuthUser): Promise<UserResponseDto> {
     const userProfile = await this.usersService.getUserById(user.id);
     if (!userProfile) {
       throw new Error('User not found');

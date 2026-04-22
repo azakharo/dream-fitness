@@ -15,30 +15,21 @@ export class BalanceHelper {
     headers: Record<string, string>,
     dto: DepositDto,
   ): Promise<TestResponse<TransactionResponseDto>> {
-    return this.request
-      .post('/auth/balance/deposit')
-      .set(headers)
-      .send(dto);
+    return this.request.post('/auth/balance/deposit').set(headers).send(dto);
   }
 
   reserve(
     headers: Record<string, string>,
     dto: ReserveDto,
   ): Promise<TestResponse<TransactionResponseDto>> {
-    return this.request
-      .post('/auth/balance/reserve')
-      .set(headers)
-      .send(dto);
+    return this.request.post('/auth/balance/reserve').set(headers).send(dto);
   }
 
   release(
     headers: Record<string, string>,
     dto: ReleaseDto,
   ): Promise<TestResponse<TransactionResponseDto>> {
-    return this.request
-      .post('/auth/balance/release')
-      .set(headers)
-      .send(dto);
+    return this.request.post('/auth/balance/release').set(headers).send(dto);
   }
 
   refund(

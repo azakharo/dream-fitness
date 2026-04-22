@@ -6,6 +6,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,6 +16,7 @@ import {
   ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
+import { InternalGuard } from '@app/shared';
 import { BalanceService } from './balance.service';
 import { DepositDto } from './dto/deposit.dto';
 import { ReserveDto } from './dto/reserve.dto';
@@ -27,6 +29,7 @@ import type { PaginationParams, AuthenticatedUser } from '@app/shared';
 
 @ApiTags('Balance')
 @Controller('auth')
+@UseGuards(InternalGuard)
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
