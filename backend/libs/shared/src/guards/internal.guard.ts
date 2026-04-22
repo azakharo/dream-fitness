@@ -2,10 +2,17 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidUuid(value: string): boolean {
+  return UUID_REGEX.test(value);
+}
 
 @Injectable()
 export class InternalGuard implements CanActivate {
@@ -14,15 +21,17 @@ export class InternalGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
 
-    // Check for internal headers from Gateway
     const userId = request.headers['x-user-id'];
     const userRole = request.headers['x-user-role'];
 
     if (!userId || !userRole) {
-      throw new UnauthorizedException('Missing internal auth headers');
+      throw new BadRequestException('Missing internal auth headers');
     }
 
-    // Attach user to request
+    if (typeof userId !== 'string' || !isValidUuid(userId)) {
+      throw new BadRequestException('Invalid x-user-id format');
+    }
+
     request.user = {
       id: userId,
       role: userRole,

@@ -95,7 +95,7 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when invalid token is provided', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
         const invalidHeaders = {
           'x-user-id': 'invalid',
           'x-user-role': 'user',
@@ -108,7 +108,7 @@ describe('BalanceController (e2e)', () => {
           }),
         );
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
@@ -210,7 +210,7 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when no token is provided', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
         const invalidHeaders = {
           'x-user-id': 'invalid',
           'x-user-role': 'user',
@@ -224,7 +224,7 @@ describe('BalanceController (e2e)', () => {
           }),
         );
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
@@ -296,7 +296,7 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when auth token is invalid', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
         const invalidHeaders = {
           'x-user-id': 'invalid',
           'x-user-role': 'user',
@@ -310,7 +310,7 @@ describe('BalanceController (e2e)', () => {
           }),
         );
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
@@ -376,7 +376,7 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 404 when x-user-id is invalid', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
         const invalidHeaders = {
           'x-user-id': 'invalid',
           'x-user-role': 'user',
@@ -390,7 +390,7 @@ describe('BalanceController (e2e)', () => {
           }),
         );
 
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(400);
       });
     });
   });
@@ -470,14 +470,14 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when no token is provided', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
         const invalidHeaders = {
           'x-user-id': 'invalid',
           'x-user-role': 'user',
         };
         const response = await balanceHelper.getTransactions(invalidHeaders);
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
