@@ -148,7 +148,7 @@ describe('BalanceController (e2e)', () => {
       expect(balanceResp.body.balance).toBe(900);
     });
 
-    it('should return 400 when reserve amount exceeds balance', async () => {
+    it('should return 409 when reserve amount exceeds balance', async () => {
       await balanceHelper.deposit(
         headers,
         createDepositDto({ userId, amount: 100 }),
@@ -163,7 +163,7 @@ describe('BalanceController (e2e)', () => {
         }),
       );
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(409);
       // Expected
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
