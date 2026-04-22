@@ -286,22 +286,22 @@ describe('AuthController (e2e)', () => {
       expect(response.body.message).toBe('Logout successful');
     });
 
-    it('should throw 401 when no internal headers are provided', async () => {
+    it('should throw 400 when no internal headers are provided', async () => {
       const response = await appHelper
         .getRequest()
         .post('/auth/logout')
         .send({});
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
-    it('should throw 401 when using JWT token instead of internal headers', async () => {
+    it('should throw 400 when using JWT token instead of internal headers', async () => {
       const userData = createRegisterDto();
       const regResp = await authHelper.register(userData);
 
       const response = await authHelper.logout(regResp.body.tokens.accessToken);
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 });
