@@ -7,25 +7,22 @@ import { BalanceResponseDto } from '../../src/users/dto/balance-response.dto';
 export class ProfileHelper {
   constructor(private readonly request: request.SuperTest<request.Test>) {}
 
-  getMe(accessToken: string): Promise<TestResponse<UserResponseDto>> {
-    return this.request
-      .get('/auth/me')
-      .set('Authorization', `Bearer ${accessToken}`);
+  getMe(
+    headers: Record<string, string>,
+  ): Promise<TestResponse<UserResponseDto>> {
+    return this.request.get('/auth/me').set(headers);
   }
 
   updateMe(
-    accessToken: string,
+    headers: Record<string, string>,
     dto: UpdateUserDto,
   ): Promise<TestResponse<UserResponseDto>> {
-    return this.request
-      .patch('/auth/me')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(dto);
+    return this.request.patch('/auth/me').set(headers).send(dto);
   }
 
-  getBalance(accessToken: string): Promise<TestResponse<BalanceResponseDto>> {
-    return this.request
-      .get('/auth/balance')
-      .set('Authorization', `Bearer ${accessToken}`);
+  getBalance(
+    headers: Record<string, string>,
+  ): Promise<TestResponse<BalanceResponseDto>> {
+    return this.request.get('/auth/balance').set(headers);
   }
 }
