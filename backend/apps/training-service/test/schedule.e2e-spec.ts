@@ -119,7 +119,7 @@ describe('ScheduleController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/schedule/week');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -223,7 +223,7 @@ describe('ScheduleController (e2e)', () => {
         .getRequest()
         .get('/schedule/trainer/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 });

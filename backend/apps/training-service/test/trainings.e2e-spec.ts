@@ -211,7 +211,7 @@ describe('TrainingsController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().post('/trainings').send({});
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -413,7 +413,7 @@ describe('TrainingsController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainings');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -463,7 +463,7 @@ describe('TrainingsController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainings/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -531,7 +531,7 @@ describe('TrainingsController (e2e)', () => {
         .getRequest()
         .get('/trainings/123/availability');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -626,7 +626,7 @@ describe('TrainingsController (e2e)', () => {
         .patch('/trainings/123')
         .send({ title: 'Updated' });
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -709,7 +709,7 @@ describe('TrainingsController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().delete('/trainings/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 });

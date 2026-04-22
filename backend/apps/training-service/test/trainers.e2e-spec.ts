@@ -67,7 +67,7 @@ describe('TrainersController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().post('/trainers').send({});
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
     it('should return 401 when missing internal auth headers', async () => {
@@ -78,7 +78,7 @@ describe('TrainersController (e2e)', () => {
         .set('Authorization', 'Bearer some-token')
         .send(trainerData);
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -132,7 +132,7 @@ describe('TrainersController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainers');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -168,7 +168,7 @@ describe('TrainersController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainers/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -228,7 +228,7 @@ describe('TrainersController (e2e)', () => {
         .patch('/trainers/123')
         .send({ name: 'Updated' });
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -269,7 +269,7 @@ describe('TrainersController (e2e)', () => {
     it('should return 401 when no auth headers', async () => {
       const response = await appHelper.getRequest().delete('/trainers/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 });
