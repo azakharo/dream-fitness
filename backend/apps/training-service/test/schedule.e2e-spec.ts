@@ -39,7 +39,7 @@ describe('ScheduleController (e2e)', () => {
 
   describe('GET /schedule/week', () => {
     it('should return weekly schedule with trainings', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
       const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
@@ -72,7 +72,7 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should return schedule for specific week', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
       const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
@@ -96,7 +96,7 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should return empty days for week without trainings', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
 
       const response = await scheduleHelper.getWeekSchedule(headers);
 
@@ -125,7 +125,7 @@ describe('ScheduleController (e2e)', () => {
 
   describe('GET /schedule/trainer/:id', () => {
     it('should return trainer schedule with trainings', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
       const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
@@ -152,7 +152,7 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should return 404 for non-existent trainer', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000001';
 
       const response = await scheduleHelper.getTrainerSchedule(
@@ -164,7 +164,7 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should filter by date range', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
       const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
@@ -197,7 +197,7 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should use default 30-day range when no dates provided', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
       const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;

@@ -30,7 +30,7 @@ describe('TrainersController (e2e)', () => {
 
   describe('POST /trainers', () => {
     it('should create a new trainer with valid data (admin headers)', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
 
       const response = await trainersHelper.create(headers, trainerData);
@@ -47,7 +47,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should return 400 when name is missing', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const response = await trainersHelper.create(headers, {
         bio: 'test',
       } as CreateTrainerDto);
@@ -56,7 +56,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should return 400 when name exceeds 255 chars', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const response = await trainersHelper.create(headers, {
         name: 'a'.repeat(256),
       });
@@ -84,7 +84,7 @@ describe('TrainersController (e2e)', () => {
 
   describe('GET /trainers', () => {
     it('should return list of active trainers', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData1 = createTrainerDto({ name: 'Trainer 1' });
       const trainerData2 = createTrainerDto({ name: 'Trainer 2' });
 
@@ -100,7 +100,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should return only active trainers (exclude deactivated)', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData1 = createTrainerDto({ name: 'Active Trainer' });
       const trainerData2 = createTrainerDto({ name: 'Inactive Trainer' });
 
@@ -120,7 +120,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should return empty array when no trainers exist', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
 
       const response = await trainersHelper.findAll(headers);
 
@@ -138,7 +138,7 @@ describe('TrainersController (e2e)', () => {
 
   describe('GET /trainers/:id', () => {
     it('should return trainer by ID', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
 
       const createResponse = await trainersHelper.create(headers, trainerData);
@@ -157,7 +157,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should return 404 for non-existent trainer', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000001';
 
       const response = await trainersHelper.findById(headers, nonExistentId);
@@ -174,7 +174,7 @@ describe('TrainersController (e2e)', () => {
 
   describe('PATCH /trainers/:id', () => {
     it('should update trainer name', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Original Name' });
 
       const createResponse = await trainersHelper.create(headers, trainerData);
@@ -192,7 +192,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should update trainer bio', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ bio: 'Original bio' });
 
       const createResponse = await trainersHelper.create(headers, trainerData);
@@ -209,7 +209,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should return 404 for non-existent trainer', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000002';
       const updateData = { name: 'Updated Name' };
 
@@ -234,7 +234,7 @@ describe('TrainersController (e2e)', () => {
 
   describe('DELETE /trainers/:id', () => {
     it('should deactivate trainer (soft delete)', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'To Be Deactivated' });
 
       const createResponse = await trainersHelper.create(headers, trainerData);
@@ -258,7 +258,7 @@ describe('TrainersController (e2e)', () => {
     });
 
     it('should return 404 for non-existent trainer', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000003';
 
       const response = await trainersHelper.remove(headers, nonExistentId);

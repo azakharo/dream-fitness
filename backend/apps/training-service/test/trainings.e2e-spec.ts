@@ -40,7 +40,7 @@ describe('TrainingsController (e2e)', () => {
 
   describe('POST /trainings', () => {
     it('should create a training with valid data and active trainer', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -59,7 +59,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should publish training.created event', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -71,7 +71,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 when trainer does not exist', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainingData = createTrainingDto(
         '00000000-0000-0000-0000-000000000001',
       );
@@ -82,7 +82,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when trainer is not active', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -96,7 +96,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when scheduledAt is in the past', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -111,7 +111,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 409 on schedule conflict', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -135,7 +135,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when title is missing', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -150,7 +150,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when type is invalid', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -165,7 +165,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when capacity exceeds 100', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -180,7 +180,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when durationMinutes is less than 15', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -195,7 +195,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when extra fields are provided', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -217,7 +217,7 @@ describe('TrainingsController (e2e)', () => {
 
   describe('GET /trainings', () => {
     it('should return paginated list of trainings', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -254,7 +254,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return empty list when no trainings exist', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
 
       const response = await trainingsHelper.findAll(headers);
 
@@ -264,7 +264,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should filter by type', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -306,7 +306,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should filter by trainerId', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData1 = createTrainerDto({ name: 'Trainer 1' });
       const trainerData2 = createTrainerDto({ name: 'Trainer 2' });
       const trainerRes1 = await trainersHelper.create(headers, trainerData1);
@@ -343,7 +343,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should filter by date range', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -385,7 +385,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should respect pagination (page, limit)', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -419,7 +419,7 @@ describe('TrainingsController (e2e)', () => {
 
   describe('GET /trainings/:id', () => {
     it('should return training details by ID', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -449,7 +449,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000002';
 
       const response = await appHelper
@@ -469,7 +469,7 @@ describe('TrainingsController (e2e)', () => {
 
   describe('GET /trainings/:id/availability', () => {
     it('should return availability info', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -494,7 +494,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return isAvailable=true when slots available', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -515,7 +515,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000003';
 
       const response = await appHelper
@@ -537,7 +537,7 @@ describe('TrainingsController (e2e)', () => {
 
   describe('PATCH /trainings/:id', () => {
     it('should update training title', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -563,7 +563,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should publish training.updated event', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -583,7 +583,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when updating cancelled training', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -607,7 +607,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000004';
       const updateData = { title: 'Updated Title' };
 
@@ -632,7 +632,7 @@ describe('TrainingsController (e2e)', () => {
 
   describe('DELETE /trainings/:id', () => {
     it('should cancel training (set status=cancelled)', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -659,7 +659,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should publish training.cancelled event', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -676,7 +676,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 400 when cancelling already cancelled training', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
@@ -698,7 +698,7 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const headers = authHelper.getAdminHeaders('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const nonExistentId = '00000000-0000-0000-0000-000000000005';
 
       const response = await trainingsHelper.cancel(headers, nonExistentId);
