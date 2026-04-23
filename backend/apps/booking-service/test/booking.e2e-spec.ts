@@ -156,9 +156,9 @@ describe('Bookings API (e2e)', () => {
   describe('GET /bookings', () => {
     it('should return user bookings list with pagination', async () => {
       const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
-      await bookingHelper.createBooking(TEST_TRAINING.id, headers);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+      await bookingHelper.createBooking(TEST_TRAINING.id, headers);
 
       const response = await bookingHelper.getBookings(headers);
 
