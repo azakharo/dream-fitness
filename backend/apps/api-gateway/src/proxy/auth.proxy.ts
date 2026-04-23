@@ -14,7 +14,7 @@ import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -46,54 +46,63 @@ export class AuthProxyController {
   // Protected endpoints
   @Post('logout')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   logout(@Req() req: RequestWithUser) {
     return this.proxyRequest(req, null, '/auth/logout', 'POST');
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getProfile(@Req() req: RequestWithUser) {
     return this.proxyRequest(req, null, '/auth/me', 'GET');
   }
 
   @Patch('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   updateProfile(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/auth/me', 'PATCH');
   }
 
   @Get('balance')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getBalance(@Req() req: RequestWithUser) {
     return this.proxyRequest(req, null, '/auth/balance', 'GET');
   }
 
   @Post('balance/deposit')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   deposit(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/auth/balance/deposit', 'POST');
   }
 
   @Post('balance/reserve')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   reserve(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/auth/balance/reserve', 'POST');
   }
 
   @Post('balance/release')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   release(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/auth/balance/release', 'POST');
   }
 
   @Post('balance/refund')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   refund(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/auth/balance/refund', 'POST');
   }
 
   @Get('transactions')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getTransactions(
     @Req() req: RequestWithUser,
     @Query('page') page?: string,

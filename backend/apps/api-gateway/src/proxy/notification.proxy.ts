@@ -15,7 +15,7 @@ import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -31,6 +31,7 @@ export class NotificationProxyController {
   // Notifications endpoints
   @Get('notifications')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getNotifications(
     @Req() req: RequestWithUser,
     @Query('page') page?: string,
@@ -54,36 +55,42 @@ export class NotificationProxyController {
 
   @Get('notifications/unread-count')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getUnreadCount(@Req() req: RequestWithUser) {
     return this.proxyRequest(req, null, '/notifications/unread-count', 'GET');
   }
 
   @Get('notifications/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getNotificationById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/notifications/${id}`, 'GET');
   }
 
   @Patch('notifications/:id/read')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   markAsRead(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/notifications/${id}/read`, 'PATCH');
   }
 
   @Patch('notifications/read-all')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   markAllAsRead(@Req() req: RequestWithUser) {
     return this.proxyRequest(req, null, '/notifications/read-all', 'PATCH');
   }
 
   @Delete('notifications/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   deleteNotification(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/notifications/${id}`, 'DELETE');
   }
 
   @Delete('notifications')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   deleteAllNotifications(@Req() req: RequestWithUser) {
     return this.proxyRequest(req, null, '/notifications', 'DELETE');
   }

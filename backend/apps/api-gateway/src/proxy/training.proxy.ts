@@ -18,7 +18,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '@app/shared';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -34,6 +34,7 @@ export class TrainingProxyController {
   // Trainers endpoints
   @Get('trainers')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getTrainers(
     @Req() req: RequestWithUser,
     @Query('page') page?: string,
@@ -55,6 +56,7 @@ export class TrainingProxyController {
 
   @Get('trainers/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getTrainerById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/trainers/${id}`, 'GET');
   }
@@ -62,6 +64,7 @@ export class TrainingProxyController {
   @Post('trainers')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiBearerAuth()
   createTrainer(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/trainers', 'POST');
   }
@@ -69,6 +72,7 @@ export class TrainingProxyController {
   @Patch('trainers/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiBearerAuth()
   updateTrainer(
     @Req() req: RequestWithUser,
     @Param('id') id: string,
@@ -80,6 +84,7 @@ export class TrainingProxyController {
   @Delete('trainers/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiBearerAuth()
   deleteTrainer(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/trainers/${id}`, 'DELETE');
   }
@@ -87,6 +92,7 @@ export class TrainingProxyController {
   // Trainings endpoints
   @Get('trainings')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getTrainings(
     @Req() req: RequestWithUser,
     @Query('page') page?: string,
@@ -112,6 +118,7 @@ export class TrainingProxyController {
 
   @Get('trainings/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getTrainingById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/trainings/${id}`, 'GET');
   }
@@ -119,6 +126,7 @@ export class TrainingProxyController {
   @Post('trainings')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiBearerAuth()
   createTraining(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/trainings', 'POST');
   }
@@ -126,6 +134,7 @@ export class TrainingProxyController {
   @Patch('trainings/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiBearerAuth()
   updateTraining(
     @Req() req: RequestWithUser,
     @Param('id') id: string,
@@ -137,6 +146,7 @@ export class TrainingProxyController {
   @Delete('trainings/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiBearerAuth()
   deleteTraining(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/trainings/${id}`, 'DELETE');
   }
@@ -144,6 +154,7 @@ export class TrainingProxyController {
   // Schedule endpoints
   @Get('schedule')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getSchedule(
     @Req() req: RequestWithUser,
     @Query('date') date?: string,
@@ -165,6 +176,7 @@ export class TrainingProxyController {
 
   @Get('schedule/:date')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getScheduleByDate(@Req() req: RequestWithUser, @Param('date') date: string) {
     return this.proxyRequest(req, null, `/schedule/${date}`, 'GET');
   }

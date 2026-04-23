@@ -15,7 +15,7 @@ import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -31,6 +31,7 @@ export class BookingProxyController {
   // Bookings endpoints
   @Get('bookings')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getBookings(
     @Req() req: RequestWithUser,
     @Query('page') page?: string,
@@ -54,18 +55,21 @@ export class BookingProxyController {
 
   @Get('bookings/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getBookingById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/bookings/${id}`, 'GET');
   }
 
   @Post('bookings')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   createBooking(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/bookings', 'POST');
   }
 
   @Delete('bookings/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   cancelBooking(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyRequest(req, null, `/bookings/${id}`, 'DELETE');
   }
@@ -73,6 +77,7 @@ export class BookingProxyController {
   // Waitlist endpoints
   @Get('waitlist')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getWaitlist(
     @Req() req: RequestWithUser,
     @Query('page') page?: string,
@@ -94,6 +99,7 @@ export class BookingProxyController {
 
   @Get('waitlist/:trainingId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getWaitlistPosition(
     @Req() req: RequestWithUser,
     @Param('trainingId') trainingId: string,
@@ -103,12 +109,14 @@ export class BookingProxyController {
 
   @Post('waitlist')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   joinWaitlist(@Req() req: RequestWithUser, @Body() body: unknown) {
     return this.proxyRequest(req, body, '/waitlist', 'POST');
   }
 
   @Delete('waitlist/:trainingId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   leaveWaitlist(
     @Req() req: RequestWithUser,
     @Param('trainingId') trainingId: string,
