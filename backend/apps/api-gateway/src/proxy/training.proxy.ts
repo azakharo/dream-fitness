@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '@app/shared';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -170,18 +171,21 @@ export class TrainingProxyController {
 
   // Catch-all for training routes
   @All('trainers/*path')
+  @ApiExcludeEndpoint()
   catchAllTrainers(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
   }
 
   @All('trainings/*path')
+  @ApiExcludeEndpoint()
   catchAllTrainings(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
   }
 
   @All('schedule/*path')
+  @ApiExcludeEndpoint()
   catchAllSchedule(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);

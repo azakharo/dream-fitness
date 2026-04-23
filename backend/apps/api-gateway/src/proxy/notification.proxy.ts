@@ -15,6 +15,7 @@ import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -89,6 +90,7 @@ export class NotificationProxyController {
 
   // Catch-all for notification routes
   @All('notifications/*path')
+  @ApiExcludeEndpoint()
   catchAllNotifications(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);

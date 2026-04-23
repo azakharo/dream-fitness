@@ -14,6 +14,7 @@ import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -112,6 +113,7 @@ export class AuthProxyController {
 
   // Catch-all for any other auth routes
   @All('*path')
+  @ApiExcludeEndpoint()
   catchAll(@Req() req: Request) {
     const path = req.path.replace(/^\/api\/auth/, '');
     return this.proxyRequest(req, req.body, `/auth${path}`, req.method);

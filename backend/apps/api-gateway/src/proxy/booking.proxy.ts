@@ -15,6 +15,7 @@ import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -117,12 +118,14 @@ export class BookingProxyController {
 
   // Catch-all for booking routes
   @All('bookings/*path')
+  @ApiExcludeEndpoint()
   catchAllBookings(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
   }
 
   @All('waitlist/*path')
+  @ApiExcludeEndpoint()
   catchAllWaitlist(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
