@@ -3,8 +3,10 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { mockAuthClientService } from '../mocks/auth-client.mock';
 import { mockTrainingClientService } from '../mocks/training-client.mock';
+import { mockEventsPublisher } from '../mocks/events.module.mock';
 import { AuthClientService } from '../../src/clients/auth-client.service';
 import { TrainingClientService } from '../../src/clients/training-client.service';
+import { EventsPublisher } from '../../src/events/events.publisher';
 import { DataSource } from 'typeorm';
 import { Server } from 'node:http';
 import request from 'supertest';
@@ -23,6 +25,8 @@ export class AppTestHelper {
       .useValue(mockAuthClientService)
       .overrideProvider(TrainingClientService)
       .useValue(mockTrainingClientService)
+      .overrideProvider(EventsPublisher)
+      .useValue(mockEventsPublisher)
       .compile();
 
     this.app = moduleFixture.createNestApplication();

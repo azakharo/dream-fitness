@@ -5,6 +5,7 @@ export const mockAuthClientService = {
   releasePoints: jest.fn(),
   refundPoints: jest.fn(),
   getUserEmail: jest.fn().mockResolvedValue('test@example.com'),
+  getUserName: jest.fn().mockResolvedValue('Test User'),
 };
 
 export class MockAuthClientService {
