@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser, InternalGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { WaitlistResponseDto } from './dto';
+import { WaitlistResponseDto, WaitlistQueryDto } from './dto';
 import { WaitlistPositionResponseDto } from './dto/waitlist-position-response.dto';
 import { JoinWaitlistDto } from '@app/contracts/booking';
 import { JoinWaitlistCommand, LeaveWaitlistCommand } from '../cqrs/commands';
@@ -54,13 +54,13 @@ export class WaitlistController {
   @ApiOperation({ summary: 'Get current waitlist position' })
   @ApiOkResponse({ type: WaitlistPositionResponseDto })
   async getPosition(
-    @Query('trainingId') trainingId: string,
+    @Query() query: WaitlistQueryDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<WaitlistPositionResponseDto> {
     return this.queryBus.execute<
       GetWaitlistPositionQuery,
       WaitlistPositionResponseDto
-    >(new GetWaitlistPositionQuery(user.id, trainingId));
+    >(new GetWaitlistPositionQuery(user.id, query.trainingId));
   }
 
   @Delete()
@@ -71,11 +71,11 @@ export class WaitlistController {
     schema: { example: { message: 'Removed from waitlist' } },
   })
   async leave(
-    @Query('trainingId') trainingId: string,
+    @Query() query: WaitlistQueryDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ message: string }> {
     await this.commandBus.execute<LeaveWaitlistCommand, void>(
-      new LeaveWaitlistCommand(user.id, trainingId),
+      new LeaveWaitlistCommand(user.id, query.trainingId),
     );
     return { message: 'Removed from waitlist' };
   }
