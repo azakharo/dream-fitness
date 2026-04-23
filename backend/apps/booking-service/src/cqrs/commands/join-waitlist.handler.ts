@@ -22,7 +22,7 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
   ) {}
 
   async execute(command: JoinWaitlistCommand) {
-    const { userId, trainingId } = command;
+    const { userId, trainingId, userRole } = command;
 
     const existingBooking = await this.bookingRepository.findByUserAndTraining(
       userId,
@@ -40,7 +40,8 @@ export class JoinWaitlistHandler implements ICommandHandler<JoinWaitlistCommand>
 
     const training = await this.trainingClientService.getTraining(
       trainingId,
-      command.jwtToken,
+      userId,
+      userRole,
     );
 
     const trainingDateTime = formatDateTime(training.scheduledAt);
