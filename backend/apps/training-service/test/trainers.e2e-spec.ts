@@ -64,13 +64,13 @@ describe('TrainersController (e2e)', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().post('/trainers').send({});
 
       expect(response.status).toBe(400);
     });
 
-    it('should return 401 when missing internal auth headers', async () => {
+    it('should return 400 when missing internal auth headers', async () => {
       const trainerData = createTrainerDto();
       const response = await appHelper
         .getRequest()
@@ -129,7 +129,7 @@ describe('TrainersController (e2e)', () => {
       expect(response.body.length).toBe(0);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainers');
 
       expect(response.status).toBe(400);
@@ -165,7 +165,7 @@ describe('TrainersController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainers/123');
 
       expect(response.status).toBe(400);
@@ -222,7 +222,7 @@ describe('TrainersController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper
         .getRequest()
         .patch('/trainers/123')
@@ -266,7 +266,7 @@ describe('TrainersController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().delete('/trainers/123');
 
       expect(response.status).toBe(400);

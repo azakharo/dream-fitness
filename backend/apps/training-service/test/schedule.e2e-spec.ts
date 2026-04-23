@@ -116,7 +116,7 @@ describe('ScheduleController (e2e)', () => {
       });
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/schedule/week');
 
       expect(response.status).toBe(400);
@@ -218,7 +218,7 @@ describe('ScheduleController (e2e)', () => {
       expect(response.body.trainings.length).toBeGreaterThan(0);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper
         .getRequest()
         .get('/schedule/trainer/123');

@@ -208,7 +208,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().post('/trainings').send({});
 
       expect(response.status).toBe(400);
@@ -410,7 +410,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.body.total).toBe(5);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainings');
 
       expect(response.status).toBe(400);
@@ -460,7 +460,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainings/123');
 
       expect(response.status).toBe(400);
@@ -526,7 +526,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper
         .getRequest()
         .get('/trainings/123/availability');
@@ -620,7 +620,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper
         .getRequest()
         .patch('/trainings/123')
@@ -706,7 +706,7 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth headers', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().delete('/trainings/123');
 
       expect(response.status).toBe(400);
