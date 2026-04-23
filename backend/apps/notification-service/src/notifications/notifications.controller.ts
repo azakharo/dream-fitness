@@ -15,8 +15,6 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { InternalGuard, InternalUser } from '@app/shared';
 import { NotificationsService } from './notifications.service';
@@ -36,7 +34,6 @@ interface AuthenticatedUser {
 }
 
 @ApiTags('Notifications')
-@ApiBearerAuth()
 @Controller('notifications')
 @UseGuards(InternalGuard)
 export class NotificationsController {
@@ -47,7 +44,6 @@ export class NotificationsController {
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Create a notification (admin only)' })
   @ApiCreatedResponse({ type: NotificationResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async create(
     @Body() dto: CreateNotificationAdminDto,
   ): Promise<NotificationResponseDto> {
@@ -63,7 +59,6 @@ export class NotificationsController {
   @Get()
   @ApiOperation({ summary: 'Get user notifications with filters' })
   @ApiOkResponse({ type: NotificationListResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(
     @InternalUser() user: AuthenticatedUser,
     @Query() filters: NotificationFilterDto,
@@ -80,7 +75,6 @@ export class NotificationsController {
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread notification count' })
   @ApiOkResponse({ type: UnreadCountResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getUnreadCount(
     @InternalUser() user: AuthenticatedUser,
   ): Promise<UnreadCountResponseDto> {
@@ -91,7 +85,6 @@ export class NotificationsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark notification as read' })
   @ApiOkResponse({ type: NotificationResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async markAsRead(
     @Param('id') id: string,
     @InternalUser() user: AuthenticatedUser,
@@ -103,7 +96,6 @@ export class NotificationsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark all notifications as read' })
   @ApiOkResponse({ description: 'All notifications marked as read' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async markAllAsRead(@InternalUser() user: AuthenticatedUser): Promise<void> {
     await this.notificationsService.markAllAsRead(user.id);
   }

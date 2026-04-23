@@ -14,8 +14,6 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
 import { CurrentUser, InternalGuard } from '@app/shared';
@@ -31,7 +29,6 @@ import type { AuthenticatedUser } from '@app/shared';
 import { Booking } from './entities/booking.entity';
 
 @ApiTags('Bookings')
-@ApiBearerAuth()
 @Controller('bookings')
 @UseGuards(InternalGuard)
 export class BookingsController {
@@ -55,7 +52,6 @@ export class BookingsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Book a training' })
   @ApiCreatedResponse({ type: BookingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CreateBookingDto })
   async create(
     @Body() dto: CreateBookingDto,
@@ -70,7 +66,6 @@ export class BookingsController {
   @Get()
   @ApiOperation({ summary: 'Get user bookings with filters' })
   @ApiOkResponse({ type: BookingResponseDto, isArray: true })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: BookingFilterDto,
@@ -90,7 +85,6 @@ export class BookingsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get booking by ID' })
   @ApiOkResponse({ type: BookingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -105,7 +99,6 @@ export class BookingsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Cancel a booking' })
   @ApiOkResponse({ type: BookingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CancelBookingDto })
   async cancel(
     @Param('id') id: string,

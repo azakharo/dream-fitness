@@ -16,8 +16,6 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
 import { InternalGuard } from '@app/shared';
@@ -35,10 +33,8 @@ export class TrainingsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new training' })
   @ApiCreatedResponse({ type: TrainingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CreateTrainingDto })
   async create(
     @Body() createTrainingDto: CreateTrainingDto,
@@ -48,10 +44,8 @@ export class TrainingsController {
 
   @Get()
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get list of trainings with filters' })
   @ApiOkResponse({ type: [TrainingResponseDto] })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(
     @Query() filterDto: TrainingFilterDto,
   ): Promise<{ data: TrainingResponseDto[]; total: number }> {
@@ -62,7 +56,6 @@ export class TrainingsController {
   @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Get training by ID' })
   @ApiOkResponse({ type: TrainingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne(@Param('id') id: string): Promise<TrainingResponseDto> {
     return this.trainingsService.findById(id);
   }
@@ -70,10 +63,8 @@ export class TrainingsController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update training' })
   @ApiOkResponse({ type: TrainingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: UpdateTrainingDto })
   async update(
     @Param('id') id: string,
@@ -85,10 +76,8 @@ export class TrainingsController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Cancel training' })
   @ApiOkResponse({ description: 'Training cancelled successfully' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.trainingsService.remove(id);
   }
@@ -108,7 +97,6 @@ export class TrainingsController {
       },
     },
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getAvailability(@Param('id') id: string): Promise<{
     trainingId: string;
     capacity: number;

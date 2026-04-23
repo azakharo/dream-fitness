@@ -8,14 +8,7 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiBody } from '@nestjs/swagger';
 import { InternalGuard } from '@app/shared';
 import { BalanceService } from './balance.service';
 import { DepositDto } from './dto/deposit.dto';
@@ -35,10 +28,8 @@ export class BalanceController {
 
   @Post('balance/deposit')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Deposit funds to user balance' })
   @ApiOkResponse({ type: TransactionResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: DepositDto })
   async deposit(
     @Body() depositDto: DepositDto,
@@ -48,10 +39,8 @@ export class BalanceController {
 
   @Post('balance/reserve')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Reserve funds for a booking' })
   @ApiOkResponse({ type: TransactionResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: ReserveDto })
   async reserve(
     @Body() reserveDto: ReserveDto,
@@ -61,10 +50,8 @@ export class BalanceController {
 
   @Post('balance/release')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Release reserved funds back to balance' })
   @ApiOkResponse({ type: TransactionResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: ReleaseDto })
   async release(
     @Body() releaseDto: ReleaseDto,
@@ -74,20 +61,16 @@ export class BalanceController {
 
   @Post('balance/refund')
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Refund funds to user balance' })
   @ApiOkResponse({ type: TransactionResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: RefundDto })
   async refund(@Body() refundDto: RefundDto): Promise<TransactionResponseDto> {
     return this.balanceService.refund(refundDto);
   }
 
   @Get('transactions')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user transaction history' })
   @ApiOkResponse({ type: TransactionListResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getTransactions(
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: PaginationParams,

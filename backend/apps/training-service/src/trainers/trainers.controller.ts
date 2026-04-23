@@ -15,8 +15,6 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
 import { InternalGuard } from '@app/shared';
@@ -34,10 +32,8 @@ export class TrainersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new trainer' })
   @ApiCreatedResponse({ type: TrainerResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CreateTrainerDto })
   async create(
     @Body() createTrainerDto: CreateTrainerDto,
@@ -47,20 +43,16 @@ export class TrainersController {
 
   @Get()
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get list of active trainers' })
   @ApiOkResponse({ type: [TrainerResponseDto] })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(): Promise<TrainerResponseDto[]> {
     return this.trainersService.findActive();
   }
 
   @Get(':id')
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get trainer by ID' })
   @ApiOkResponse({ type: TrainerResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne(@Param('id') id: string): Promise<TrainerResponseDto> {
     const trainer = await this.trainersService.findById(id);
     if (!trainer) {
@@ -72,10 +64,8 @@ export class TrainersController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update trainer' })
   @ApiOkResponse({ type: TrainerResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: UpdateTrainerDto })
   async update(
     @Param('id') id: string,
@@ -87,10 +77,8 @@ export class TrainersController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Deactivate trainer' })
   @ApiOkResponse({ description: 'Trainer deactivated successfully' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.trainersService.remove(id);
   }

@@ -9,14 +9,7 @@ import {
   HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiBody } from '@nestjs/swagger';
 import { InternalUser } from '@app/shared';
 import { InternalGuard } from '@app/shared';
 import { UsersService } from './users.service';
@@ -36,10 +29,8 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiOkResponse({ type: UserResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProfile(@InternalUser() user: AuthUser): Promise<UserResponseDto> {
     const userProfile = await this.usersService.getUserById(user.id);
     if (!userProfile) {
@@ -51,10 +42,8 @@ export class UsersController {
   @Patch('me')
   @HttpCode(HttpStatus.OK)
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update current user profile' })
   @ApiOkResponse({ type: UserResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: UpdateUserDto })
   async updateProfile(
     @InternalUser() user: AuthUser,
@@ -72,10 +61,8 @@ export class UsersController {
 
   @Get('balance')
   @UseGuards(InternalGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user balance' })
   @ApiOkResponse({ type: BalanceResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getBalance(
     @InternalUser() user: AuthUser,
   ): Promise<BalanceResponseDto> {
