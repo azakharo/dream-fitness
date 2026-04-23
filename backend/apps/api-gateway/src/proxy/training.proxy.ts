@@ -204,13 +204,26 @@ export class TrainingProxyController {
 
     const headers = this.buildHeaders(req as RequestWithUser);
 
-    const response = await this.httpService.axiosRef.request({
+    // Only include data property if body is not null/undefined,
+    // otherwise axios sends "null" as body which causes JSON parsing errors
+    const requestConfig: {
+      method: string;
+      url: string;
+      headers: Record<string, string>;
+      data?: unknown;
+      params: typeof req.query;
+    } = {
       method,
       url,
       headers,
-      data: body,
       params: req.query,
-    });
+    };
+
+    if (body !== null && body !== undefined) {
+      requestConfig.data = body;
+    }
+
+    const response = await this.httpService.axiosRef.request(requestConfig);
     return response.data;
   }
 
