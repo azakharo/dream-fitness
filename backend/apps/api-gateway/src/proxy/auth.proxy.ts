@@ -15,6 +15,7 @@ import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { TransactionFilterDto } from '@app/contracts/auth';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -105,12 +106,11 @@ export class AuthProxyController {
   @ApiBearerAuth()
   getTransactions(
     @Req() req: RequestWithUser,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @Query() filters: TransactionFilterDto,
   ) {
     const queryParams = new URLSearchParams();
-    if (page) queryParams.append('page', page);
-    if (limit) queryParams.append('limit', limit);
+    if (filters.page) queryParams.append('page', String(filters.page));
+    if (filters.limit) queryParams.append('limit', String(filters.limit));
     const query = queryParams.toString();
     return this.proxyRequest(
       req,

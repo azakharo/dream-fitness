@@ -16,6 +16,7 @@ import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { BookingFilterDto, WaitlistFilterDto } from '@app/contracts/booking';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -32,18 +33,13 @@ export class BookingProxyController {
   @Get('bookings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getBookings(
-    @Req() req: RequestWithUser,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('status') status?: string,
-    @Query('trainingId') trainingId?: string,
-  ) {
+  getBookings(@Req() req: RequestWithUser, @Query() filters: BookingFilterDto) {
     const queryParams = new URLSearchParams();
-    if (page) queryParams.append('page', page);
-    if (limit) queryParams.append('limit', limit);
-    if (status) queryParams.append('status', status);
-    if (trainingId) queryParams.append('trainingId', trainingId);
+    if (filters.page) queryParams.append('page', String(filters.page));
+    if (filters.limit) queryParams.append('limit', String(filters.limit));
+    if (filters.status) queryParams.append('status', filters.status);
+    if (filters.trainingId)
+      queryParams.append('trainingId', filters.trainingId);
     const query = queryParams.toString();
     return this.proxyRequest(
       req,
@@ -80,14 +76,13 @@ export class BookingProxyController {
   @ApiBearerAuth()
   getWaitlist(
     @Req() req: RequestWithUser,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('trainingId') trainingId?: string,
+    @Query() filters: WaitlistFilterDto,
   ) {
     const queryParams = new URLSearchParams();
-    if (page) queryParams.append('page', page);
-    if (limit) queryParams.append('limit', limit);
-    if (trainingId) queryParams.append('trainingId', trainingId);
+    if (filters.page) queryParams.append('page', String(filters.page));
+    if (filters.limit) queryParams.append('limit', String(filters.limit));
+    if (filters.trainingId)
+      queryParams.append('trainingId', filters.trainingId);
     const query = queryParams.toString();
     return this.proxyRequest(
       req,

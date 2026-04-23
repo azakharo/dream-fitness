@@ -19,6 +19,11 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '@app/shared';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
+import {
+  TrainerFilterDto,
+  TrainingFilterDto,
+  ScheduleFilterDto,
+} from '@app/contracts/training';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -35,16 +40,12 @@ export class TrainingProxyController {
   @Get('trainers')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getTrainers(
-    @Req() req: RequestWithUser,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('specialization') specialization?: string,
-  ) {
+  getTrainers(@Req() req: RequestWithUser, @Query() filters: TrainerFilterDto) {
     const queryParams = new URLSearchParams();
-    if (page) queryParams.append('page', page);
-    if (limit) queryParams.append('limit', limit);
-    if (specialization) queryParams.append('specialization', specialization);
+    if (filters.page) queryParams.append('page', String(filters.page));
+    if (filters.limit) queryParams.append('limit', String(filters.limit));
+    if (filters.specialization)
+      queryParams.append('specialization', filters.specialization);
     const query = queryParams.toString();
     return this.proxyRequest(
       req,
@@ -95,18 +96,14 @@ export class TrainingProxyController {
   @ApiBearerAuth()
   getTrainings(
     @Req() req: RequestWithUser,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('trainerId') trainerId?: string,
-    @Query('type') type?: string,
-    @Query('status') status?: string,
+    @Query() filters: TrainingFilterDto,
   ) {
     const queryParams = new URLSearchParams();
-    if (page) queryParams.append('page', page);
-    if (limit) queryParams.append('limit', limit);
-    if (trainerId) queryParams.append('trainerId', trainerId);
-    if (type) queryParams.append('type', type);
-    if (status) queryParams.append('status', status);
+    if (filters.page) queryParams.append('page', String(filters.page));
+    if (filters.limit) queryParams.append('limit', String(filters.limit));
+    if (filters.trainerId) queryParams.append('trainerId', filters.trainerId);
+    if (filters.type) queryParams.append('type', filters.type);
+    if (filters.status) queryParams.append('status', filters.status);
     const query = queryParams.toString();
     return this.proxyRequest(
       req,
@@ -157,14 +154,12 @@ export class TrainingProxyController {
   @ApiBearerAuth()
   getSchedule(
     @Req() req: RequestWithUser,
-    @Query('date') date?: string,
-    @Query('trainerId') trainerId?: string,
-    @Query('week') week?: string,
+    @Query() filters: ScheduleFilterDto,
   ) {
     const queryParams = new URLSearchParams();
-    if (date) queryParams.append('date', date);
-    if (trainerId) queryParams.append('trainerId', trainerId);
-    if (week) queryParams.append('week', week);
+    if (filters.date) queryParams.append('date', filters.date);
+    if (filters.trainerId) queryParams.append('trainerId', filters.trainerId);
+    if (filters.week) queryParams.append('week', String(filters.week));
     const query = queryParams.toString();
     return this.proxyRequest(
       req,

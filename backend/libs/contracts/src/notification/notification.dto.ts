@@ -5,7 +5,11 @@ import {
   IsOptional,
   IsBoolean,
   IsObject,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { NotificationType } from '@app/shared/enums';
 
 export class CreateNotificationDto {
@@ -52,4 +56,27 @@ export class MarkAsReadDto {
 export class MarkAllAsReadDto {
   @IsUUID()
   userId: string;
+}
+
+export class NotificationFilterDto {
+  @IsOptional()
+  @IsBoolean()
+  read?: boolean;
+
+  @IsOptional()
+  @IsEnum(NotificationType)
+  type?: NotificationType;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
 }

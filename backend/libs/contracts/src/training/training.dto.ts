@@ -11,6 +11,7 @@ import {
   MaxLength,
   IsBoolean,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { TrainingType, TrainingStatus } from '@app/shared/enums';
 
 export class CreateTrainingDto {
@@ -159,6 +160,42 @@ export class TrainerResponseDto {
   updatedAt: string;
 }
 
+export class TrainerFilterDto {
+  @IsOptional()
+  @IsString()
+  specialization?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
+}
+
+export class ScheduleFilterDto {
+  @IsOptional()
+  @IsString()
+  date?: string;
+
+  @IsOptional()
+  @IsUUID()
+  trainerId?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(52)
+  week?: number;
+}
+
 export class TrainingFilterDto {
   @IsOptional()
   @IsEnum(TrainingType)
@@ -169,6 +206,10 @@ export class TrainingFilterDto {
   trainerId?: string;
 
   @IsOptional()
+  @IsEnum(TrainingStatus)
+  status?: TrainingStatus;
+
+  @IsOptional()
   @IsDateString()
   dateFrom?: string;
 
@@ -177,11 +218,13 @@ export class TrainingFilterDto {
   dateTo?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(50)

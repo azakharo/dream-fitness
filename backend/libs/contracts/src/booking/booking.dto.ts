@@ -1,4 +1,14 @@
-import { IsString, IsUUID, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { BookingStatus } from '@app/shared/enums';
 
 export class CreateBookingDto {
   @IsUUID()
@@ -32,4 +42,46 @@ export class CancelBookingDto {
 export class JoinWaitlistDto {
   @IsUUID()
   trainingId: string;
+}
+
+export class BookingFilterDto {
+  @IsOptional()
+  @IsEnum(BookingStatus)
+  status?: BookingStatus;
+
+  @IsOptional()
+  @IsUUID()
+  trainingId?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
+}
+
+export class WaitlistFilterDto {
+  @IsOptional()
+  @IsUUID()
+  trainingId?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
 }
