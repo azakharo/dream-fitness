@@ -17,12 +17,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '@app/shared';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
-import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
 }
 
+@ApiTags('Trainings')
 @Controller('api')
 export class TrainingProxyController {
   constructor(
