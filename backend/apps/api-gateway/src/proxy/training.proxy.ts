@@ -169,19 +169,19 @@ export class TrainingProxyController {
   }
 
   // Catch-all for training routes
-  @All('trainers/*')
+  @All('trainers/*path')
   catchAllTrainers(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
   }
 
-  @All('trainings/*')
+  @All('trainings/*path')
   catchAllTrainings(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
   }
 
-  @All('schedule/*')
+  @All('schedule/*path')
   catchAllSchedule(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);

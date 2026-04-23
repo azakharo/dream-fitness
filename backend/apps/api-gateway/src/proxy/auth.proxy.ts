@@ -111,7 +111,7 @@ export class AuthProxyController {
   }
 
   // Catch-all for any other auth routes
-  @All('*')
+  @All('*path')
   catchAll(@Req() req: Request) {
     const path = req.path.replace(/^\/api\/auth/, '');
     return this.proxyRequest(req, req.body, `/auth${path}`, req.method);

@@ -88,7 +88,7 @@ export class NotificationProxyController {
   }
 
   // Catch-all for notification routes
-  @All('notifications/*')
+  @All('notifications/*path')
   catchAllNotifications(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);

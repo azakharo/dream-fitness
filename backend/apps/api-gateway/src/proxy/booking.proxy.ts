@@ -116,13 +116,13 @@ export class BookingProxyController {
   }
 
   // Catch-all for booking routes
-  @All('bookings/*')
+  @All('bookings/*path')
   catchAllBookings(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
   }
 
-  @All('waitlist/*')
+  @All('waitlist/*path')
   catchAllWaitlist(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
     return this.proxyRequest(req, req.body, path, req.method);
