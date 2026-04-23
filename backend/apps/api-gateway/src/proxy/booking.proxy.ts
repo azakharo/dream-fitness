@@ -118,6 +118,7 @@ export class BookingProxyController {
 
   // Catch-all for booking routes
   @All('bookings/*path')
+  @UseGuards(JwtAuthGuard)
   @ApiExcludeEndpoint()
   catchAllBookings(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
@@ -125,6 +126,7 @@ export class BookingProxyController {
   }
 
   @All('waitlist/*path')
+  @UseGuards(JwtAuthGuard)
   @ApiExcludeEndpoint()
   catchAllWaitlist(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
