@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   Req,
   UseGuards,
   All,
@@ -19,11 +18,6 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '@app/shared';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
-import {
-  TrainerFilterDto,
-  TrainingFilterDto,
-  ScheduleFilterDto,
-} from '@app/contracts/training';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -40,19 +34,8 @@ export class TrainingProxyController {
   @Get('trainers')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getTrainers(@Req() req: RequestWithUser, @Query() filters: TrainerFilterDto) {
-    const queryParams = new URLSearchParams();
-    if (filters.page) queryParams.append('page', String(filters.page));
-    if (filters.limit) queryParams.append('limit', String(filters.limit));
-    if (filters.specialization)
-      queryParams.append('specialization', filters.specialization);
-    const query = queryParams.toString();
-    return this.proxyRequest(
-      req,
-      null,
-      `/trainers${query ? `?${query}` : ''}`,
-      'GET',
-    );
+  getTrainers(@Req() req: RequestWithUser) {
+    return this.proxyRequest(req, null, '/trainers', 'GET');
   }
 
   @Get('trainers/:id')
@@ -94,23 +77,8 @@ export class TrainingProxyController {
   @Get('trainings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getTrainings(
-    @Req() req: RequestWithUser,
-    @Query() filters: TrainingFilterDto,
-  ) {
-    const queryParams = new URLSearchParams();
-    if (filters.page) queryParams.append('page', String(filters.page));
-    if (filters.limit) queryParams.append('limit', String(filters.limit));
-    if (filters.trainerId) queryParams.append('trainerId', filters.trainerId);
-    if (filters.type) queryParams.append('type', filters.type);
-    if (filters.status) queryParams.append('status', filters.status);
-    const query = queryParams.toString();
-    return this.proxyRequest(
-      req,
-      null,
-      `/trainings${query ? `?${query}` : ''}`,
-      'GET',
-    );
+  getTrainings(@Req() req: RequestWithUser) {
+    return this.proxyRequest(req, null, '/trainings', 'GET');
   }
 
   @Get('trainings/:id')
@@ -152,21 +120,8 @@ export class TrainingProxyController {
   @Get('schedule')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getSchedule(
-    @Req() req: RequestWithUser,
-    @Query() filters: ScheduleFilterDto,
-  ) {
-    const queryParams = new URLSearchParams();
-    if (filters.date) queryParams.append('date', filters.date);
-    if (filters.trainerId) queryParams.append('trainerId', filters.trainerId);
-    if (filters.week) queryParams.append('week', String(filters.week));
-    const query = queryParams.toString();
-    return this.proxyRequest(
-      req,
-      null,
-      `/schedule${query ? `?${query}` : ''}`,
-      'GET',
-    );
+  getSchedule(@Req() req: RequestWithUser) {
+    return this.proxyRequest(req, null, '/schedule', 'GET');
   }
 
   @Get('schedule/:date')

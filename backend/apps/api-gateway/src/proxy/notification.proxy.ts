@@ -5,7 +5,6 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   Req,
   UseGuards,
   All,
@@ -16,7 +15,6 @@ import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { NotificationFilterDto } from '@app/contracts/notification';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -33,23 +31,8 @@ export class NotificationProxyController {
   @Get('notifications')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getNotifications(
-    @Req() req: RequestWithUser,
-    @Query() filters: NotificationFilterDto,
-  ) {
-    const queryParams = new URLSearchParams();
-    if (filters.page) queryParams.append('page', String(filters.page));
-    if (filters.limit) queryParams.append('limit', String(filters.limit));
-    if (filters.read !== undefined)
-      queryParams.append('read', String(filters.read));
-    if (filters.type) queryParams.append('type', filters.type);
-    const query = queryParams.toString();
-    return this.proxyRequest(
-      req,
-      null,
-      `/notifications${query ? `?${query}` : ''}`,
-      'GET',
-    );
+  getNotifications(@Req() req: RequestWithUser) {
+    return this.proxyRequest(req, null, '/notifications', 'GET');
   }
 
   @Get('notifications/unread-count')

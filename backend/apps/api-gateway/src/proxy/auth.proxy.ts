@@ -4,7 +4,6 @@ import {
   Post,
   Patch,
   Body,
-  Query,
   Req,
   UseGuards,
   All,
@@ -15,7 +14,6 @@ import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { ApiBearerAuth, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { TransactionFilterDto } from '@app/contracts/auth';
 
 interface RequestWithUser extends Request {
   user?: AuthenticatedUser;
@@ -104,20 +102,8 @@ export class AuthProxyController {
   @Get('transactions')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getTransactions(
-    @Req() req: RequestWithUser,
-    @Query() filters: TransactionFilterDto,
-  ) {
-    const queryParams = new URLSearchParams();
-    if (filters.page) queryParams.append('page', String(filters.page));
-    if (filters.limit) queryParams.append('limit', String(filters.limit));
-    const query = queryParams.toString();
-    return this.proxyRequest(
-      req,
-      null,
-      `/auth/transactions${query ? `?${query}` : ''}`,
-      'GET',
-    );
+  getTransactions(@Req() req: RequestWithUser) {
+    return this.proxyRequest(req, null, '/auth/transactions', 'GET');
   }
 
   // Catch-all for any other auth routes
