@@ -7,6 +7,7 @@ import {
   createTrainerDto,
   createTrainingDto,
   futureDate,
+  NON_EXISTENT_ID,
 } from './fixtures/training.fixtures';
 import { mockEventsPublisher } from './mocks/events.module.mock';
 import { TrainingType } from '@app/shared/enums';
@@ -72,9 +73,7 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 when trainer does not exist', async () => {
       const headers = authHelper.getAdminHeaders();
-      const trainingData = createTrainingDto(
-        '00000000-0000-0000-0000-000000000001',
-      );
+      const trainingData = createTrainingDto(NON_EXISTENT_ID);
 
       const response = await trainingsHelper.create(headers, trainingData);
 
@@ -450,11 +449,10 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000002';
 
       const response = await appHelper
         .getRequest()
-        .get(`/trainings/${nonExistentId}`)
+        .get(`/trainings/${NON_EXISTENT_ID}`)
         .set(headers);
 
       expect(response.status).toBe(404);
@@ -516,11 +514,10 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000003';
 
       const response = await appHelper
         .getRequest()
-        .get(`/trainings/${nonExistentId}/availability`)
+        .get(`/trainings/${NON_EXISTENT_ID}/availability`)
         .set(headers);
 
       expect(response.status).toBe(404);
@@ -608,12 +605,11 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000004';
       const updateData = { title: 'Updated Title' };
 
       const response = await appHelper
         .getRequest()
-        .patch(`/trainings/${nonExistentId}`)
+        .patch(`/trainings/${NON_EXISTENT_ID}`)
         .set(headers)
         .send(updateData);
 
@@ -699,9 +695,8 @@ describe('TrainingsController (e2e)', () => {
 
     it('should return 404 for non-existent training', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000005';
 
-      const response = await trainingsHelper.cancel(headers, nonExistentId);
+      const response = await trainingsHelper.cancel(headers, NON_EXISTENT_ID);
 
       expect(response.status).toBe(404);
     });

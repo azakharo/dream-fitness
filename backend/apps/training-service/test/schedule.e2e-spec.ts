@@ -8,6 +8,7 @@ import {
   createTrainerDto,
   futureDate,
   createTrainingDto,
+  NON_EXISTENT_ID,
 } from './fixtures/training.fixtures';
 
 describe('ScheduleController (e2e)', () => {
@@ -153,11 +154,10 @@ describe('ScheduleController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000001';
 
       const response = await scheduleHelper.getTrainerSchedule(
         headers,
-        nonExistentId,
+        NON_EXISTENT_ID,
       );
 
       expect(response.status).toBe(404);

@@ -2,7 +2,10 @@ import { AppTestHelper } from './helpers/app-test.helper';
 import { DbHelper } from './helpers/db.helper';
 import { AuthHelper } from './helpers/auth.helper';
 import { TrainersHelper } from './helpers/trainers.helper';
-import { createTrainerDto } from './fixtures/training.fixtures';
+import {
+  createTrainerDto,
+  NON_EXISTENT_ID,
+} from './fixtures/training.fixtures';
 import { CreateTrainerDto } from '../src/trainers/dto';
 
 describe('TrainersController (e2e)', () => {
@@ -158,9 +161,8 @@ describe('TrainersController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000001';
 
-      const response = await trainersHelper.findById(headers, nonExistentId);
+      const response = await trainersHelper.findById(headers, NON_EXISTENT_ID);
 
       expect(response.status).toBe(404);
     });
@@ -210,12 +212,11 @@ describe('TrainersController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000002';
       const updateData = { name: 'Updated Name' };
 
       const response = await trainersHelper.update(
         headers,
-        nonExistentId,
+        NON_EXISTENT_ID,
         updateData,
       );
 
@@ -259,9 +260,8 @@ describe('TrainersController (e2e)', () => {
 
     it('should return 404 for non-existent trainer', async () => {
       const headers = authHelper.getAdminHeaders();
-      const nonExistentId = '00000000-0000-0000-0000-000000000003';
 
-      const response = await trainersHelper.remove(headers, nonExistentId);
+      const response = await trainersHelper.remove(headers, NON_EXISTENT_ID);
 
       expect(response.status).toBe(404);
     });
