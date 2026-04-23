@@ -47,13 +47,13 @@ describe('Bookings API (e2e)', () => {
     );
     // The following mocks will be called if a test is wrong (forgot to add mock)
     mockAuthClientService.reservePoints.mockRejectedValue(
-      new Error('unexpected, should not be called'),
+      new Error('unexpected call of reservePoints (should not be called)'),
     );
     mockAuthClientService.refundPoints.mockRejectedValue(
-      new Error('unexpected, should not be called'),
+      new Error('unexpected call of refundPoints (should not be called)'),
     );
     mockAuthClientService.releasePoints.mockRejectedValue(
-      new Error('unexpected, should not be called'),
+      new Error('unexpected call of releasePoints (should not be called)'),
     );
   });
 
