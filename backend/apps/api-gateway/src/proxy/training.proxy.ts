@@ -15,13 +15,8 @@ import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '@app/shared';
-import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
+import { type RequestWithUser, Roles } from '@app/shared';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-
-interface RequestWithUser extends Request {
-  user?: AuthenticatedUser;
-}
 
 @ApiTags('Trainings')
 @Controller('api')
