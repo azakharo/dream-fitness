@@ -55,13 +55,43 @@ export abstract class BaseExceptionFilter implements ExceptionFilter {
 
   protected logError(exception: unknown, context: HttpContext): void {
     const requestInfo = `${context.request.method} ${context.request.url}`;
+
+    // Determine log level based on HTTP status code
+    let logLevel: 'error' | 'warn' | 'debug' = 'error';
+    let message = 'Unknown exception caught';
+
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+      if (status >= 400 && status < 500) {
+        // Client errors (4xx) are expected business outcomes - log as warning
+        logLevel = 'warn';
+      } else if (status >= 500) {
+        // Server errors (5xx) are actual problems - log as error
+        logLevel = 'error';
+      } else if (status < 400) {
+        // Informational responses (1xx-3xx) - log as debug
+        logLevel = 'debug';
+      }
+    }
+
     if (exception instanceof Error) {
-      this.logger.error(
-        `Exception caught: ${exception.message} [${requestInfo}]`,
-        exception.stack,
-      );
+      message = `Exception caught: ${exception.message} [${requestInfo}]`;
+      if (logLevel === 'error') {
+        this.logger.error(message, exception.stack);
+      } else if (logLevel === 'warn') {
+        this.logger.warn(message);
+      } else {
+        this.logger.debug(message);
+      }
     } else {
-      this.logger.error(`Unknown exception caught [${requestInfo}]`);
+      message = `Unknown exception caught [${requestInfo}]`;
+      if (logLevel === 'error') {
+        this.logger.error(message);
+      } else if (logLevel === 'warn') {
+        this.logger.warn(message);
+      } else {
+        this.logger.debug(message);
+      }
     }
   }
 
