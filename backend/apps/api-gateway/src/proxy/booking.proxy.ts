@@ -9,48 +9,75 @@ import {
   UseGuards,
   All,
 } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
 import type { Request } from 'express';
-import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import type { RequestWithUser } from '@app/shared';
+import { ProxyService } from './proxy.service';
+
+const BOOKING_SERVICE_URL = 'BOOKING_SERVICE_URL';
+const BOOKING_SERVICE_DEFAULT_URL = 'http://localhost:3003';
 
 @ApiTags('Booking')
 @Controller('api')
 export class BookingProxyController {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly proxyService: ProxyService) {}
 
   // Bookings endpoints
   @Get('bookings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getBookings(@Req() req: RequestWithUser) {
-    return this.proxyRequest(req, null, '/bookings', 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      '/bookings',
+      'GET',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Get('bookings/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getBookingById(@Req() req: RequestWithUser, @Param('id') id: string) {
-    return this.proxyRequest(req, null, `/bookings/${id}`, 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/bookings/${id}`,
+      'GET',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Post('bookings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   createBooking(@Req() req: RequestWithUser, @Body() body: unknown) {
-    return this.proxyRequest(req, body, '/bookings', 'POST');
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      '/bookings',
+      'POST',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Delete('bookings/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   cancelBooking(@Req() req: RequestWithUser, @Param('id') id: string) {
-    return this.proxyRequest(req, null, `/bookings/${id}`, 'DELETE');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/bookings/${id}`,
+      'DELETE',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   // Waitlist endpoints
@@ -58,7 +85,14 @@ export class BookingProxyController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getWaitlist(@Req() req: RequestWithUser) {
-    return this.proxyRequest(req, null, '/waitlist', 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      '/waitlist',
+      'GET',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Get('waitlist/:trainingId')
@@ -68,14 +102,28 @@ export class BookingProxyController {
     @Req() req: RequestWithUser,
     @Param('trainingId') trainingId: string,
   ) {
-    return this.proxyRequest(req, null, `/waitlist/${trainingId}`, 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/waitlist/${trainingId}`,
+      'GET',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Post('waitlist')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   joinWaitlist(@Req() req: RequestWithUser, @Body() body: unknown) {
-    return this.proxyRequest(req, body, '/waitlist', 'POST');
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      '/waitlist',
+      'POST',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Delete('waitlist/:trainingId')
@@ -85,7 +133,14 @@ export class BookingProxyController {
     @Req() req: RequestWithUser,
     @Param('trainingId') trainingId: string,
   ) {
-    return this.proxyRequest(req, null, `/waitlist/${trainingId}`, 'DELETE');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/waitlist/${trainingId}`,
+      'DELETE',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   // Catch-all for booking routes
@@ -94,7 +149,14 @@ export class BookingProxyController {
   @ApiExcludeEndpoint()
   catchAllBookings(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
-    return this.proxyRequest(req, req.body, path, req.method);
+    return this.proxyService.proxyRequest(
+      req,
+      req.body,
+      path,
+      req.method,
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @All('waitlist/*path')
@@ -102,55 +164,13 @@ export class BookingProxyController {
   @ApiExcludeEndpoint()
   catchAllWaitlist(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
-    return this.proxyRequest(req, req.body, path, req.method);
-  }
-
-  private async proxyRequest(
-    req: Request,
-    body: unknown,
-    path: string,
-    method = 'GET',
-  ): Promise<unknown> {
-    const baseUrl =
-      this.configService.get<string>('BOOKING_SERVICE_URL') ||
-      'http://localhost:3003';
-    const url = `${baseUrl}${path}`;
-
-    const headers = this.buildHeaders(req as RequestWithUser);
-
-    // Only include data property if body is not null/undefined,
-    // otherwise axios sends "null" as body which causes JSON parsing errors
-    const requestConfig: {
-      method: string;
-      url: string;
-      headers: Record<string, string>;
-      data?: unknown;
-      params: typeof req.query;
-    } = {
-      method,
-      url,
-      headers,
-      params: req.query,
-    };
-
-    if (body !== null && body !== undefined) {
-      requestConfig.data = body;
-    }
-
-    const response = await this.httpService.axiosRef.request(requestConfig);
-    return response.data;
-  }
-
-  private buildHeaders(req: RequestWithUser): Record<string, string> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    if (req.user) {
-      headers['X-User-Id'] = req.user.id;
-      headers['X-User-Role'] = req.user.role;
-    }
-
-    return headers;
+    return this.proxyService.proxyRequest(
+      req,
+      req.body,
+      path,
+      req.method,
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
   }
 }

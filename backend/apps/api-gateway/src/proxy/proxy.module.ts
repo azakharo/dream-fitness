@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '../config';
+import { ProxyService } from './proxy.service';
 import { AuthProxyController } from './auth.proxy';
 import { TrainingProxyController } from './training.proxy';
 import { BookingProxyController } from './booking.proxy';
@@ -22,5 +23,6 @@ import { NotificationProxyController } from './notification.proxy';
     BookingProxyController,
     NotificationProxyController,
   ],
+  providers: [ProxyService],
 })
 export class ProxyModule {}

@@ -10,35 +10,48 @@ import {
   UseGuards,
   All,
 } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
 import type { Request } from 'express';
-import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { type RequestWithUser, Roles } from '@app/shared';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import { ProxyService } from './proxy.service';
+
+const TRAINING_SERVICE_URL = 'TRAINING_SERVICE_URL';
+const TRAINING_SERVICE_DEFAULT_URL = 'http://localhost:3002';
 
 @ApiTags('Trainings')
 @Controller('api')
 export class TrainingProxyController {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly proxyService: ProxyService) {}
 
   // Trainers endpoints
   @Get('trainers')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getTrainers(@Req() req: RequestWithUser) {
-    return this.proxyRequest(req, null, '/trainers', 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      '/trainers',
+      'GET',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Get('trainers/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getTrainerById(@Req() req: RequestWithUser, @Param('id') id: string) {
-    return this.proxyRequest(req, null, `/trainers/${id}`, 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/trainers/${id}`,
+      'GET',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Post('trainers')
@@ -46,7 +59,14 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   createTrainer(@Req() req: RequestWithUser, @Body() body: unknown) {
-    return this.proxyRequest(req, body, '/trainers', 'POST');
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      '/trainers',
+      'POST',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Patch('trainers/:id')
@@ -58,7 +78,14 @@ export class TrainingProxyController {
     @Param('id') id: string,
     @Body() body: unknown,
   ) {
-    return this.proxyRequest(req, body, `/trainers/${id}`, 'PATCH');
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      `/trainers/${id}`,
+      'PATCH',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Delete('trainers/:id')
@@ -66,7 +93,14 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   deleteTrainer(@Req() req: RequestWithUser, @Param('id') id: string) {
-    return this.proxyRequest(req, null, `/trainers/${id}`, 'DELETE');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/trainers/${id}`,
+      'DELETE',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   // Trainings endpoints
@@ -74,14 +108,28 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getTrainings(@Req() req: RequestWithUser) {
-    return this.proxyRequest(req, null, '/trainings', 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      '/trainings',
+      'GET',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Get('trainings/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getTrainingById(@Req() req: RequestWithUser, @Param('id') id: string) {
-    return this.proxyRequest(req, null, `/trainings/${id}`, 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/trainings/${id}`,
+      'GET',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Post('trainings')
@@ -89,7 +137,14 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   createTraining(@Req() req: RequestWithUser, @Body() body: unknown) {
-    return this.proxyRequest(req, body, '/trainings', 'POST');
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      '/trainings',
+      'POST',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Patch('trainings/:id')
@@ -101,7 +156,14 @@ export class TrainingProxyController {
     @Param('id') id: string,
     @Body() body: unknown,
   ) {
-    return this.proxyRequest(req, body, `/trainings/${id}`, 'PATCH');
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      `/trainings/${id}`,
+      'PATCH',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Delete('trainings/:id')
@@ -109,7 +171,14 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   deleteTraining(@Req() req: RequestWithUser, @Param('id') id: string) {
-    return this.proxyRequest(req, null, `/trainings/${id}`, 'DELETE');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/trainings/${id}`,
+      'DELETE',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   // Schedule endpoints
@@ -117,14 +186,28 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getSchedule(@Req() req: RequestWithUser) {
-    return this.proxyRequest(req, null, '/schedule', 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      '/schedule',
+      'GET',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @Get('schedule/:date')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   getScheduleByDate(@Req() req: RequestWithUser, @Param('date') date: string) {
-    return this.proxyRequest(req, null, `/schedule/${date}`, 'GET');
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/schedule/${date}`,
+      'GET',
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   // Catch-all for training routes
@@ -132,69 +215,41 @@ export class TrainingProxyController {
   @ApiExcludeEndpoint()
   catchAllTrainers(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
-    return this.proxyRequest(req, req.body, path, req.method);
+    return this.proxyService.proxyRequest(
+      req,
+      req.body,
+      path,
+      req.method,
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @All('trainings/*path')
   @ApiExcludeEndpoint()
   catchAllTrainings(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
-    return this.proxyRequest(req, req.body, path, req.method);
+    return this.proxyService.proxyRequest(
+      req,
+      req.body,
+      path,
+      req.method,
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 
   @All('schedule/*path')
   @ApiExcludeEndpoint()
   catchAllSchedule(@Req() req: RequestWithUser) {
     const path = req.path.replace(/^\/api/, '');
-    return this.proxyRequest(req, req.body, path, req.method);
-  }
-
-  private async proxyRequest(
-    req: Request,
-    body: unknown,
-    path: string,
-    method = 'GET',
-  ): Promise<unknown> {
-    const baseUrl =
-      this.configService.get<string>('TRAINING_SERVICE_URL') ||
-      'http://localhost:3002';
-    const url = `${baseUrl}${path}`;
-
-    const headers = this.buildHeaders(req as RequestWithUser);
-
-    // Only include data property if body is not null/undefined,
-    // otherwise axios sends "null" as body which causes JSON parsing errors
-    const requestConfig: {
-      method: string;
-      url: string;
-      headers: Record<string, string>;
-      data?: unknown;
-      params: typeof req.query;
-    } = {
-      method,
-      url,
-      headers,
-      params: req.query,
-    };
-
-    if (body !== null && body !== undefined) {
-      requestConfig.data = body;
-    }
-
-    const response = await this.httpService.axiosRef.request(requestConfig);
-    return response.data;
-  }
-
-  private buildHeaders(req: RequestWithUser): Record<string, string> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    if (req.user) {
-      headers['X-User-Id'] = req.user.id;
-      headers['X-User-Role'] = req.user.role;
-    }
-
-    return headers;
+    return this.proxyService.proxyRequest(
+      req,
+      req.body,
+      path,
+      req.method,
+      TRAINING_SERVICE_URL,
+      TRAINING_SERVICE_DEFAULT_URL,
+    );
   }
 }
