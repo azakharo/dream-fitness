@@ -12,12 +12,8 @@ import { HttpService } from '@nestjs/axios';
 import type { Request } from 'express';
 import { ConfigService } from '../config';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-
-interface RequestWithUser extends Request {
-  user?: AuthenticatedUser;
-}
+import type { RequestWithUser } from '@app/shared';
 
 @ApiTags('Auth')
 @Controller('api/auth')
