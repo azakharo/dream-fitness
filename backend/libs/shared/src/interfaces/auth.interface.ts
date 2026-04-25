@@ -27,5 +27,5 @@ export interface JwtPayload {
  * Use this when typing request objects in guards and interceptors
  */
 export interface RequestWithUser extends Request {
-  user?: AuthenticatedUser;
+  user: AuthenticatedUser;
 }
