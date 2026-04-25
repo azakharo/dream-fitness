@@ -14,10 +14,6 @@ interface GatewayConfig {
   // JWT
   JWT_SECRET: string;
   JWT_ACCESS_TTL: string;
-
-  // Rate Limiting
-  THROTTLE_TTL: number;
-  THROTTLE_LIMIT: number;
 }
 
 @Injectable()
@@ -45,8 +41,6 @@ export class ConfigService {
         this.get<string>('NOTIFICATION_SERVICE_URL') || 'http://localhost:3004',
       JWT_SECRET: this.getOrThrow<string>('JWT_SECRET'),
       JWT_ACCESS_TTL: this.get<string>('JWT_ACCESS_TTL') || '15m',
-      THROTTLE_TTL: this.get<number>('THROTTLE_TTL') || 60,
-      THROTTLE_LIMIT: this.get<number>('THROTTLE_LIMIT') || 100,
     };
   }
 }

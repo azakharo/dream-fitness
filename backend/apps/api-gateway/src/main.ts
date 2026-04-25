@@ -31,4 +31,5 @@ async function bootstrap() {
   console.log(`API Gateway is running on port ${port}`);
   console.log(`Swagger UI available at http://localhost:${port}/api/docs`);
 }
+
 void bootstrap();
