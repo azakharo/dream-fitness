@@ -1,15 +1,10 @@
-import { Module, Global } from '@nestjs/common';
-import { ConfigModule as NestConfigModule } from '@nestjs/config';
+import { Global, Module } from '@nestjs/common';
+import { SharedConfigModule } from '@app/shared/config';
 import { ConfigService } from './config.service';
 
 @Global()
 @Module({
-  imports: [
-    NestConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
-      isGlobal: true,
-    }),
-  ],
+  imports: [SharedConfigModule],
   providers: [ConfigService],
   exports: [ConfigService],
 })

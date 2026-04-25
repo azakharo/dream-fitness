@@ -6,3 +6,4 @@ export * from './interfaces';
 export * from './utils';
 export * from './rabbitmq';
 export * from './enums';
+export * from './config';
