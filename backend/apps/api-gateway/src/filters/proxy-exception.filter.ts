@@ -1,12 +1,6 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { AxiosError } from 'axios';
-import { Response, Request } from 'express';
+import { BaseExceptionFilter, HttpContext } from '@app/shared';
 
 interface ProblemDetails {
   type: string;
@@ -16,72 +10,53 @@ interface ProblemDetails {
   instance: string;
 }
 
-@Catch()
-export class ProxyExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost): void {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+export class ProxyExceptionFilter extends BaseExceptionFilter {
+  protected handleHttpException(
+    exception: HttpException,
+    context: HttpContext,
+  ): void {
+    const status = exception.getStatus();
+    const exceptionResponse = exception.getResponse();
 
-    if (exception instanceof AxiosError) {
-      const status =
-        exception.response?.status || HttpStatus.SERVICE_UNAVAILABLE;
-      const data = exception.response?.data as ProblemDetails | undefined;
+    const detail =
+      typeof exceptionResponse === 'string'
+        ? exceptionResponse
+        : (exceptionResponse as ProblemDetails).detail || exception.message;
 
-      const problemDetails: ProblemDetails = {
-        type: `https://httpstatuses.com/${status}`,
-        title: this.getTitle(status),
-        status,
-        detail: data?.detail || exception.message,
-        instance: request.url,
-      };
-
-      response.status(status).json(problemDetails);
-      return;
-    }
-
-    if (exception instanceof HttpException) {
-      const status = exception.getStatus();
-      const exceptionResponse = exception.getResponse();
-
-      const problemDetails: ProblemDetails = {
-        type: `https://httpstatuses.com/${status}`,
-        title: this.getTitle(status),
-        status,
-        detail:
-          typeof exceptionResponse === 'string'
-            ? exceptionResponse
-            : (exceptionResponse as ProblemDetails).detail || exception.message,
-        instance: request.url,
-      };
-
-      response.status(status).json(problemDetails);
-      return;
-    }
-
-    // Default internal server error
-    const status = HttpStatus.INTERNAL_SERVER_ERROR;
-    const problemDetails: ProblemDetails = {
-      type: `https://httpstatuses.com/${status}`,
-      title: this.getTitle(status),
-      status,
-      detail: 'Internal server error',
-      instance: request.url,
-    };
-
-    response.status(status).json(problemDetails);
+    this.sendProblemDetails(context, status, detail);
   }
 
-  private getTitle(status: number): string {
-    const titles: Record<number, string> = {
-      [HttpStatus.BAD_REQUEST]: 'Bad Request',
-      [HttpStatus.UNAUTHORIZED]: 'Unauthorized',
-      [HttpStatus.FORBIDDEN]: 'Forbidden',
-      [HttpStatus.NOT_FOUND]: 'Not Found',
-      [HttpStatus.CONFLICT]: 'Conflict',
-      [HttpStatus.INTERNAL_SERVER_ERROR]: 'Internal Server Error',
-      [HttpStatus.SERVICE_UNAVAILABLE]: 'Service Unavailable',
+  protected handleAxiosError(
+    exception: AxiosError,
+    context: HttpContext,
+  ): void {
+    const status = exception.response?.status || HttpStatus.SERVICE_UNAVAILABLE;
+    const data = exception.response?.data as ProblemDetails | undefined;
+    const detail = data?.detail || exception.message;
+
+    this.sendProblemDetails(context, status, detail);
+  }
+
+  protected handleUnknownError(exception: unknown, context: HttpContext): void {
+    const status = HttpStatus.INTERNAL_SERVER_ERROR;
+    const detail = 'Internal server error';
+
+    this.sendProblemDetails(context, status, detail);
+  }
+
+  private sendProblemDetails(
+    context: HttpContext,
+    status: number,
+    detail: string,
+  ): void {
+    const problemDetails: ProblemDetails = {
+      type: `https://httpstatuses.com/${status}`,
+      title: this.getStatusTitle(status),
+      status,
+      detail,
+      instance: context.request.url,
     };
-    return titles[status] || 'Error';
+
+    context.response.status(status).json(problemDetails);
   }
 }
