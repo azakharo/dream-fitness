@@ -18,7 +18,7 @@ async function createTestDb() {
   await dataSource.initialize();
 
   try {
-    const result = await dataSource.query(
+    const result = await dataSource.query<string[]>(
       `SELECT 1 FROM pg_database WHERE datname = '${process.env.DATABASE_NAME}'`,
     );
 
