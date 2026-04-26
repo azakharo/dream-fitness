@@ -14,6 +14,12 @@ async function bootstrap() {
     }),
   );
 
+  // Health check endpoint
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.get('/health', (_, res) => {
+    res.json({ status: 'ok', service: 'api-gateway' });
+  });
+
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('DreamFitness API')

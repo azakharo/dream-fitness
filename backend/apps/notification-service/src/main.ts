@@ -24,6 +24,12 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
+  // Health check endpoint
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.get('/health', (_, res) => {
+    res.json({ status: 'ok', service: 'notification-service' });
+  });
+
   const port = process.env.NOTIFICATION_SERVICE_PORT || 3004;
   await app.listen(port, '0.0.0.0');
   console.log(`Notification Service is running on port ${port}`);

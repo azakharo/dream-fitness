@@ -39,5 +39,9 @@ RUN npm ci --only=production
 # Copy built files from development stage
 COPY --from=development /app/dist ./dist
 COPY --from=development /app/nest-cli.json ./nest-cli.json
+COPY --from=development /app/scripts ./scripts
+
+# Make entrypoint script executable
+RUN chmod +x /app/scripts/docker-entrypoint.sh
 
 # Production command set per service in docker-compose

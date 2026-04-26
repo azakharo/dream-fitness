@@ -13,5 +13,8 @@ COPY . .
 # Build all services
 RUN npm run build:all
 
+# Make entrypoint script executable
+RUN chmod +x /app/scripts/docker-entrypoint.sh
+
 # Keep container running (command set in docker-compose)
 CMD ["tail", "-f", "/dev/null"]

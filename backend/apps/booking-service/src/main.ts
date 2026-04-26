@@ -14,6 +14,12 @@ async function bootstrap() {
     }),
   );
 
+  // Health check endpoint
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.get('/health', (_, res) => {
+    res.json({ status: 'ok', service: 'booking-service' });
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Booking Service API')
     .setDescription('Booking and waitlist management API')

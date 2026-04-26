@@ -14,6 +14,12 @@ async function bootstrap() {
     }),
   );
 
+  // Health check endpoint
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.get('/health', (_, res) => {
+    res.json({ status: 'ok', service: 'training-service' });
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Training Service API')
     .setDescription('Training and schedule management API')
