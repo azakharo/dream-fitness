@@ -40,7 +40,7 @@ services:
         condition: service_healthy
     command: npm run start:dev:api-gateway
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -73,11 +73,11 @@ services:
     entrypoint: ["sh", "/app/scripts/docker-entrypoint.sh"]
     command: ["npm", "run", "start:dev:auth-service"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     networks:
       - dreamfitness-network
 
@@ -103,7 +103,7 @@ services:
         condition: service_healthy
     command: npm run start:dev:training-service
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3002/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -133,7 +133,7 @@ services:
         condition: service_healthy
     command: npm run start:dev:booking-service
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3003/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -163,7 +163,7 @@ services:
         condition: service_healthy
     command: npm run start:dev:notification-service
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3004/health"]
       interval: 10s
       timeout: 5s
       retries: 5
