@@ -1,0 +1,148 @@
+# Development override - extends docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  # ============================================
+  # Infrastructure (from docker-compose.yml)
+  # ============================================
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+
+  rabbitmq:
+    extends:
+      file: docker-compose.yml
+      service: rabbitmq
+
+  # ============================================
+  # Application Services
+  # ============================================
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dreamfitness-api-gateway
+    volumes:
+      - ./apps:/app/apps:cached
+      - ./libs:/app/libs:cached
+      - ./node_modules:/app/node_modules:delegated
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+      - .env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: npm run start:dev:api-gateway
+    networks:
+      - dreamfitness-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dreamfitness-auth-service
+    volumes:
+      - ./apps:/app/apps:cached
+      - ./libs:/app/libs:cached
+      - ./node_modules:/app/node_modules:delegated
+    ports:
+      - "${AUTH_SERVICE_PORT:-3001}:${AUTH_SERVICE_PORT:-3001}"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+      - .env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: npm run start:dev:auth-service
+    networks:
+      - dreamfitness-network
+
+  training-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dreamfitness-training-service
+    volumes:
+      - ./apps:/app/apps:cached
+      - ./libs:/app/libs:cached
+      - ./node_modules:/app/node_modules:delegated
+    ports:
+      - "${TRAINING_SERVICE_PORT:-3002}:${TRAINING_SERVICE_PORT:-3002}"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+      - .env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: npm run start:dev:training-service
+    networks:
+      - dreamfitness-network
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dreamfitness-booking-service
+    volumes:
+      - ./apps:/app/apps:cached
+      - ./libs:/app/libs:cached
+      - ./node_modules:/app/node_modules:delegated
+    ports:
+      - "${BOOKING_SERVICE_PORT:-3003}:${BOOKING_SERVICE_PORT:-3003}"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+      - .env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: npm run start:dev:booking-service
+    networks:
+      - dreamfitness-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dreamfitness-notification-service
+    volumes:
+      - ./apps:/app/apps:cached
+      - ./libs:/app/libs:cached
+      - ./node_modules:/app/node_modules:delegated
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT:-3004}:${NOTIFICATION_SERVICE_PORT:-3004}"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+      - .env.development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: npm run start:dev:notification-service
+    networks:
+      - dreamfitness-network
+
+networks:
+  dreamfitness-network:
+    driver: bridge

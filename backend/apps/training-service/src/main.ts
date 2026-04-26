@@ -24,7 +24,7 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT || 3002;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Training Service is running on port ${port}`);
 }
 

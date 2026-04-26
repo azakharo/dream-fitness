@@ -1,0 +1,140 @@
+# Production override - extends docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  # ============================================
+  # Infrastructure (from docker-compose.yml)
+  # ============================================
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    restart: always
+
+  rabbitmq:
+    extends:
+      file: docker-compose.yml
+      service: rabbitmq
+    restart: always
+
+  # ============================================
+  # Application Services
+  # ============================================
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-api-gateway
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+      - .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+    command: node dist/apps/api-gateway/main.js
+    networks:
+      - dreamfitness-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-auth-service
+    ports:
+      - "${AUTH_SERVICE_PORT:-3001}:${AUTH_SERVICE_PORT:-3001}"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+      - .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+    command: node dist/apps/auth-service/main.js
+    networks:
+      - dreamfitness-network
+
+  training-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-training-service
+    ports:
+      - "${TRAINING_SERVICE_PORT:-3002}:${TRAINING_SERVICE_PORT:-3002}"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+      - .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+    command: node dist/apps/training-service/main.js
+    networks:
+      - dreamfitness-network
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-booking-service
+    ports:
+      - "${BOOKING_SERVICE_PORT:-3003}:${BOOKING_SERVICE_PORT:-3003}"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+      - .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+    command: node dist/apps/booking-service/main.js
+    networks:
+      - dreamfitness-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-notification-service
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT:-3004}:${NOTIFICATION_SERVICE_PORT:-3004}"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+      - .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+    command: node dist/apps/notification-service/main.js
+    networks:
+      - dreamfitness-network
+
+networks:
+  dreamfitness-network:
+    driver: bridge

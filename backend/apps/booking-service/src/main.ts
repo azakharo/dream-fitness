@@ -24,7 +24,7 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   const port = process.env.BOOKING_SERVICE_PORT || 3003;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Booking Service is running on port ${port}`);
 }
 void bootstrap();
