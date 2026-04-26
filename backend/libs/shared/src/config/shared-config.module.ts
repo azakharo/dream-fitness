@@ -7,8 +7,8 @@ import { BaseConfigService } from './base-config.service';
   imports: [
     NestConfigModule.forRoot({
       envFilePath: [
-        `.env`, // Base configuration (loaded first)
         `.env.${process.env.NODE_ENV || 'development'}`, // Environment-specific (overrides base)
+        `.env`, // Base configuration (fallback)
       ],
       isGlobal: true,
     }),
