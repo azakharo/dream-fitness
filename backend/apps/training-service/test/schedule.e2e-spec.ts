@@ -45,8 +45,10 @@ describe('ScheduleController (e2e)', () => {
       const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
 
+      const startDate = futureDate(1);
+
       const training1 = createTrainingDto(trainerId, {
-        scheduledAt: futureDate(1),
+        scheduledAt: startDate,
         title: 'Morning Yoga',
       });
       const training2 = createTrainingDto(trainerId, {
@@ -57,7 +59,7 @@ describe('ScheduleController (e2e)', () => {
       await trainingsHelper.create(headers, training1);
       await trainingsHelper.create(headers, training2);
 
-      const response = await scheduleHelper.getWeekSchedule(headers);
+      const response = await scheduleHelper.getWeekSchedule(headers, startDate);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('weekStart');
