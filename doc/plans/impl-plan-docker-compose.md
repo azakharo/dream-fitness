@@ -40,6 +40,42 @@
 
 ## Implementation Steps
 
+### Step 0: Update SharedConfigModule for Multiple Env Files
+
+**Problem:** Current `SharedConfigModule` loads only one env file (`.env.development` or `.env.production`). After splitting variables into `.env` and `.env.{environment}`, the base `.env` file won't be loaded.
+
+**File to update:** `backend/libs/shared/src/config/shared-config.module.ts`
+
+**Current code:**
+
+```typescript
+NestConfigModule.forRoot({
+  envFilePath: `.env.${process.env.NODE_ENV || "development"}`,
+  isGlobal: true,
+});
+```
+
+**Updated code:**
+
+```typescript
+NestConfigModule.forRoot({
+  envFilePath: [
+    `.env`, // Base configuration (loaded first)
+    `.env.${process.env.NODE_ENV || "development"}`, // Environment-specific (overrides base)
+  ],
+  isGlobal: true,
+});
+```
+
+**Why this works:**
+
+- NestJS ConfigModule supports array of file paths
+- Files are loaded in order, later files override earlier ones
+- Development commands (`npm run start:dev:*`) will load both `.env` and `.env.development`
+- Production Docker containers will load both `.env` and `.env.production`
+
+---
+
 ### Step 1: Create Environment Files Structure
 
 **Files to create:**
@@ -699,24 +735,26 @@ dreamfitness-notification-service | [Nest] LOG [InstanceLoader] NotificationModu
 
 ## Files Summary
 
-| File                      | Purpose                            |
-| ------------------------- | ---------------------------------- |
-| `.env`                    | Shared configuration (ports, URLs) |
-| `.env.development`        | Development-only settings          |
-| `.env.production`         | Production-only settings           |
-| `Dockerfile`              | Multi-stage production build       |
-| `Dockerfile.dev`          | Development build with hot-reload  |
-| `docker-compose.yml`      | Base infrastructure                |
-| `docker-compose.dev.yml`  | Development override               |
-| `docker-compose.prod.yml` | Production override                |
-| `.dockerignore`           | Exclude files from Docker build    |
+| File                                  | Purpose                            |
+| ------------------------------------- | ---------------------------------- |
+| `libs/shared/src/config/shared-config.module.ts` | Update to support multiple env files |
+| `.env`                                | Shared configuration (ports, URLs) |
+| `.env.development`                    | Development-only settings          |
+| `.env.production`                     | Production-only settings           |
+| `Dockerfile`                          | Multi-stage production build       |
+| `Dockerfile.dev`                      | Development build with hot-reload  |
+| `docker-compose.yml`                  | Base infrastructure                |
+| `docker-compose.dev.yml`              | Development override               |
+| `docker-compose.prod.yml`             | Production override                |
+| `.dockerignore`                       | Exclude files from Docker build    |
 
 ---
 
 ## Next Steps After Approval
 
-1. Create all configuration files
-2. Update `main.ts` files to listen on `0.0.0.0`
-3. Test development setup (`npm run docker:dev`)
-4. Test production build (`npm run docker:prod`)
-5. Update documentation
+1. **Update SharedConfigModule** to support multiple env files
+2. Create all configuration files (`.env`, `.env.development`, `.env.production`)
+3. Update `main.ts` files to listen on `0.0.0.0`
+4. Test development setup (`npm run docker:dev`)
+5. Test production build (`npm run docker:prod`)
+6. Update documentation
