@@ -68,8 +68,7 @@ services:
       rabbitmq:
         condition: service_healthy
     restart: always
-    entrypoint: ["sh", "/app/scripts/docker-entrypoint.sh"]
-    command: ["node", "dist/apps/auth-service/main.js"]
+    command: node dist/apps/auth-service/main.js
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
       interval: 10s
