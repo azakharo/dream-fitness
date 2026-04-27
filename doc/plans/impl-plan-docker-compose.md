@@ -7,7 +7,7 @@
 ## Current State
 
 - 5 NestJS сервисов в монорепозитории: api-gateway, auth-service, training-service, booking-service, notification-service
-- PostgreSQL и RabbitMQ запускаются через docker-compose.yml
+- PostgreSQL и RabbitMQ запускаются через docker-compose.base.yml
 - Каждый сервис запускается вручную в отдельном терминале
 
 ## Target State
@@ -251,21 +251,21 @@ CMD ["tail", "-f", "/dev/null"]
 **File: `backend/docker-compose.dev.yml`**
 
 ```yaml
-# Development override - extends docker-compose.yml
-# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Development override - extends docker-compose.base.yml
+# Usage: docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml up
 
 services:
   # ============================================
-  # Infrastructure (from docker-compose.yml)
+  # Infrastructure (from docker-compose.base.yml)
   # ============================================
   postgres:
     extends:
-      file: docker-compose.yml
+      file: docker-compose.base.yml
       service: postgres
 
   rabbitmq:
     extends:
-      file: docker-compose.yml
+      file: docker-compose.base.yml
       service: rabbitmq
 
   # ============================================
@@ -408,22 +408,22 @@ networks:
 **File: `backend/docker-compose.prod.yml`**
 
 ```yaml
-# Production override - extends docker-compose.yml
-# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Production override - extends docker-compose.base.yml
+# Usage: docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 
 services:
   # ============================================
-  # Infrastructure (from docker-compose.yml)
+  # Infrastructure (from docker-compose.base.yml)
   # ============================================
   postgres:
     extends:
-      file: docker-compose.yml
+      file: docker-compose.base.yml
       service: postgres
     restart: always
 
   rabbitmq:
     extends:
-      file: docker-compose.yml
+      file: docker-compose.base.yml
       service: rabbitmq
     restart: always
 
@@ -552,9 +552,9 @@ networks:
 
 ---
 
-### Step 5: Update docker-compose.yml
+### Step 5: Update docker-compose.base.yml
 
-**File: `backend/docker-compose.yml`** (update existing)
+**File: `backend/docker-compose.base.yml`** (update existing)
 
 ```yaml
 # Base infrastructure configuration
@@ -617,14 +617,14 @@ networks:
 ```json
 {
   "scripts": {
-    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
-    "docker:dev:build": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml build",
-    "docker:dev:down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
-    "docker:dev:logs": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f",
-    "docker:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
-    "docker:prod:build": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml build",
-    "docker:prod:down": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml down",
-    "docker:prod:logs": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f"
+    "docker:dev": "docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml up",
+    "docker:dev:build": "docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml build",
+    "docker:dev:down": "docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml down",
+    "docker:dev:logs": "docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml logs -f",
+    "docker:prod": "docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d",
+    "docker:prod:build": "docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml build",
+    "docker:prod:down": "docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml down",
+    "docker:prod:logs": "docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml logs -f"
   }
 }
 ```
@@ -682,7 +682,7 @@ npm run docker:dev
 npm run docker:dev:logs
 
 # View logs (specific service)
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f api-gateway
+docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml logs -f api-gateway
 
 # Stop all services
 npm run docker:dev:down
@@ -711,7 +711,7 @@ npm run docker:prod:down
 
 ```bash
 # Run migrations manually (production)
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec api-gateway npm run db:migrate
+docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml exec api-gateway npm run db:migrate
 
 # Or locally (if services not running)
 npm run db:migrate
@@ -735,18 +735,18 @@ dreamfitness-notification-service | [Nest] LOG [InstanceLoader] NotificationModu
 
 ## Files Summary
 
-| File                                  | Purpose                            |
-| ------------------------------------- | ---------------------------------- |
+| File                                             | Purpose                              |
+| ------------------------------------------------ | ------------------------------------ |
 | `libs/shared/src/config/shared-config.module.ts` | Update to support multiple env files |
-| `.env`                                | Shared configuration (ports, URLs) |
-| `.env.development`                    | Development-only settings          |
-| `.env.production`                     | Production-only settings           |
-| `Dockerfile`                          | Multi-stage production build       |
-| `Dockerfile.dev`                      | Development build with hot-reload  |
-| `docker-compose.yml`                  | Base infrastructure                |
-| `docker-compose.dev.yml`              | Development override               |
-| `docker-compose.prod.yml`             | Production override                |
-| `.dockerignore`                       | Exclude files from Docker build    |
+| `.env`                                           | Shared configuration (ports, URLs)   |
+| `.env.development`                               | Development-only settings            |
+| `.env.production`                                | Production-only settings             |
+| `Dockerfile`                                     | Multi-stage production build         |
+| `Dockerfile.dev`                                 | Development build with hot-reload    |
+| `docker-compose.base.yml`                        | Base infrastructure                  |
+| `docker-compose.dev.yml`                         | Development override                 |
+| `docker-compose.prod.yml`                        | Production override                  |
+| `.dockerignore`                                  | Exclude files from Docker build      |
 
 ---
 

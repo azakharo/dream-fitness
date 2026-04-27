@@ -25,7 +25,7 @@
 - **Фреймворк:** NestJS с TypeScript
 - **ORM:** TypeORM с PostgreSQL
 - **Конфигурация:** `nest-cli.json`, `tsconfig.json`, eslint, prettier
-- **Docker:** `docker-compose.yml` для локальной разработки
+- **Docker:** `docker-compose.base.yml` для локальной разработки
 - **Структура:** Базовые файлы в `/src` (app.module.ts, main.ts)
 - **База данных:** data-source.ts для миграций, seed скрипты
 
@@ -67,7 +67,7 @@
 
 ### 1.3. Database Infrastructure
 
-- [ ] Обновить `docker-compose.yml` для PostgreSQL + RabbitMQ
+- [ ] Обновить `docker-compose.base.yml` для PostgreSQL + RabbitMQ
 - [ ] Настроить TypeORM data source для monorepo
 - [ ] Создать базовую миграцию для всех таблиц
 

@@ -1,19 +1,19 @@
-# Production override - extends docker-compose.yml
-# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Production override - extends docker-compose.base.yml
+# Usage: docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 
 services:
   # ============================================
-  # Infrastructure (from docker-compose.yml)
+  # Infrastructure (from docker-compose.base.yml)
   # ============================================
   postgres:
     extends:
-      file: docker-compose.yml
+      file: docker-compose.base.yml
       service: postgres
     restart: always
 
   rabbitmq:
     extends:
-      file: docker-compose.yml
+      file: docker-compose.base.yml
       service: rabbitmq
     restart: always
 

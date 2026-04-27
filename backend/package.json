@@ -60,14 +60,14 @@
     "db:drop": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d src/data-source.ts",
     "db:seed": "ts-node -r tsconfig-paths/register src/database/run-seed.ts",
     "db:reset": "ts-node -r tsconfig-paths/register src/database/reset-db.ts",
-    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
-    "docker:dev:build": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml build",
-    "docker:dev:down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
-    "docker:dev:logs": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f",
-    "docker:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
-    "docker:prod:build": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml build",
-    "docker:prod:down": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml down",
-    "docker:prod:logs": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f"
+    "docker:dev": "docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml up",
+    "docker:dev:build": "docker-compose -f docker-compose.base.yml  -f docker-compose.dev.yml build",
+    "docker:dev:down": "docker-compose -f docker-compose.base.yml  -f docker-compose.dev.yml down",
+    "docker:dev:logs": "docker-compose -f docker-compose.base.yml  -f docker-compose.dev.yml logs -f",
+    "docker:prod": "docker-compose -f docker-compose.base.yml  -f docker-compose.prod.yml up -d",
+    "docker:prod:build": "docker-compose -f docker-compose.base.yml  -f docker-compose.prod.yml build",
+    "docker:prod:down": "docker-compose -f docker-compose.base.yml  -f docker-compose.prod.yml down",
+    "docker:prod:logs": "docker-compose -f docker-compose.base.yml  -f docker-compose.prod.yml logs -f"
   },
   "dependencies": {
     "@golevelup/nestjs-rabbitmq": "9.0.0",
