@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import type { Response } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,12 +13,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  // Health check endpoint
-  const httpAdapter = app.getHttpAdapter();
-  httpAdapter.get('/health', (_: unknown, res: Response) => {
-    res.json({ status: 'ok', service: 'training-service' });
-  });
 
   const config = new DocumentBuilder()
     .setTitle('Training Service API')

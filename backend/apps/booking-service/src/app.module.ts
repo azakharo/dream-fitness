@@ -7,6 +7,7 @@ import { BookingCqrsModule } from './cqrs/cqrs.module';
 import { ClientsModule } from './clients/clients.module';
 import { EventsModule } from './events/events.module';
 import { ConfigModule } from './config/config.module';
+import { HealthModule } from './health/health.module';
 import { HttpExceptionFilter, LoggingInterceptor } from '@app/shared';
 
 @Module({
@@ -19,6 +20,7 @@ import { HttpExceptionFilter, LoggingInterceptor } from '@app/shared';
     BookingsModule,
     WaitlistModule,
     BookingCqrsModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [

@@ -5,6 +5,7 @@ import { ConfigModule } from './config';
 import { AuthModule } from './auth/auth.module';
 import { ProxyModule } from './proxy/proxy.module';
 import { ProxyExceptionFilter } from './filters/proxy-exception.filter';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ProxyExceptionFilter } from './filters/proxy-exception.filter';
         limit: 100, // 100 requests per minute
       },
     ]),
+    HealthModule,
   ],
   providers: [
     {

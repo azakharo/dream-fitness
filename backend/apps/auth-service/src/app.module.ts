@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { BalanceModule } from './balance/balance.module';
 import { EventsModule } from './events/events.module';
 import { ConfigModule } from './config/config.module';
+import { HealthModule } from './health/health.module';
 import { HttpExceptionFilter } from '@app/shared';
 import { LoggingInterceptor } from '@app/shared';
 
@@ -18,6 +19,7 @@ import { LoggingInterceptor } from '@app/shared';
     UsersModule,
     BalanceModule,
     EventsModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [

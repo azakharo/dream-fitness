@@ -6,6 +6,7 @@ import { ConsumersModule } from './consumers';
 import { EventsModule } from './events';
 import { EmailModule } from './email/email.module';
 import { RabbitMQModule } from '@app/shared';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RabbitMQModule } from '@app/shared';
     ConsumersModule,
     EventsModule,
     EmailModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

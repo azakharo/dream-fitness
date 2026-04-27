@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import type { Response } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,12 +23,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-
-  // Health check endpoint
-  const httpAdapter = app.getHttpAdapter();
-  httpAdapter.get('/health', (_: unknown, res: Response) => {
-    res.json({ status: 'ok', service: 'notification-service' });
-  });
 
   const port = process.env.NOTIFICATION_SERVICE_PORT || 3004;
   await app.listen(port, '0.0.0.0');
