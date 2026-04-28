@@ -24,8 +24,11 @@ flowchart TD
     end
 
     M -->|depends on| DB
-    AG -->|depends on| M
     AS -->|depends on| M
+    TS -->|depends on| AS
+    BS -->|depends on| TS
+    NS -->|depends on| BS
+    AG -->|depends on| NS
 ```
 
 ### Implementation Steps
@@ -94,15 +97,6 @@ Add dependency on migration-runner for each service:
 services:
   # ... existing services ...
 
-  api-gateway:
-    # ... existing config ...
-    depends_on:
-      migration-runner:
-        condition: service_completed_successfully
-      notification-service:
-        condition: service_healthy
-    # ... rest of config ...
-
   auth-service:
     # ... existing config ...
     depends_on:
@@ -114,7 +108,9 @@ services:
         condition: service_healthy
     # ... rest of config ...
 
-  # ... similar for other services ...
+  # Other services (training-service, booking-service, notification-service, api-gateway)
+  # don't need direct dependency on migration-runner because they depend on auth-service
+  # (directly or transitively), which ensures migrations complete before they start.
 ```
 
 #### 4. Add npm scripts for production deployment (optional)
