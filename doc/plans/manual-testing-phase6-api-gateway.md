@@ -145,12 +145,7 @@ http POST http://localhost:3000/api/auth/login email="admin@dreamfitness.com" pa
 ```json
 {
   "accessToken": "...",
-  "refreshToken": "...",
-  "user": {
-    "id": "...",
-    "email": "admin@dreamfitness.com",
-    "role": "admin"
-  }
+  "refreshToken": "..."
 }
 ```
 

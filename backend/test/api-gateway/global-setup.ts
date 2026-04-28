@@ -1,22 +1,12 @@
 import type { APIRequestContext } from '@playwright/test';
+import {
+  LoginResponseBody,
+  UserDto,
+  TrainerResponseDto,
+  TrainingResponseDto,
+} from '@app/contracts';
 
 const BASE_URL = 'http://localhost:3000';
-
-interface LoginResponse {
-  accessToken: string;
-  user: {
-    id: string;
-    email: string;
-  };
-}
-
-interface TrainerResponse {
-  id: string;
-}
-
-interface TrainingResponse {
-  id: string;
-}
 
 interface DepositResponse {
   balance: number;
@@ -31,10 +21,20 @@ async function login(
     data: { email, password },
   });
 
-  const data = (await response.json()) as LoginResponse;
+  const data = (await response.json()) as LoginResponseBody;
+
+  // Get user ID from /api/auth/me endpoint
+  const meResponse = await request.get(`${BASE_URL}/api/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${data.accessToken}`,
+    },
+  });
+
+  const userData = (await meResponse.json()) as UserDto;
+
   return {
     token: data.accessToken,
-    userId: data.user.id,
+    userId: userData.id,
   };
 }
 
@@ -50,7 +50,7 @@ async function createTrainer(
     data: { name },
   });
 
-  const data = (await response.json()) as TrainerResponse;
+  const data = (await response.json()) as TrainerResponseDto;
   return data.id;
 }
 
@@ -75,7 +75,7 @@ async function createTraining(
     },
   });
 
-  const data = (await response.json()) as TrainingResponse;
+  const data = (await response.json()) as TrainingResponseDto;
   return data.id;
 }
 
