@@ -121,30 +121,6 @@ services:
       - dreamfitness-network
 ```
 
-#### 4. Update `backend/docker-compose.prod.yml`
-
-Add dependency on migration-runner for the auth service:
-
-```yaml
-services:
-  # ... existing services ...
-
-  auth-service:
-    # ... existing config ...
-    depends_on:
-      migration-runner:
-        condition: service_completed_successfully
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    # ... rest of config ...
-
-  # Other services (training-service, booking-service, notification-service, api-gateway)
-  # don't need direct dependency on migration-runner because they depend on auth-service
-  # (directly or transitively), which ensures migrations complete before they start.
-```
-
 #### 4. Add npm scripts for production deployment
 
 ```json
