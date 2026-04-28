@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-pattern */
 import { test, expect, APIRequestContext } from '@playwright/test';
 import { test as base } from '../fixtures/auth.fixture';
 
