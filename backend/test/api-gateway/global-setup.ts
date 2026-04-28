@@ -5,8 +5,7 @@ import {
   TrainerResponseDto,
   TrainingResponseDto,
 } from '@app/contracts';
-
-const BASE_URL = 'http://localhost:3000';
+import { TEST_CONFIG } from './test-config';
 
 interface DepositResponse {
   balance: number;
@@ -17,14 +16,14 @@ async function login(
   email: string,
   password: string,
 ): Promise<{ token: string; userId: string }> {
-  const response = await request.post(`${BASE_URL}/api/auth/login`, {
+  const response = await request.post(`${TEST_CONFIG.baseURL}/api/auth/login`, {
     data: { email, password },
   });
 
   const data = (await response.json()) as LoginResponseBody;
 
   // Get user ID from /api/auth/me endpoint
-  const meResponse = await request.get(`${BASE_URL}/api/auth/me`, {
+  const meResponse = await request.get(`${TEST_CONFIG.baseURL}/api/auth/me`, {
     headers: {
       Authorization: `Bearer ${data.accessToken}`,
     },
@@ -43,7 +42,7 @@ async function createTrainer(
   name: string,
   token: string,
 ): Promise<string> {
-  const response = await request.post(`${BASE_URL}/api/trainers`, {
+  const response = await request.post(`${TEST_CONFIG.baseURL}/api/trainers`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -62,7 +61,7 @@ async function createTraining(
   trainerId: string,
   token: string,
 ): Promise<string> {
-  const response = await request.post(`${BASE_URL}/api/trainings`, {
+  const response = await request.post(`${TEST_CONFIG.baseURL}/api/trainings`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -85,12 +84,15 @@ async function depositBalance(
   amount: number,
   adminToken: string,
 ): Promise<number> {
-  const response = await request.post(`${BASE_URL}/api/auth/balance/deposit`, {
-    headers: {
-      Authorization: `Bearer ${adminToken}`,
+  const response = await request.post(
+    `${TEST_CONFIG.baseURL}/api/auth/balance/deposit`,
+    {
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+      data: { userId, amount },
     },
-    data: { userId, amount },
-  });
+  );
 
   const data = (await response.json()) as DepositResponse;
   return data.balance;
@@ -102,7 +104,7 @@ export default async function globalSetup() {
   const playwright = pw.default;
 
   const request: APIRequestContext = await playwright.request.newContext({
-    baseURL: BASE_URL,
+    baseURL: TEST_CONFIG.baseURL,
   });
 
   // Login as admin

@@ -7,13 +7,13 @@ type BookingFixtures = {
 };
 
 export const bookingTest = base.extend<BookingFixtures>({
-  bookingId: async (_, use) => {
+  bookingId: async ({}, use) => {
     await use(process.env.BOOKING_ID || '');
   },
-  user2Id: async (_, use) => {
+  user2Id: async ({}, use) => {
     await use(process.env.USER2_ID || '');
   },
-  user2Token: async (_, use) => {
+  user2Token: async ({}, use) => {
     await use(process.env.USER2_TOKEN || '');
   },
 });

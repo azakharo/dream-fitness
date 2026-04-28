@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { TEST_CONFIG } from './test-config';
 
 export default defineConfig({
   testDir: './tests',
@@ -9,7 +10,7 @@ export default defineConfig({
   },
   reporter: [['html'], ['list']],
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: TEST_CONFIG.baseURL,
     extraHTTPHeaders: {
       'Content-Type': 'application/json',
     },

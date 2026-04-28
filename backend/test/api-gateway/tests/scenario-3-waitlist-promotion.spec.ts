@@ -7,10 +7,10 @@ type WaitlistFixtures = {
 };
 
 const testWaitlist = base.extend<WaitlistFixtures>({
-  user2Token: async (_, use) => {
+  user2Token: async ({}, use) => {
     await use(process.env.USER2_TOKEN || '');
   },
-  user2Id: async (_, use) => {
+  user2Id: async ({}, use) => {
     await use(process.env.USER2_ID || '');
   },
 });
@@ -20,13 +20,13 @@ const testWithTraining = testWaitlist.extend<{
   trainingId1: string;
   trainingId2: string;
 }>({
-  trainerId: async (_, use) => {
+  trainerId: async ({}, use) => {
     await use(process.env.TRAINER_ID || '');
   },
-  trainingId1: async (_, use) => {
+  trainingId1: async ({}, use) => {
     await use(process.env.TRAINING_ID_1 || '');
   },
-  trainingId2: async (_, use) => {
+  trainingId2: async ({}, use) => {
     await use(process.env.TRAINING_ID_2 || '');
   },
 });
