@@ -18,7 +18,7 @@ FROM base AS development
 COPY . .
 
 # Build all services
-RUN npm run build:all
+RUN npm run build
 
 # Default command (overridden by docker-compose)
 CMD ["npm", "run", "start:dev:api-gateway"]
