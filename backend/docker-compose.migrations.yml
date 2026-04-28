@@ -21,7 +21,3 @@ services:
         condition: service_healthy
     networks:
       - dreamfitness-network
-
-networks:
-  dreamfitness-network:
-    external: true
