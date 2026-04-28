@@ -1,7 +1,7 @@
 /* eslint-disable no-empty-pattern */
 import { test as base } from '@playwright/test';
 
-type BookingFixtures = {
+export type BookingFixtures = {
   bookingId: string;
   user2Id: string;
   user2Token: string;

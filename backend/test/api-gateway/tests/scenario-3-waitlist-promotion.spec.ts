@@ -1,26 +1,22 @@
 /* eslint-disable no-empty-pattern */
 import { test, expect, APIRequestContext } from '@playwright/test';
 import { test as base } from '../fixtures/auth.fixture';
+import { BookingFixtures } from '../fixtures/booking.fixture';
+import { TrainingFixtures } from '../fixtures/training.fixture';
 
-type WaitlistFixtures = {
-  user2Token: string;
-  user2Id: string;
-};
+type WaitlistFixtures = Pick<BookingFixtures, 'user2Token' | 'user2Id'>;
+type TrainingPick = Pick<
+  TrainingFixtures,
+  'trainerId' | 'trainingId1' | 'trainingId2'
+>;
 
-const testWaitlist = base.extend<WaitlistFixtures>({
+const testWithTraining = base.extend<WaitlistFixtures & TrainingPick>({
   user2Token: async ({}, use) => {
     await use(process.env.USER2_TOKEN || '');
   },
   user2Id: async ({}, use) => {
     await use(process.env.USER2_ID || '');
   },
-});
-
-const testWithTraining = testWaitlist.extend<{
-  trainerId: string;
-  trainingId1: string;
-  trainingId2: string;
-}>({
   trainerId: async ({}, use) => {
     await use(process.env.TRAINER_ID || '');
   },

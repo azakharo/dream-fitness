@@ -1,12 +1,13 @@
 /* eslint-disable no-empty-pattern */
-import { test, expect, APIRequestContext } from '@playwright/test';
+import { expect, APIRequestContext } from '@playwright/test';
 import { test as base } from '../fixtures/auth.fixture';
+import type { BookingFixtures } from '../fixtures/booking.fixture';
 
-type CancellationFixtures = {
-  bookingId: string;
-};
+// Re-export fixtures from auth.fixture for direct usage
+export const { test } = { test: base };
 
-const testCancellation = base.extend<CancellationFixtures>({
+// Chain the fixtures: base (auth) -> booking
+const testCancellation = base.extend<Pick<BookingFixtures, 'bookingId'>>({
   bookingId: async ({}, use) => {
     await use(process.env.BOOKING_ID || '');
   },
