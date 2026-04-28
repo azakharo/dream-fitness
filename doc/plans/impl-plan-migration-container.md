@@ -33,7 +33,35 @@ flowchart TD
 
 ### Implementation Steps
 
-#### 1. Create `backend/Dockerfile.migrations`
+#### 1. Create `backend/scripts/migration-entrypoint.sh`
+
+This entrypoint script handles automatic and manual modes based on environment variables.
+
+```bash
+#!/bin/sh
+set -e
+
+echo "Migration Runner started"
+echo "RUN_MIGRATIONS=${RUN_MIGRATIONS:-false}"
+echo "RUN_SEED=${RUN_SEED:-false}"
+
+# Automatic mode: run migrations if enabled
+if [ "$RUN_MIGRATIONS" = "true" ]; then
+    echo "Running migrations..."
+    npm run db:migrate
+fi
+
+# Automatic mode: run seed if enabled
+if [ "$RUN_SEED" = "true" ]; then
+    echo "Running seed..."
+    npm run db:seed
+fi
+
+# Container exits after completing automatic tasks
+# For manual mode, the command is passed via docker-compose run
+```
+
+#### 2. Create `backend/Dockerfile.migrations`
 
 ```dockerfile
 # Dockerfile for migration runner
@@ -51,21 +79,26 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Copy entrypoint script
+COPY scripts/migration-entrypoint.sh /app/scripts/migration-entrypoint.sh
+RUN chmod +x /app/scripts/migration-entrypoint.sh
+
 # Set environment
 ENV NODE_ENV=production
 
 # Build the application (generates dist/ for apps)
 RUN npm run build
 
-# Default command - can be overridden
-CMD ["npm", "run", "db:migrate"]
+# Use entrypoint script - handles automatic mode based on env vars
+# For manual mode, pass command as argument: docker-compose run migration-runner npm run db:migrate:revert
+ENTRYPOINT ["sh", "/app/scripts/migration-entrypoint.sh"]
 ```
 
-#### 2. Create `backend/docker-compose.migrations.yml`
+#### 3. Create `backend/docker-compose.migrations.yml`
 
 ```yaml
 # Migration runner service
-# Usage: docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run migration-runner
+# Supports automatic and manual modes via RUN_MIGRATIONS and RUN_SEED environment variables
 
 services:
   migration-runner:
@@ -75,6 +108,8 @@ services:
     container_name: dreamfitness-migration-runner
     environment:
       - NODE_ENV=production
+      - RUN_MIGRATIONS=${RUN_MIGRATIONS:-false}
+      - RUN_SEED=${RUN_SEED:-false}
     env_file:
       - .env
       - .env.production
@@ -84,14 +119,11 @@ services:
         condition: service_healthy
     networks:
       - dreamfitness-network
-    # Run migrations and seed, then exit
-    command: >
-      sh -c "npm run db:migrate && npm run db:seed"
 ```
 
-#### 3. Update `backend/docker-compose.prod.yml`
+#### 4. Update `backend/docker-compose.prod.yml`
 
-Add dependency on migration-runner for each service:
+Add dependency on migration-runner for the auth service:
 
 ```yaml
 services:
@@ -113,15 +145,30 @@ services:
   # (directly or transitively), which ensures migrations complete before they start.
 ```
 
-#### 4. Add npm scripts for production deployment (optional)
+#### 4. Add npm scripts for production deployment
 
 ```json
 {
   "scripts": {
-    "docker:prod:migrate": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner"
+    "docker:migrate:auto": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner",
+    "docker:migrate:manual": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate",
+    "docker:seed:manual": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:seed",
+    "docker:migrate:revert": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert"
   }
 }
 ```
+
+---
+
+## Usage Scenarios
+
+| Scenario             | RUN_MIGRATIONS | RUN_SEED | Command                         |
+| -------------------- | -------------- | -------- | ------------------------------- |
+| Auto: migrate + seed | true           | true     | `npm run docker:migrate:auto`   |
+| Auto: migrate only   | true           | false    | Set env vars and run container  |
+| Manual: migrate      | false          | false    | `npm run docker:migrate:manual` |
+| Manual: seed         | false          | false    | `npm run docker:seed:manual`    |
+| Manual: revert       | false          | false    | `npm run docker:migrate:revert` |
 
 ---
 
@@ -129,34 +176,51 @@ services:
 
 ### Option A: Automatic Migration (Recommended for Development)
 
-Migrations run automatically before services start:
+Set environment variables and run migrations automatically:
 
 ```bash
-# Start all services (migrations run automatically)
+# Set environment variables in .env.production or pass via command line
+export RUN_MIGRATIONS=true
+export RUN_SEED=true
+
+# Run migrations and seed automatically
+docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner
+
+# Start services
 docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 ```
 
 ### Option B: Manual Migration (Recommended for Production)
 
-Run migrations separately before deploying services:
+Run migrations manually with explicit control:
 
 ```bash
-# Step 1: Run migrations
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner
+# Step 1: Run migrations manually
+npm run docker:migrate:manual
 
-# Step 2: Start services
+# Step 2: Run seed manually (optional)
+npm run docker:seed:manual
+
+# Step 3: Start services
 docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 ```
 
-### Option C: CI/CD Pipeline
+### Option C: Revert Migrations (Manual Only)
+
+```bash
+# Revert last migration
+npm run docker:migrate:revert
+```
+
+### Option D: CI/CD Pipeline
 
 ```yaml
 # Example GitLab CI/CD
 deploy:
   stage: deploy
   script:
-    # Run migrations
-    - docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner
+    # Run migrations automatically
+    - docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
     # Start services
     - docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 ```
@@ -182,8 +246,14 @@ deploy:
 # Build migration container
 docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml build
 
-# Run migrations
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner
+# Test automatic mode (migrate + seed)
+docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
+
+# Test manual mode (migrate only)
+docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate
+
+# Test manual mode (revert)
+docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert
 
 # Check logs
 docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml logs migration-runner
@@ -192,8 +262,8 @@ docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml logs 
 ### Test Full Production Stack
 
 ```bash
-# Run migrations first
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner
+# Run migrations automatically
+npm run docker:migrate:auto
 
 # Start services
 docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
