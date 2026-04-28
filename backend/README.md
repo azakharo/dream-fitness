@@ -102,16 +102,3 @@ npm run test:e2e
 E2E tests start a real NestJS application, connect to the test database (`dreamfitness_test`), and execute HTTP requests via `supertest`. RabbitMQ is mocked automatically — no live connection needed.
 
 > E2E tests clean the database before each test (`TRUNCATE`), so the database remains empty after the test run.
-
-#### Available NPM Scripts
-
-| Script                    | Description                          |
-| ------------------------- | ------------------------------------ |
-| `npm test`                | Run all tests                        |
-| `npm run test:watch`      | Run unit tests in watch mode         |
-| `npm run test:cov`        | Run unit tests with coverage report  |
-| `npm run test:setup`      | Create test DB + run migrations      |
-| `npm run test:db:create`  | Create `dreamfitness_test` database  |
-| `npm run test:db:migrate` | Run migrations against test database |
-| `npm run test:db:seed`    | Seed test database with fixture data |
-| `npm run test:e2e`        | Run E2E tests                        |
