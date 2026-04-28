@@ -1,35 +1,23 @@
-/* eslint-disable no-empty-pattern */
 import { expect, APIRequestContext } from '@playwright/test';
-import { test as base } from '../fixtures/auth.fixture';
-import type { BookingFixtures } from '../fixtures/booking.fixture';
+import { bookingTest } from '../fixtures/booking.fixture';
 
-// Re-export fixtures from auth.fixture for direct usage
-export const { test } = { test: base };
-
-// Chain the fixtures: base (auth) -> booking
-const testCancellation = base.extend<Pick<BookingFixtures, 'bookingId'>>({
-  bookingId: async ({}, use) => {
-    await use(process.env.BOOKING_ID || '');
-  },
-});
-
-testCancellation.describe('Scenario 2: Training Cancellation', () => {
+bookingTest.describe('Scenario 2: Training Cancellation', () => {
   let request: APIRequestContext;
   let baseURL: string;
 
-  test.beforeAll(async ({ playwright }) => {
+  bookingTest.beforeAll(async ({ playwright }) => {
     request = await playwright.request.newContext({
       baseURL: process.env.API_BASE_URL || 'http://localhost:3000',
     });
     baseURL = process.env.API_BASE_URL || 'http://localhost:3000';
   });
 
-  test.afterAll(async () => {
+  bookingTest.afterAll(async () => {
     await request.dispose();
   });
 
   // Step 22 - should cancel booking successfully
-  testCancellation(
+  bookingTest(
     'should cancel booking successfully',
     async ({ userToken, bookingId }) => {
       const response = await request.post(
@@ -53,7 +41,7 @@ testCancellation.describe('Scenario 2: Training Cancellation', () => {
   );
 
   // Step 23 - should reject re-cancellation
-  testCancellation(
+  bookingTest(
     'should reject re-cancellation',
     async ({ userToken, bookingId }) => {
       const response = await request.post(
@@ -73,7 +61,7 @@ testCancellation.describe('Scenario 2: Training Cancellation', () => {
   );
 
   // Step 24 - should reject non-existent booking
-  testCancellation(
+  bookingTest(
     'should reject non-existent booking',
     async ({ userToken }) => {
       const nonExistentBookingId = '00000000-0000-0000-0000-000000000000';

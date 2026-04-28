@@ -1,48 +1,23 @@
-/* eslint-disable no-empty-pattern */
 import { expect, APIRequestContext } from '@playwright/test';
-import { test as base } from '../fixtures/auth.fixture';
-import type { BookingFixtures } from '../fixtures/booking.fixture';
-import type { TrainingFixtures } from '../fixtures/training.fixture';
+import { trainingTest } from '../fixtures/training.fixture';
 
-// Re-export fixtures from auth.fixture for direct usage
-export const { test } = { test: base };
-
-// Chain the fixtures: base (auth) -> booking -> training
-const bookingWorkflowTest = base
-  .extend<Pick<BookingFixtures, 'bookingId'>>({
-    bookingId: async ({}, use) => {
-      await use(process.env.BOOKING_ID || '');
-    },
-  })
-  .extend<Pick<TrainingFixtures, 'trainerId' | 'trainingId1' | 'trainingId2'>>({
-    trainerId: async ({}, use) => {
-      await use(process.env.TRAINER_ID || '');
-    },
-    trainingId1: async ({}, use) => {
-      await use(process.env.TRAINING_ID_1 || '');
-    },
-    trainingId2: async ({}, use) => {
-      await use(process.env.TRAINING_ID_2 || '');
-    },
-  });
-
-bookingWorkflowTest.describe('Scenario 1: Booking Workflow', () => {
+trainingTest.describe('Scenario 1: Booking Workflow', () => {
   let request: APIRequestContext;
   let baseURL: string;
 
-  test.beforeAll(async ({ playwright }) => {
+  trainingTest.beforeAll(async ({ playwright }) => {
     request = await playwright.request.newContext({
       baseURL: process.env.API_BASE_URL || 'http://localhost:3000',
     });
     baseURL = process.env.API_BASE_URL || 'http://localhost:3000';
   });
 
-  test.afterAll(async () => {
+  trainingTest.afterAll(async () => {
     await request.dispose();
   });
 
   // Step 16 - should create booking successfully
-  bookingWorkflowTest(
+  trainingTest(
     'should create booking successfully',
     async ({ userToken, trainingId1 }) => {
       const response = await request.post(`${baseURL}/api/bookings`, {
@@ -71,28 +46,25 @@ bookingWorkflowTest.describe('Scenario 1: Booking Workflow', () => {
   );
 
   // Step 17 - should return user bookings list
-  bookingWorkflowTest(
-    'should return user bookings list',
-    async ({ userToken }) => {
-      const response = await request.get(`${baseURL}/api/bookings`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
+  trainingTest('should return user bookings list', async ({ userToken }) => {
+    const response = await request.get(`${baseURL}/api/bookings`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
 
-      expect(response.status()).toBe(200);
+    expect(response.status()).toBe(200);
 
-      const responseBody = (await response.json()) as {
-        bookings: Array<{ id: string }>;
-      };
-      expect(responseBody).toHaveProperty('bookings');
-      expect(Array.isArray(responseBody.bookings)).toBe(true);
-      expect(responseBody.bookings.length).toBeGreaterThan(0);
-    },
-  );
+    const responseBody = (await response.json()) as {
+      bookings: Array<{ id: string }>;
+    };
+    expect(responseBody).toHaveProperty('bookings');
+    expect(Array.isArray(responseBody.bookings)).toBe(true);
+    expect(responseBody.bookings.length).toBeGreaterThan(0);
+  });
 
   // Step 18 - should return booking by ID
-  bookingWorkflowTest(
+  trainingTest(
     'should return booking by ID',
     async ({ userToken, bookingId }) => {
       const response = await request.get(
@@ -118,7 +90,7 @@ bookingWorkflowTest.describe('Scenario 1: Booking Workflow', () => {
   );
 
   // Step 19 - should reject duplicate booking
-  bookingWorkflowTest(
+  trainingTest(
     'should reject duplicate booking',
     async ({ userToken, trainingId1 }) => {
       const response = await request.post(`${baseURL}/api/bookings`, {
@@ -138,7 +110,7 @@ bookingWorkflowTest.describe('Scenario 1: Booking Workflow', () => {
   );
 
   // Step 20 - should reject non-existent training
-  bookingWorkflowTest(
+  trainingTest(
     'should reject non-existent training',
     async ({ userToken }) => {
       const nonExistentTrainingId = '00000000-0000-0000-0000-000000000000';
@@ -158,7 +130,7 @@ bookingWorkflowTest.describe('Scenario 1: Booking Workflow', () => {
   );
 
   // Step 21 - should reject request without token
-  bookingWorkflowTest(
+  trainingTest(
     'should reject request without token',
     async ({ trainingId1 }) => {
       const response = await request.post(`${baseURL}/api/bookings`, {

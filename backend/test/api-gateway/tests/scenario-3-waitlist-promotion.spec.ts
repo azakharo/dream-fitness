@@ -1,34 +1,7 @@
-/* eslint-disable no-empty-pattern */
 import { test, expect, APIRequestContext } from '@playwright/test';
-import { test as base } from '../fixtures/auth.fixture';
-import { BookingFixtures } from '../fixtures/booking.fixture';
-import { TrainingFixtures } from '../fixtures/training.fixture';
+import { trainingTest } from '../fixtures/training.fixture';
 
-type WaitlistFixtures = Pick<BookingFixtures, 'user2Token' | 'user2Id'>;
-type TrainingPick = Pick<
-  TrainingFixtures,
-  'trainerId' | 'trainingId1' | 'trainingId2'
->;
-
-const testWithTraining = base.extend<WaitlistFixtures & TrainingPick>({
-  user2Token: async ({}, use) => {
-    await use(process.env.USER2_TOKEN || '');
-  },
-  user2Id: async ({}, use) => {
-    await use(process.env.USER2_ID || '');
-  },
-  trainerId: async ({}, use) => {
-    await use(process.env.TRAINER_ID || '');
-  },
-  trainingId1: async ({}, use) => {
-    await use(process.env.TRAINING_ID_1 || '');
-  },
-  trainingId2: async ({}, use) => {
-    await use(process.env.TRAINING_ID_2 || '');
-  },
-});
-
-testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
+trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
   let request: APIRequestContext;
   let baseURL: string;
 
@@ -44,7 +17,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   });
 
   // Step 25 - should fill training with capacity 1
-  testWithTraining(
+  trainingTest(
     'should fill training with capacity 1',
     async ({ userToken, trainingId1 }) => {
       const response = await request.post(`${baseURL}/api/bookings`, {
@@ -73,7 +46,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   );
 
   // Step 26 - should create second user
-  testWithTraining('should create second user', async () => {
+  trainingTest('should create second user', async () => {
     const uniqueEmail = `user2_${Date.now()}@example.com`;
 
     const response = await request.post(`${baseURL}/api/auth/register`, {
@@ -103,7 +76,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   });
 
   // Step 27 - should deposit balance to user2
-  testWithTraining(
+  trainingTest(
     'should deposit balance to user2',
     async ({ adminToken, user2Id }) => {
       const response = await request.post(
@@ -129,7 +102,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   );
 
   // Step 28 - should reject booking full training
-  testWithTraining(
+  trainingTest(
     'should reject booking full training',
     async ({ user2Token, trainingId1 }) => {
       const response = await request.post(`${baseURL}/api/bookings`, {
@@ -149,7 +122,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   );
 
   // Step 29 - should join waitlist
-  testWithTraining(
+  trainingTest(
     'should join waitlist',
     async ({ user2Token, trainingId1 }) => {
       const response = await request.post(`${baseURL}/api/waitlist`, {
@@ -177,7 +150,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   );
 
   // Step 30 - should return waitlist position
-  testWithTraining(
+  trainingTest(
     'should return waitlist position',
     async ({ user2Token, trainingId1 }) => {
       const response = await request.get(
@@ -201,7 +174,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   );
 
   // Step 31 - should promote from waitlist on cancel
-  testWithTraining(
+  trainingTest(
     'should promote from waitlist on cancel',
     async ({ userToken, user2Token, trainingId1 }) => {
       // First, cancel the booking from Step 25

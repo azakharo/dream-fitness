@@ -1,5 +1,5 @@
 /* eslint-disable no-empty-pattern */
-import { test as base } from '@playwright/test';
+import { bookingTest } from './booking.fixture';
 
 export type TrainingFixtures = {
   trainerId: string;
@@ -7,7 +7,7 @@ export type TrainingFixtures = {
   trainingId2: string; // capacity=10
 };
 
-export const trainingTest = base.extend<TrainingFixtures>({
+export const trainingTest = bookingTest.extend<TrainingFixtures>({
   trainerId: async ({}, use) => {
     await use(process.env.TRAINER_ID || '');
   },

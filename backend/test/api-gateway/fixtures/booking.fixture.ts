@@ -1,5 +1,5 @@
 /* eslint-disable no-empty-pattern */
-import { test as base } from '@playwright/test';
+import { test } from './auth.fixture';
 
 export type BookingFixtures = {
   bookingId: string;
@@ -7,7 +7,7 @@ export type BookingFixtures = {
   user2Token: string;
 };
 
-export const bookingTest = base.extend<BookingFixtures>({
+export const bookingTest = test.extend<BookingFixtures>({
   bookingId: async ({}, use) => {
     await use(process.env.BOOKING_ID || '');
   },
