@@ -126,10 +126,10 @@ services:
 ```json
 {
   "scripts": {
-    "docker:migrate:auto": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner",
-    "docker:migrate:manual": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate",
-    "docker:seed:manual": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:seed",
-    "docker:migrate:revert": "docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert"
+    "docker:migrate:auto": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner",
+    "docker:migrate:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate",
+    "docker:seed:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:seed",
+    "docker:migrate:revert": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert"
   }
 }
 ```
@@ -160,10 +160,10 @@ export RUN_MIGRATIONS=true
 export RUN_SEED=true
 
 # Run migrations and seed automatically
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner
 
 # Start services
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 ```
 
 ### Option B: Manual Migration (Recommended for Production)
@@ -178,7 +178,7 @@ npm run docker:migrate:manual
 npm run docker:seed:manual
 
 # Step 3: Start services
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 ```
 
 ### Option C: Revert Migrations (Manual Only)
@@ -196,9 +196,9 @@ deploy:
   stage: deploy
   script:
     # Run migrations automatically
-    - docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
+    - docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
     # Start services
-    - docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
+    - docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 ```
 
 ---
@@ -220,19 +220,19 @@ deploy:
 
 ```bash
 # Build migration container
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml build
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml build
 
 # Test automatic mode (migrate + seed)
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
 
 # Test manual mode (migrate only)
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate
 
 # Test manual mode (revert)
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert
 
 # Check logs
-docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml logs migration-runner
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml logs migration-runner
 ```
 
 ### Test Full Production Stack
@@ -242,8 +242,8 @@ docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml logs 
 npm run docker:migrate:auto
 
 # Start services
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up -d
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.prod.yml up -d
 
 # Check service health
-docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml ps
+docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.prod.yml ps
 ```
