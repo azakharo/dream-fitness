@@ -4,6 +4,11 @@
 
 Backend starter which uses Nest.js, TypeORM, Postgres.
 
+## Основные документы по проекту
+
+- `../doc/ADR.md`
+- `../doc/PRD.md`
+
 ## Технологический стек
 
 - [TypeScript](https://www.typescriptlang.org/)
@@ -15,14 +20,12 @@ Backend starter which uses Nest.js, TypeORM, Postgres.
 ## Основные npm команды
 
 - Установка зависимостей: `npm install`
-- Разработка: `npm run start:dev`
 - Проверка кода на наличие ошибок Typescript: `npm run ts`
 - Линтинг и автоформатирование кода: `npm run lint`
 
 ## npm команды для запуска тестов
 
-- unit тесты: `npm test`
-- e2e тесты: `npm run test:e2e:auth`
+- `npm test`
 
 ## Правила по работе с кодом
 
