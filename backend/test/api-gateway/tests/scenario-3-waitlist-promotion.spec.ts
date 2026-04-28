@@ -122,32 +122,29 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
   );
 
   // Step 29 - should join waitlist
-  trainingTest(
-    'should join waitlist',
-    async ({ user2Token, trainingId1 }) => {
-      const response = await request.post(`${baseURL}/api/waitlist`, {
-        headers: {
-          Authorization: `Bearer ${user2Token}`,
-        },
-        data: {
-          trainingId: trainingId1,
-        },
-      });
+  trainingTest('should join waitlist', async ({ user2Token, trainingId1 }) => {
+    const response = await request.post(`${baseURL}/api/waitlist`, {
+      headers: {
+        Authorization: `Bearer ${user2Token}`,
+      },
+      data: {
+        trainingId: trainingId1,
+      },
+    });
 
-      expect(response.status()).toBe(201);
+    expect(response.status()).toBe(201);
 
-      const responseBody = (await response.json()) as {
-        id: string;
-        trainingId: string;
-        userId: string;
-        position: number;
-      };
-      expect(responseBody).toHaveProperty('id');
-      expect(responseBody).toHaveProperty('trainingId', trainingId1);
-      expect(responseBody).toHaveProperty('userId');
-      expect(responseBody).toHaveProperty('position');
-    },
-  );
+    const responseBody = (await response.json()) as {
+      id: string;
+      trainingId: string;
+      userId: string;
+      position: number;
+    };
+    expect(responseBody).toHaveProperty('id');
+    expect(responseBody).toHaveProperty('trainingId', trainingId1);
+    expect(responseBody).toHaveProperty('userId');
+    expect(responseBody).toHaveProperty('position');
+  });
 
   // Step 30 - should return waitlist position
   trainingTest(

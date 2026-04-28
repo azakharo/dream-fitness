@@ -61,24 +61,21 @@ bookingTest.describe('Scenario 2: Training Cancellation', () => {
   );
 
   // Step 24 - should reject non-existent booking
-  bookingTest(
-    'should reject non-existent booking',
-    async ({ userToken }) => {
-      const nonExistentBookingId = '00000000-0000-0000-0000-000000000000';
+  bookingTest('should reject non-existent booking', async ({ userToken }) => {
+    const nonExistentBookingId = '00000000-0000-0000-0000-000000000000';
 
-      const response = await request.post(
-        `${baseURL}/api/bookings/${nonExistentBookingId}/cancel`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+    const response = await request.post(
+      `${baseURL}/api/bookings/${nonExistentBookingId}/cancel`,
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-      );
+      },
+    );
 
-      expect(response.status()).toBe(404);
+    expect(response.status()).toBe(404);
 
-      const responseBody = (await response.json()) as { message: string };
-      expect(responseBody).toHaveProperty('message');
-    },
-  );
+    const responseBody = (await response.json()) as { message: string };
+    expect(responseBody).toHaveProperty('message');
+  });
 });

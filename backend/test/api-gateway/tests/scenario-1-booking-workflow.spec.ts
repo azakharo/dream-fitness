@@ -110,24 +110,21 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
   );
 
   // Step 20 - should reject non-existent training
-  trainingTest(
-    'should reject non-existent training',
-    async ({ userToken }) => {
-      const nonExistentTrainingId = '00000000-0000-0000-0000-000000000000';
+  trainingTest('should reject non-existent training', async ({ userToken }) => {
+    const nonExistentTrainingId = '00000000-0000-0000-0000-000000000000';
 
-      const response = await request.post(`${baseURL}/api/bookings`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-        data: {
-          trainingId: nonExistentTrainingId,
-        },
-      });
+    const response = await request.post(`${baseURL}/api/bookings`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+      data: {
+        trainingId: nonExistentTrainingId,
+      },
+    });
 
-      // Expect 404 or 503 depending on the service response
-      expect([404, 503]).toContain(response.status());
-    },
-  );
+    // Expect 404 or 503 depending on the service response
+    expect([404, 503]).toContain(response.status());
+  });
 
   // Step 21 - should reject request without token
   trainingTest(
