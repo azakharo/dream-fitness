@@ -1,4 +1,4 @@
-import { request } from 'httpie';
+import type { APIRequestContext } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -23,43 +23,49 @@ interface DepositResponse {
 }
 
 async function login(
+  request: APIRequestContext,
   email: string,
   password: string,
 ): Promise<{ token: string; userId: string }> {
-  const response = await request(`${BASE_URL}/api/auth/login`, {
-    method: 'POST',
+  const response = await request.post(`${BASE_URL}/api/auth/login`, {
     data: { email, password },
   });
 
-  const data = response.data as LoginResponse;
+  const data = (await response.json()) as LoginResponse;
   return {
     token: data.accessToken,
     userId: data.user.id,
   };
 }
 
-async function createTrainer(name: string, token: string): Promise<string> {
-  const response = await request(`${BASE_URL}/api/trainers`, {
-    method: 'POST',
-    data: { name },
+async function createTrainer(
+  request: APIRequestContext,
+  name: string,
+  token: string,
+): Promise<string> {
+  const response = await request.post(`${BASE_URL}/api/trainers`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    data: { name },
   });
 
-  const data = response.data as TrainerResponse;
+  const data = (await response.json()) as TrainerResponse;
   return data.id;
 }
 
 async function createTraining(
+  request: APIRequestContext,
   name: string,
   capacity: number,
   price: number,
   trainerId: string,
   token: string,
 ): Promise<string> {
-  const response = await request(`${BASE_URL}/api/trainings`, {
-    method: 'POST',
+  const response = await request.post(`${BASE_URL}/api/trainings`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     data: {
       name,
       capacity,
@@ -67,70 +73,80 @@ async function createTraining(
       trainerId,
       description: `Test training: ${name}`,
     },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
 
-  const data = response.data as TrainingResponse;
+  const data = (await response.json()) as TrainingResponse;
   return data.id;
 }
 
 async function depositBalance(
+  request: APIRequestContext,
   userId: string,
   amount: number,
-  token: string,
+  adminToken: string,
 ): Promise<number> {
-  const response = await request(`${BASE_URL}/api/auth/balance/deposit`, {
-    method: 'POST',
-    data: { userId, amount },
+  const response = await request.post(`${BASE_URL}/api/auth/balance/deposit`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${adminToken}`,
     },
+    data: { userId, amount },
   });
 
-  const data = response.data as DepositResponse;
+  const data = (await response.json()) as DepositResponse;
   return data.balance;
 }
 
 export default async function globalSetup() {
+  // Dynamic import of playwright to avoid issues in global setup
+  const pw = await import('playwright');
+  const playwright = pw.default;
+
+  const request: APIRequestContext = await playwright.request.newContext({
+    baseURL: BASE_URL,
+  });
+
   // Login as admin
-  const admin = await login('admin@dreamfitness.com', 'admin123');
+  const admin = await login(request, 'admin@dreamfitness.com', 'admin123');
   process.env.ADMIN_TOKEN = admin.token;
   process.env.ADMIN_USER_ID = admin.userId;
 
   // Login as test user
-  const testUser = await login('test@example.com', 'test12345');
+  const testUser = await login(request, 'test@example.com', 'test12345');
   process.env.TEST_USER_TOKEN = testUser.token;
   process.env.TEST_USER_ID = testUser.userId;
 
   // Create a trainer
-  const trainerId = await createTrainer('Test Trainer', admin.token);
+  const trainerId = await createTrainer(request, 'Test Trainer', admin.token);
   process.env.TRAINER_ID = trainerId;
 
   // Create Training 1: capacity=1, price=500
   const training1Id = await createTraining(
+    request,
     'Test Training 1',
     1,
     500,
     trainerId,
     admin.token,
   );
-  process.env.TRAINING_1_ID = training1Id;
+  process.env.TRAINING_ID_1 = training1Id;
 
   // Create Training 2: capacity=10, price=300
   const training2Id = await createTraining(
+    request,
     'Test Training 2',
     10,
     300,
     trainerId,
     admin.token,
   );
-  process.env.TRAINING_2_ID = training2Id;
+  process.env.TRAINING_ID_2 = training2Id;
 
-  // Deposit balance 5000 to test user
-  await depositBalance(testUser.userId, 5000, admin.token);
+  // Deposit balance 5000 to test user (admin does this)
+  await depositBalance(request, testUser.userId, 5000, admin.token);
   process.env.TEST_USER_BALANCE = '5000';
+
+  // Clean up
+  await request.dispose();
 
   console.log('Global setup completed successfully');
 }

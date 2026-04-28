@@ -12,13 +12,13 @@ export const test = base.extend<AuthFixtures>({
     await use(process.env.ADMIN_TOKEN || '');
   },
   userToken: async ({}, use) => {
-    await use(process.env.USER_TOKEN || '');
+    await use(process.env.TEST_USER_TOKEN || '');
   },
   userId: async ({}, use) => {
-    await use(process.env.USER_ID || '');
+    await use(process.env.TEST_USER_ID || '');
   },
   adminId: async ({}, use) => {
-    await use(process.env.ADMIN_ID || '');
+    await use(process.env.ADMIN_USER_ID || '');
   },
 });
 

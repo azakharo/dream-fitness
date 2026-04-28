@@ -108,14 +108,15 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   // Step 27 - should deposit balance to user2
   testWithTraining(
     'should deposit balance to user2',
-    async ({ user2Token }) => {
+    async ({ adminToken, user2Id }) => {
       const response = await request.post(
         `${baseURL}/api/auth/balance/deposit`,
         {
           headers: {
-            Authorization: `Bearer ${user2Token}`,
+            Authorization: `Bearer ${adminToken}`,
           },
           data: {
+            userId: user2Id,
             amount: 5000,
           },
         },
@@ -183,7 +184,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
     'should return waitlist position',
     async ({ user2Token, trainingId1 }) => {
       const response = await request.get(
-        `${baseURL}/api/waitlist/${trainingId1}`,
+        `${baseURL}/api/waitlist/position?trainingId=${trainingId1}`,
         {
           headers: {
             Authorization: `Bearer ${user2Token}`,
@@ -209,8 +210,8 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
       // First, cancel the booking from Step 25
       const bookingId = process.env.BOOKING_ID_FILLED;
 
-      const cancelResponse = await request.delete(
-        `${baseURL}/api/bookings/${bookingId}`,
+      const cancelResponse = await request.post(
+        `${baseURL}/api/bookings/${bookingId}/cancel`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`,
