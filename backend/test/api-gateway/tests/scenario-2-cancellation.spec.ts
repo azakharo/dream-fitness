@@ -6,7 +6,7 @@ type CancellationFixtures = {
 };
 
 const testCancellation = base.extend<CancellationFixtures>({
-  bookingId: async ({}, use) => {
+  bookingId: async (_, use) => {
     await use(process.env.BOOKING_ID || '');
   },
 });

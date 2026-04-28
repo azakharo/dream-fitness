@@ -8,16 +8,16 @@ type AuthFixtures = {
 };
 
 export const test = base.extend<AuthFixtures>({
-  adminToken: async ({}, use) => {
+  adminToken: async (_, use) => {
     await use(process.env.ADMIN_TOKEN || '');
   },
-  userToken: async ({}, use) => {
+  userToken: async (_, use) => {
     await use(process.env.TEST_USER_TOKEN || '');
   },
-  userId: async ({}, use) => {
+  userId: async (_, use) => {
     await use(process.env.TEST_USER_ID || '');
   },
-  adminId: async ({}, use) => {
+  adminId: async (_, use) => {
     await use(process.env.ADMIN_USER_ID || '');
   },
 });

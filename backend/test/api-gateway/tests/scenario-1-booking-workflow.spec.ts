@@ -8,18 +8,18 @@ type BookingFixtures = {
 // Chain the fixtures: base (auth) -> bookingWorkflowTest
 const bookingWorkflowTest = base
   .extend<BookingFixtures>({
-    bookingId: async ({}, use) => {
+    bookingId: async (_, use) => {
       await use(process.env.BOOKING_ID || '');
     },
   })
   .extend<{ trainerId: string; trainingId1: string; trainingId2: string }>({
-    trainerId: async ({}, use) => {
+    trainerId: async (_, use) => {
       await use(process.env.TRAINER_ID || '');
     },
-    trainingId1: async ({}, use) => {
+    trainingId1: async (_, use) => {
       await use(process.env.TRAINING_ID_1 || '');
     },
-    trainingId2: async ({}, use) => {
+    trainingId2: async (_, use) => {
       await use(process.env.TRAINING_ID_2 || '');
     },
   });

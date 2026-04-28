@@ -7,13 +7,13 @@ type TrainingFixtures = {
 };
 
 export const trainingTest = base.extend<TrainingFixtures>({
-  trainerId: async ({}, use) => {
+  trainerId: async (_, use) => {
     await use(process.env.TRAINER_ID || '');
   },
-  trainingId1: async ({}, use) => {
+  trainingId1: async (_, use) => {
     await use(process.env.TRAINING_ID_1 || '');
   },
-  trainingId2: async ({}, use) => {
+  trainingId2: async (_, use) => {
     await use(process.env.TRAINING_ID_2 || '');
   },
 });

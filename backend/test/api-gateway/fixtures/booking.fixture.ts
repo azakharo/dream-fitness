@@ -1,4 +1,4 @@
-import { test as base } from "@playwright/test";
+import { test as base } from '@playwright/test';
 
 type BookingFixtures = {
   bookingId: string;
@@ -7,13 +7,13 @@ type BookingFixtures = {
 };
 
 export const bookingTest = base.extend<BookingFixtures>({
-  bookingId: async ({}, use) => {
-    await use(process.env.BOOKING_ID || "");
+  bookingId: async (_, use) => {
+    await use(process.env.BOOKING_ID || '');
   },
-  user2Id: async ({}, use) => {
-    await use(process.env.USER2_ID || "");
+  user2Id: async (_, use) => {
+    await use(process.env.USER2_ID || '');
   },
-  user2Token: async ({}, use) => {
-    await use(process.env.USER2_TOKEN || "");
+  user2Token: async (_, use) => {
+    await use(process.env.USER2_TOKEN || '');
   },
 });

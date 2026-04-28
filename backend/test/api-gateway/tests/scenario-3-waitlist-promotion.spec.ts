@@ -7,10 +7,10 @@ type WaitlistFixtures = {
 };
 
 const testWaitlist = base.extend<WaitlistFixtures>({
-  user2Token: async ({}, use) => {
+  user2Token: async (_, use) => {
     await use(process.env.USER2_TOKEN || '');
   },
-  user2Id: async ({}, use) => {
+  user2Id: async (_, use) => {
     await use(process.env.USER2_ID || '');
   },
 });
@@ -20,13 +20,13 @@ const testWithTraining = testWaitlist.extend<{
   trainingId1: string;
   trainingId2: string;
 }>({
-  trainerId: async ({}, use) => {
+  trainerId: async (_, use) => {
     await use(process.env.TRAINER_ID || '');
   },
-  trainingId1: async ({}, use) => {
+  trainingId1: async (_, use) => {
     await use(process.env.TRAINING_ID_1 || '');
   },
-  trainingId2: async ({}, use) => {
+  trainingId2: async (_, use) => {
     await use(process.env.TRAINING_ID_2 || '');
   },
 });
@@ -76,7 +76,7 @@ testWithTraining.describe('Scenario 3: Waitlist Promotion', () => {
   );
 
   // Step 26 - should create second user
-  testWithTraining('should create second user', async ({}) => {
+  testWithTraining('should create second user', async () => {
     const uniqueEmail = `user2_${Date.now()}@example.com`;
 
     const response = await request.post(`${baseURL}/api/auth/register`, {

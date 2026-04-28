@@ -1,19 +1,19 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: './tests',
   fullyParallel: false,
   timeout: 30000,
   expect: {
     timeout: 5000,
   },
-  reporter: [["html"], ["list"]],
+  reporter: [['html'], ['list']],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: 'http://localhost:3000',
     extraHTTPHeaders: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   },
-  globalSetup: require.resolve("./global-setup"),
-  globalTeardown: require.resolve("./global-teardown"),
+  globalSetup: require.resolve('./global-setup'),
+  globalTeardown: require.resolve('./global-teardown'),
 });
