@@ -13,6 +13,8 @@
     "build:api-gateway": "nest build api-gateway",
     "build": "nest build api-gateway && nest build auth-service && nest build training-service && nest build booking-service && nest build notification-service",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\" \"test/**/*.ts\"",
+    "start:dev:infra": "docker-compose --env-file .env --env-file .env.development -f docker-compose.base.yml up -d",
+    "stop:dev:infra": "docker-compose --env-file .env --env-file .env.development -f docker-compose.base.yml down",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

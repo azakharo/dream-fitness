@@ -1,7 +1,8 @@
-# Minimal backend starter which uses Nest, TypeORM, Postgres
+# DreamFitness backend
 
-Postgres runs in Docker container.
-The backend runs locally for development.
+## Prerequisites
+
+- Node.js (v24.x prefer)
 
 ## Install deps
 
@@ -9,17 +10,34 @@ The backend runs locally for development.
 $ npm install
 ```
 
-## Run Postgres
+## Development mode
+
+### Start dev infrastructure (Postgres and RabbitMQ)
 
 ```bash
-$ docker-compose up -d
+$ npm run start:dev:infra
 ```
 
-## Start dev server
+### Run migrations (if required)
 
 ```bash
-# watch mode
-$ npm run start:dev
+$ npm run migration:run
+```
+
+### Create users (if required)
+
+```bash
+$ npm run db:seed
+```
+
+## Start dev servers for the microservices in different consoles
+
+```bash
+npm run start:dev:auth-service
+npm run start:dev:training-service
+npm run start:dev:booking-service
+npm run start:dev:notification-service
+npm run start:dev:api-gateway
 ```
 
 API is available on:
@@ -28,12 +46,16 @@ API is available on:
 API documentation is available on:
 `http://localhost:3000/api/docs`
 
-## Shuting down
-
-First stop the dev server.
+### Stop dev infrastructure
 
 ```bash
-$ docker-compose down
+$ npm run start:dev:infra
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run start:dev:infra -- -v
 ```
 
 ## Other useful npm scripts
