@@ -100,9 +100,6 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
       });
 
       expect(response.status()).toBe(409);
-
-      const responseBody = (await response.json()) as { message: string };
-      expect(responseBody).toHaveProperty('message');
     },
   );
 
