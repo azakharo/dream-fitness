@@ -82,7 +82,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
     async ({ adminToken, user2Id, request }) => {
       const response = await depositBalance(request, user2Id, 5000, adminToken);
 
-      expect(response.status()).toBe(200);
+      expect(response.status()).toBe(201);
     },
   );
 
