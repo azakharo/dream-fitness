@@ -55,22 +55,31 @@ async function createTrainer(
 
 async function createTraining(
   request: APIRequestContext,
-  name: string,
+  title: string,
   capacity: number,
   price: number,
   trainerId: string,
   token: string,
 ): Promise<string> {
+  // Schedule training for tomorrow at 10:00 AM
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(10, 0, 0, 0);
+  const scheduledAt = tomorrow.toISOString();
+
   const response = await request.post(`${TEST_CONFIG.baseURL}/api/trainings`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     data: {
-      name,
+      title,
+      type: 'yoga',
+      scheduledAt,
+      durationMinutes: 60,
       capacity,
       price,
       trainerId,
-      description: `Test training: ${name}`,
+      description: `Test training: ${title}`,
     },
   });
 
@@ -132,7 +141,7 @@ export default async function globalSetup() {
   );
   process.env.TRAINING_ID_1 = training1Id;
 
-  // Create Training 2: capacity=10, price=300
+  // Create Training 2: capacity=10, price=300, different type
   const training2Id = await createTraining(
     request,
     'Test Training 2',

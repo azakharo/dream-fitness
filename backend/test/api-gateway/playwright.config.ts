@@ -8,7 +8,7 @@ export default defineConfig({
   expect: {
     timeout: 5000,
   },
-  reporter: [['html'], ['list']],
+  reporter: [['list']],
   use: {
     baseURL: TEST_CONFIG.baseURL,
     extraHTTPHeaders: {
