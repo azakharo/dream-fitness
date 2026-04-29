@@ -36,6 +36,8 @@
     "start:prod:notification-service": "node dist/apps/notification-service/main",
     "ts": "tsc --noEmit",
     "lint": "eslint \"{src,apps,libs,test,scripts}/**/*.ts\" --fix",
+    "start:test:infra": "docker-compose --env-file .env --env-file .env.test -f docker-compose.base.yml up -d",
+    "stop:test:infra": "docker-compose --env-file .env --env-file .env.test -f docker-compose.base.yml down",
     "test": "jest && npm run test:e2e",
     "test:unit": "jest",
     "test:watch": "jest --watch",

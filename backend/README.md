@@ -64,23 +64,20 @@ $ npm run start:dev:infra -- -v
 
 ### Running Tests Locally
 
-The project has two types of tests: **unit tests** (no database required) and **E2E tests** (require PostgreSQL).
+The project has **unit tests** (no database required) and **E2E tests** (require PostgreSQL and RabbitMQ).
 
 #### Prerequisites
 
 - Docker Desktop (for PostgreSQL)
 - Node.js dependencies installed (`npm install` in `backend/`)
 
-#### Step 1: Start Infrastructure
+#### Step 1: Start test infrastructure
 
 ```bash
-cd backend
-docker compose --env-file .env --env-file .env.test -f docker-compose.base.yml up -d
+npm run start:test:infra
 ```
 
-Wait until PostgreSQL is healthy (`docker compose ps` should show `healthy`).
-
-#### Step 2: Create Test Database and Run Migrations
+#### Step 2: Create test database, run migrations and create test users
 
 ```bash
 npm run test:setup
@@ -93,20 +90,26 @@ This command runs two scripts sequentially:
 
 > If the database already exists, the create script will report it and continue safely.
 
-#### Step 3: Run Unit Tests
+#### Step 3: Run tests
 
 ```bash
-npm test:unit
+npm test
 ```
 
 Unit tests mock all external dependencies (database, RabbitMQ, JWT) and do not require a running database.
 
-#### Step 4: Run E2E Tests
-
-```bash
-npm run test:e2e
-```
-
 E2E tests start a real NestJS application, connect to the test database (`dreamfitness_test`), and execute HTTP requests via `supertest`. RabbitMQ is mocked automatically — no live connection needed.
 
 > E2E tests clean the database before each test (`TRUNCATE`), so the database remains empty after the test run.
+
+### Step 4: Stop test infrastructure
+
+```bash
+$ npm run start:test:infra
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run start:test:infra -- -v
+```
