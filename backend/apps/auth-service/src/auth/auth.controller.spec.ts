@@ -5,7 +5,7 @@ import { RegisterDto } from '@app/contracts';
 import { LoginDto } from '@app/contracts';
 import { RefreshTokenDto } from '@app/contracts';
 import { LoginResponseBody } from '@app/contracts';
-import { UserGender } from '@app/shared';
+import { UserGender, InternalGuard } from '@app/shared';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -17,6 +17,10 @@ describe('AuthController', () => {
     logout: jest.fn(),
   };
 
+  const mockInternalGuard = {
+    canActivate: jest.fn().mockReturnValue(true),
+  };
+
   const mockTokens: LoginResponseBody = {
     accessToken: 'access-token',
     refreshToken: 'refresh-token',
@@ -26,7 +30,10 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [{ provide: AuthService, useValue: mockAuthService }],
-    }).compile();
+    })
+      .overrideGuard(InternalGuard)
+      .useValue(mockInternalGuard)
+      .compile();
 
     controller = module.get<AuthController>(AuthController);
   });

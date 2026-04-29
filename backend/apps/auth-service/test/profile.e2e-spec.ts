@@ -28,17 +28,19 @@ describe('UsersController (e2e)', () => {
   });
 
   describe('GET /auth/me', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
+    let userId: string;
     let userData: ReturnType<typeof createRegisterDto>;
 
     beforeEach(async () => {
       userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
+      userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
-    it('should return user profile with valid token', async () => {
-      const response = await profileHelper.getMe(accessToken);
+    it('should return user profile with valid headers', async () => {
+      const response = await profileHelper.getMe(headers);
 
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
@@ -47,46 +49,41 @@ describe('UsersController (e2e)', () => {
       expect(response.body.name).toBe(userData.name);
     });
 
-    it('should return 401 when no token is provided', async () => {
+    it('should return 400 when no internal headers are provided', async () => {
       const response = await appHelper.getRequest().get('/auth/me');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
-    it('should return 401 with expired token', async () => {
-      const expiredToken =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIiwiaWF0IjoxNzAwMDAwMDAwfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+    it('should return 400 when x-user-id has invalid format', async () => {
+      const invalidHeaders = {
+        'x-user-id': 'invalid',
+        'x-user-role': 'user',
+      };
 
       const response = await appHelper
         .getRequest()
         .get('/auth/me')
-        .set('Authorization', `Bearer ${expiredToken}`);
+        .set(invalidHeaders);
 
-      expect(response.status).toBe(401);
-    });
-
-    it('should return 401 with invalid token format', async () => {
-      const response = await appHelper
-        .getRequest()
-        .get('/auth/me')
-        .set('Authorization', 'Bearer invalid-token');
-
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
   describe('PATCH /auth/me', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
+    let userId: string;
     let userData: ReturnType<typeof createRegisterDto>;
 
     beforeEach(async () => {
       userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
+      userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
     it('should update name successfully', async () => {
-      const response = await profileHelper.updateMe(accessToken, {
+      const response = await profileHelper.updateMe(headers, {
         name: 'Updated Name',
       });
 
@@ -96,7 +93,7 @@ describe('UsersController (e2e)', () => {
     });
 
     it('should update phone successfully', async () => {
-      const response = await profileHelper.updateMe(accessToken, {
+      const response = await profileHelper.updateMe(headers, {
         phone: '+79001234567',
       });
 
@@ -105,7 +102,7 @@ describe('UsersController (e2e)', () => {
     });
 
     it('should update all fields at once', async () => {
-      const response = await profileHelper.updateMe(accessToken, {
+      const response = await profileHelper.updateMe(headers, {
         name: 'Full Name',
         phone: '+79001234567',
         birthDate: new Date('1990-01-01'),
@@ -119,20 +116,20 @@ describe('UsersController (e2e)', () => {
       expect(response.body.gender).toBe(UserGender.MALE);
     });
 
-    it('should return 401 when no token is provided', async () => {
+    it('should return 400 when no internal headers are provided', async () => {
       const response = await appHelper
         .getRequest()
         .patch('/auth/me')
         .send({ name: 'Updated Name' });
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
     it('should return 400 when gender is invalid', async () => {
       const response = await appHelper
         .getRequest()
         .patch('/auth/me')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .set(headers)
         .send({ gender: 'INVALID' as unknown as never });
 
       expect(response.status).toBe(400);
@@ -142,7 +139,7 @@ describe('UsersController (e2e)', () => {
       const response = await appHelper
         .getRequest()
         .patch('/auth/me')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .set(headers)
         .send({ birthDate: 'not-a-date' });
 
       expect(response.status).toBe(400);
@@ -152,7 +149,7 @@ describe('UsersController (e2e)', () => {
       const response = await appHelper
         .getRequest()
         .patch('/auth/me')
-        .set('Authorization', `Bearer ${accessToken}`)
+        .set(headers)
         .send({
           name: 'Updated Name',
           extraField: 'should-be-ignored',
@@ -162,7 +159,7 @@ describe('UsersController (e2e)', () => {
     });
 
     it('should return 200 with empty body (data unchanged)', async () => {
-      const response = await profileHelper.updateMe(accessToken, {});
+      const response = await profileHelper.updateMe(headers, {});
 
       expect(response.status).toBe(200);
       expect(response.body.name).toBe(userData.name);
@@ -171,16 +168,18 @@ describe('UsersController (e2e)', () => {
   });
 
   describe('GET /auth/balance', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
+    let userId: string;
 
     beforeEach(async () => {
       const userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
+      userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
-    it('should return user balance with valid token', async () => {
-      const response = await profileHelper.getBalance(accessToken);
+    it('should return user balance with valid headers', async () => {
+      const response = await profileHelper.getBalance(headers);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('balance');
@@ -189,14 +188,14 @@ describe('UsersController (e2e)', () => {
       expect(response.body.userId).toBeDefined();
     });
 
-    it('should return 401 when no token is provided', async () => {
+    it('should return 400 when no internal headers are provided', async () => {
       const response = await appHelper.getRequest().get('/auth/balance');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
     it('should return balance 0 for new user', async () => {
-      const response = await profileHelper.getBalance(accessToken);
+      const response = await profileHelper.getBalance(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.balance).toBe(0);

@@ -23,7 +23,7 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
   ) {}
 
   async execute(command: CancelBookingCommand) {
-    const { bookingId, userId, reason } = command;
+    const { bookingId, userId, userRole, reason } = command;
 
     const booking = await this.bookingRepository.findById(bookingId);
     if (!booking) {
@@ -42,7 +42,8 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
 
     const training = await this.trainingClientService.getTraining(
       booking.trainingId,
-      command.jwtToken,
+      userId,
+      userRole,
     );
     const trainingDate = new Date(training.scheduledAt);
     const now = new Date();
@@ -57,6 +58,7 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
     try {
       await this.authClientService.refundPoints(
         userId,
+        userRole,
         training.price,
         bookingId,
       );

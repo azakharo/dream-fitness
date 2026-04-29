@@ -15,11 +15,8 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard } from '@app/shared';
-import type { AuthenticatedUser } from '@app/shared';
+import { InternalGuard, InternalUser } from '@app/shared';
 import { NotificationsService } from './notifications.service';
 import {
   NotificationFilterDto,
@@ -31,10 +28,14 @@ import {
 import { NotificationFilter } from './repositories/notification.repository';
 import { AdminGuard } from '../auth/guards';
 
+interface AuthenticatedUser {
+  id: string;
+  role?: string;
+}
+
 @ApiTags('Notifications')
-@ApiBearerAuth()
 @Controller('notifications')
-@UseGuards(JwtAuthGuard)
+@UseGuards(InternalGuard)
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
@@ -43,7 +44,6 @@ export class NotificationsController {
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Create a notification (admin only)' })
   @ApiCreatedResponse({ type: NotificationResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async create(
     @Body() dto: CreateNotificationAdminDto,
   ): Promise<NotificationResponseDto> {
@@ -59,9 +59,8 @@ export class NotificationsController {
   @Get()
   @ApiOperation({ summary: 'Get user notifications with filters' })
   @ApiOkResponse({ type: NotificationListResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(
-    @CurrentUser() user: AuthenticatedUser,
+    @InternalUser() user: AuthenticatedUser,
     @Query() filters: NotificationFilterDto,
   ): Promise<NotificationListResponseDto> {
     const filter: NotificationFilter = {
@@ -76,9 +75,8 @@ export class NotificationsController {
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread notification count' })
   @ApiOkResponse({ type: UnreadCountResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getUnreadCount(
-    @CurrentUser() user: AuthenticatedUser,
+    @InternalUser() user: AuthenticatedUser,
   ): Promise<UnreadCountResponseDto> {
     return this.notificationsService.getUnreadCount(user.id);
   }
@@ -87,10 +85,9 @@ export class NotificationsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark notification as read' })
   @ApiOkResponse({ type: NotificationResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async markAsRead(
     @Param('id') id: string,
-    @CurrentUser() user: AuthenticatedUser,
+    @InternalUser() user: AuthenticatedUser,
   ): Promise<NotificationResponseDto> {
     return this.notificationsService.markAsRead(id, user.id);
   }
@@ -99,8 +96,7 @@ export class NotificationsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark all notifications as read' })
   @ApiOkResponse({ description: 'All notifications marked as read' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async markAllAsRead(@CurrentUser() user: AuthenticatedUser): Promise<void> {
+  async markAllAsRead(@InternalUser() user: AuthenticatedUser): Promise<void> {
     await this.notificationsService.markAllAsRead(user.id);
   }
 

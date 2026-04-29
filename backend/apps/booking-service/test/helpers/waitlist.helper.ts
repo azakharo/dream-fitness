@@ -12,33 +12,33 @@ export class WaitlistHelper {
 
   async joinWaitlist(
     trainingId: string,
-    token: string,
+    headers: Record<string, string>,
   ): Promise<TestResponse<WaitlistResponseDto>> {
     const response = await this.request
       .post('/waitlist')
-      .set('Authorization', `Bearer ${token}`)
+      .set(headers)
       .send({ trainingId });
     return response as unknown as TestResponse<WaitlistResponseDto>;
   }
 
   async getWaitlistPosition(
     trainingId: string,
-    token: string,
+    headers: Record<string, string>,
   ): Promise<TestResponse<WaitlistPositionResponseDto>> {
     const response = await this.request
       .get('/waitlist/position')
-      .set('Authorization', `Bearer ${token}`)
+      .set(headers)
       .query({ trainingId });
     return response as unknown as TestResponse<WaitlistPositionResponseDto>;
   }
 
   async leaveWaitlist(
     trainingId: string,
-    token: string,
+    headers: Record<string, string>,
   ): Promise<TestResponse<{ message: string }>> {
     const response = await this.request
       .delete('/waitlist')
-      .set('Authorization', `Bearer ${token}`)
+      .set(headers)
       .query({ trainingId });
     return response as unknown as TestResponse<{ message: string }>;
   }

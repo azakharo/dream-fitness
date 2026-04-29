@@ -1,12 +1,6 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { BaseExceptionFilter } from './base-exception.filter';
+import { HttpContext } from './interfaces/http-context.interface';
 
 interface ErrorResponse {
   statusCode: number;
@@ -20,67 +14,67 @@ interface ErrorResponse {
 /**
  * Global HTTP exception filter that standardizes error responses
  */
-@Catch()
-export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name);
+export class HttpExceptionFilter extends BaseExceptionFilter {
+  protected handleHttpException(
+    exception: HttpException,
+    context: HttpContext,
+  ): void {
+    const status = exception.getStatus();
+    const exceptionResponse = exception.getResponse();
 
-  catch(exception: unknown, host: ArgumentsHost): void {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
-
-    let status: number;
     let message: string;
     let error: string;
     let details: unknown;
 
-    if (exception instanceof HttpException) {
-      status = exception.getStatus();
-      const exceptionResponse = exception.getResponse();
-
-      if (typeof exceptionResponse === 'string') {
-        message = exceptionResponse;
-        error = exception.name;
-      } else if (
-        typeof exceptionResponse === 'object' &&
-        exceptionResponse !== null
-      ) {
-        const responseObj = exceptionResponse as Record<string, unknown>;
-        message = (responseObj.message as string) || exception.message;
-        error = (responseObj.error as string) || exception.name;
-        details = responseObj.details;
-      } else {
-        message = exception.message;
-        error = exception.name;
-      }
-    } else if (exception instanceof Error) {
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
-      message = 'Internal server error';
-      error = 'Internal Server Error';
-
-      // Log the actual error for debugging
-      this.logger.error(
-        `Internal error: ${exception.message}`,
-        exception.stack,
-      );
+    if (typeof exceptionResponse === 'string') {
+      message = exceptionResponse;
+      error = exception.name;
+    } else if (
+      typeof exceptionResponse === 'object' &&
+      exceptionResponse !== null
+    ) {
+      const responseObj = exceptionResponse as Record<string, unknown>;
+      message = (responseObj.message as string) || exception.message;
+      error = (responseObj.error as string) || exception.name;
+      details = responseObj.details;
     } else {
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
-      message = 'An unexpected error occurred';
-      error = 'Internal Server Error';
+      message = exception.message;
+      error = exception.name;
     }
 
+    this.sendErrorResponse(context, status, message, error, details);
+  }
+
+  protected handleUnknownError(exception: unknown, context: HttpContext): void {
+    const status = HttpStatus.INTERNAL_SERVER_ERROR;
+    const message =
+      exception instanceof Error
+        ? 'Internal server error'
+        : 'An unexpected error occurred';
+    const error = 'Internal Server Error';
+
+    this.sendErrorResponse(context, status, message, error);
+  }
+
+  private sendErrorResponse(
+    context: HttpContext,
+    status: number,
+    message: string,
+    error: string,
+    details?: unknown,
+  ): void {
     const errorResponse: ErrorResponse = {
       statusCode: status,
       message,
       error,
       timestamp: new Date().toISOString(),
-      path: request.url,
+      path: context.request.url,
     };
 
     if (details) {
       errorResponse.details = details;
     }
 
-    response.status(status).json(errorResponse);
+    context.response.status(status).json(errorResponse);
   }
 }

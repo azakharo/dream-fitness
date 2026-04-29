@@ -1,0 +1,23 @@
+# Migration Runner - Docker Compose configuration
+# Usage: docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml up
+# Or with automatic migrations: RUN_MIGRATIONS=true RUN_SEED=true docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml up
+
+services:
+  migration-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrations
+    container_name: dreamfitness-migration-runner
+    environment:
+      - NODE_ENV=production
+      - RUN_MIGRATIONS=${RUN_MIGRATIONS:-false}
+      - RUN_SEED=${RUN_SEED:-false}
+    env_file:
+      - .env
+      - .env.production
+      - .env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dreamfitness-network

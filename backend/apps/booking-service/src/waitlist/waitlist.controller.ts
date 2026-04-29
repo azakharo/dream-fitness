@@ -8,31 +8,26 @@ import {
   HttpCode,
   HttpStatus,
   Body,
-  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard } from '@app/shared';
+import { CurrentUser, InternalGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { WaitlistResponseDto } from './dto';
+import { WaitlistResponseDto, WaitlistQueryDto } from './dto';
 import { WaitlistPositionResponseDto } from './dto/waitlist-position-response.dto';
 import { JoinWaitlistDto } from '@app/contracts/booking';
 import { JoinWaitlistCommand, LeaveWaitlistCommand } from '../cqrs/commands';
 import { GetWaitlistPositionQuery } from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
-import type { Request as ExpressRequest } from 'express';
 
 @ApiTags('Waitlist')
-@ApiBearerAuth()
 @Controller('waitlist')
-@UseGuards(JwtAuthGuard)
+@UseGuards(InternalGuard)
 export class WaitlistController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -43,38 +38,29 @@ export class WaitlistController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Join waitlist for a training' })
   @ApiCreatedResponse({ type: WaitlistResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: JoinWaitlistDto })
   async join(
     @Body() dto: JoinWaitlistDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req: ExpressRequest,
   ): Promise<WaitlistResponseDto> {
     const result = await this.commandBus.execute<
       JoinWaitlistCommand,
       WaitlistResponseDto
-    >(
-      new JoinWaitlistCommand(
-        user.id,
-        dto.trainingId,
-        req.headers.authorization,
-      ),
-    );
+    >(new JoinWaitlistCommand(user.id, dto.trainingId, user.role));
     return result;
   }
 
   @Get('position')
   @ApiOperation({ summary: 'Get current waitlist position' })
   @ApiOkResponse({ type: WaitlistPositionResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getPosition(
-    @Query('trainingId') trainingId: string,
+    @Query() query: WaitlistQueryDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<WaitlistPositionResponseDto> {
     return this.queryBus.execute<
       GetWaitlistPositionQuery,
       WaitlistPositionResponseDto
-    >(new GetWaitlistPositionQuery(user.id, trainingId));
+    >(new GetWaitlistPositionQuery(user.id, query.trainingId));
   }
 
   @Delete()
@@ -84,13 +70,12 @@ export class WaitlistController {
     description: 'Removed from waitlist successfully',
     schema: { example: { message: 'Removed from waitlist' } },
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async leave(
-    @Query('trainingId') trainingId: string,
+    @Query() query: WaitlistQueryDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ message: string }> {
     await this.commandBus.execute<LeaveWaitlistCommand, void>(
-      new LeaveWaitlistCommand(user.id, trainingId),
+      new LeaveWaitlistCommand(user.id, query.trainingId),
     );
     return { message: 'Removed from waitlist' };
   }

@@ -2,6 +2,8 @@ import { CreateTrainerDto } from '../../src/trainers/dto/create-trainer.dto';
 import { CreateTrainingDto } from '../../src/trainings/dto/create-training.dto';
 import { TrainingType } from '@app/shared/enums';
 
+export const NON_EXISTENT_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+
 export function createTrainerDto(
   overrides?: Partial<CreateTrainerDto>,
 ): CreateTrainerDto {

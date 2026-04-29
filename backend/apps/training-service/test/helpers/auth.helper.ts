@@ -1,47 +1,14 @@
-import jwt from 'jsonwebtoken';
-import { UserRole } from '@app/shared/enums';
+const TEST_ADMIN_USER_ID = 'bbc6cae7-3308-4ee8-8176-231c6b9965a3';
 
 export class AuthHelper {
-  private readonly jwtSecret: string;
-
-  constructor() {
-    this.jwtSecret =
-      process.env.JWT_SECRET || 'test-jwt-secret-key-for-e2e-tests';
-  }
-
-  generateAdminToken(userId: string): string {
-    return jwt.sign(
-      {
-        sub: userId,
-        email: `admin-${userId}@test.com`,
-        role: UserRole.ADMIN,
-      },
-      this.jwtSecret,
-      { expiresIn: '15h' },
-    );
-  }
-
-  generateClientToken(userId: string): string {
-    return jwt.sign(
-      {
-        sub: userId,
-        email: `client-${userId}@test.com`,
-        role: UserRole.CLIENT,
-      },
-      this.jwtSecret,
-      { expiresIn: '15h' },
-    );
-  }
-
-  generateExpiredToken(userId: string): string {
-    return jwt.sign(
-      {
-        sub: userId,
-        email: `client-${userId}@test.com`,
-        role: UserRole.CLIENT,
-      },
-      this.jwtSecret,
-      { expiresIn: '0ms' },
-    );
+  /**
+   * Returns headers for authentication with role 'admin'
+   * Uses a default valid UUID if no userId is provided
+   */
+  getAdminHeaders(userId: string = TEST_ADMIN_USER_ID): Record<string, string> {
+    return {
+      'X-User-Id': userId,
+      'X-User-Role': 'admin',
+    };
   }
 }

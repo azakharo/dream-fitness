@@ -16,11 +16,9 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@app/shared';
+import { InternalGuard } from '@app/shared';
 import { TrainingsService } from './trainings.service';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UpdateTrainingDto } from './dto/update-training.dto';
@@ -34,11 +32,9 @@ export class TrainingsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Create a new training' })
   @ApiCreatedResponse({ type: TrainingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CreateTrainingDto })
   async create(
     @Body() createTrainingDto: CreateTrainingDto,
@@ -47,11 +43,9 @@ export class TrainingsController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Get list of trainings with filters' })
   @ApiOkResponse({ type: [TrainingResponseDto] })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(
     @Query() filterDto: TrainingFilterDto,
   ): Promise<{ data: TrainingResponseDto[]; total: number }> {
@@ -59,20 +53,18 @@ export class TrainingsController {
   }
 
   @Get(':id')
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Get training by ID' })
   @ApiOkResponse({ type: TrainingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne(@Param('id') id: string): Promise<TrainingResponseDto> {
     return this.trainingsService.findById(id);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Update training' })
   @ApiOkResponse({ type: TrainingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: UpdateTrainingDto })
   async update(
     @Param('id') id: string,
@@ -83,16 +75,15 @@ export class TrainingsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Cancel training' })
   @ApiOkResponse({ description: 'Training cancelled successfully' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.trainingsService.remove(id);
   }
 
   @Get(':id/availability')
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Check available slots for training' })
   @ApiOkResponse({
     schema: {
@@ -106,7 +97,6 @@ export class TrainingsController {
       },
     },
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getAvailability(@Param('id') id: string): Promise<{
     trainingId: string;
     capacity: number;

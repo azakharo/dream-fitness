@@ -1,0 +1,25 @@
+# Dockerfile for migration runner
+# This container has all dependencies and source files for running migrations
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies for ts-node)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Copy entrypoint script
+COPY scripts/migration-entrypoint.sh /app/scripts/migration-entrypoint.sh
+RUN chmod +x /app/scripts/migration-entrypoint.sh
+
+# Set environment
+ENV NODE_ENV=production
+
+# Use entrypoint script - handles automatic mode based on env vars
+# For manual mode, pass command as argument: docker-compose run migration-runner npm run db:migrate:revert
+ENTRYPOINT ["sh", "/app/scripts/migration-entrypoint.sh"]

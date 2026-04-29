@@ -15,19 +15,17 @@ export class ScheduleHelper {
 
   // Get weekly schedule (optionally pass date query param)
   async getWeekSchedule(
-    token: string,
+    headers: Record<string, string>,
     date?: string,
   ): Promise<TestResponse<WeekScheduleResponseDto>> {
     const url = date ? `/schedule/week?date=${date}` : '/schedule/week';
-    const response = await this.request
-      .get(url)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await this.request.get(url).set(headers);
     return response as unknown as TestResponse<WeekScheduleResponseDto>;
   }
 
   // Get trainer schedule (optionally pass dateFrom and dateTo query params)
   async getTrainerSchedule(
-    token: string,
+    headers: Record<string, string>,
     trainerId: string,
     dateFrom?: string,
     dateTo?: string,
@@ -38,9 +36,7 @@ export class ScheduleHelper {
     if (dateTo) params.push(`dateTo=${dateTo}`);
     if (params.length > 0) url += `?${params.join('&')}`;
 
-    const response = await this.request
-      .get(url)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await this.request.get(url).set(headers);
     return response as unknown as TestResponse<TrainerScheduleResponseDto>;
   }
 }

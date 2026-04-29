@@ -1,7 +1,8 @@
-# Minimal backend starter which uses Nest, TypeORM, Postgres
+# DreamFitness backend
 
-Postgres runs in Docker container.
-The backend runs locally for development.
+## Prerequisites
+
+- Node.js (v24.x prefer)
 
 ## Install deps
 
@@ -9,17 +10,34 @@ The backend runs locally for development.
 $ npm install
 ```
 
-## Run Postgres
+## Development mode
+
+### Start dev infrastructure (Postgres and RabbitMQ)
 
 ```bash
-$ docker-compose up -d
+$ npm run start:dev:infra
 ```
 
-## Start dev server
+### Run migrations (if required)
 
 ```bash
-# watch mode
-$ npm run start:dev
+$ npm run migration:run
+```
+
+### Create users (if required)
+
+```bash
+$ npm run db:seed
+```
+
+## Start dev servers for the microservices in different consoles
+
+```bash
+npm run start:dev:auth-service
+npm run start:dev:training-service
+npm run start:dev:booking-service
+npm run start:dev:notification-service
+npm run start:dev:api-gateway
 ```
 
 API is available on:
@@ -28,27 +46,17 @@ API is available on:
 API documentation is available on:
 `http://localhost:3000/api/docs`
 
-## Shuting down
-
-First stop the dev server.
+### Stop dev infrastructure
 
 ```bash
-$ docker-compose down
+$ npm run start:dev:infra
 ```
 
-## Other useful npm scripts
+If you want to clear the DB data, then run instead:
 
-- working with migrations: create, generate, show, run, revert
-- ts - run type-checking
-- lint - run eslint + prettier
-- db seed and reset (truncate all tables)
-
-## Configuring project
-
-- Change package name in package.json
-- Configure db access in `src/data-source.ts`
-- Modify `src/database/run-seed.ts` file to fill in the db with test data
-- Change container and db names in `docker-compose.yml`
+```bash
+$ npm run start:dev:infra -- -v
+```
 
 ---
 
@@ -56,23 +64,20 @@ $ docker-compose down
 
 ### Running Tests Locally
 
-The project has two types of tests: **unit tests** (no database required) and **E2E tests** (require PostgreSQL).
+The project has **unit tests** (no database required) and **E2E tests** (require PostgreSQL and RabbitMQ).
 
 #### Prerequisites
 
 - Docker Desktop (for PostgreSQL)
 - Node.js dependencies installed (`npm install` in `backend/`)
 
-#### Step 1: Start Infrastructure
+#### Step 1: Start test infrastructure
 
 ```bash
-cd backend
-docker compose up -d
+npm run start:test:infra
 ```
 
-Wait until PostgreSQL is healthy (`docker compose ps` should show `healthy`).
-
-#### Step 2: Create Test Database and Run Migrations
+#### Step 2: Create test database, run migrations and create test users
 
 ```bash
 npm run test:setup
@@ -85,7 +90,7 @@ This command runs two scripts sequentially:
 
 > If the database already exists, the create script will report it and continue safely.
 
-#### Step 3: Run Unit Tests
+#### Step 3: Run tests
 
 ```bash
 npm test
@@ -93,26 +98,111 @@ npm test
 
 Unit tests mock all external dependencies (database, RabbitMQ, JWT) and do not require a running database.
 
-#### Step 4: Run E2E Tests (Auth Service)
-
-```bash
-npm run test:e2e:auth
-```
-
 E2E tests start a real NestJS application, connect to the test database (`dreamfitness_test`), and execute HTTP requests via `supertest`. RabbitMQ is mocked automatically — no live connection needed.
 
 > E2E tests clean the database before each test (`TRUNCATE`), so the database remains empty after the test run.
 
-#### Available NPM Scripts
+### Step 4: Stop test infrastructure
 
-| Script                        | Description                              |
-| ----------------------------- | ---------------------------------------- |
-| `npm test`                    | Run all unit tests                       |
-| `npm run test:watch`          | Run unit tests in watch mode             |
-| `npm run test:cov`            | Run unit tests with coverage report      |
-| `npm run test:setup`          | Create test DB + run migrations          |
-| `npm run test:db:create`      | Create `dreamfitness_test` database      |
-| `npm run test:db:migrate`     | Run migrations against test database     |
-| `npm run test:db:seed`        | Seed test database with fixture data     |
-| `npm run test:e2e:auth`       | Run Auth Service E2E tests               |
-| `npm run test:e2e:auth:watch` | Run Auth Service E2E tests in watch mode |
+```bash
+$ npm run start:test:infra
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run start:test:infra -- -v
+```
+
+## Run in production mode
+
+### Set production environment
+
+For that edit `.env.production` file.
+
+### Available npm scripts
+
+- docker:prod - run all
+- docker:prod:build - build or rebuild the images (add ' -- --no-cache' for full rebuild)
+- docker:prod:down - stop all
+- docker:prod:logs - view logs
+- docker:migrate:auto - run migration and create test users
+- docker:migrate:manual - run migration manually depending on the value of RUN_MIGRATIONS environment variable.
+- docker:seed:manual - create the test users depending on the value of RUN_SEED environment variables
+- docker:migrate:revert - revert migrations.
+
+### Run migrations and create admin and test users
+
+```bash
+$ npm run docker:migrate:auto
+```
+
+### Start services
+
+```bash
+$ npm run docker:prod
+```
+
+API is available on:
+`http://localhost:3000`
+
+API documentation is available on:
+`http://localhost:3000/api/docs`
+
+### View logs
+
+You can view logs in a separate console window by the following command:
+
+```bash
+$ npm run docker:prod:logs
+```
+
+### Stop services
+
+```bash
+$ npm run docker:prod:down
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run docker:prod:down -- -v
+```
+
+---
+
+## Run integration tests
+
+Test the whole system making requests to the api gateway from the outside.
+
+### Run migrations and create admin and test users
+
+```bash
+$ npm run docker:migrate:auto
+```
+
+### Start services
+
+```bash
+$ npm run docker:prod
+```
+
+### Run tests
+
+```bash
+$ npm run test:api-gateway
+```
+
+### Stop services
+
+```bash
+$ npm run docker:prod:down
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run docker:prod:down -- -v
+```
+
+---

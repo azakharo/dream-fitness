@@ -28,6 +28,12 @@ export class LoggingInterceptor implements NestInterceptor {
         const { statusCode } = response;
         const contentLength = response.get('content-length');
 
+        // Skip logging for health check endpoints that return successful responses
+        const isHealthCheck = method === 'GET' && url === '/health';
+        if (isHealthCheck && statusCode >= 200 && statusCode < 400) {
+          return;
+        }
+
         this.logger.log(
           `${method} ${url} ${statusCode} ${contentLength || 0} - ${Date.now() - now}ms - ${ip} - ${userAgent}`,
         );

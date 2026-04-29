@@ -33,26 +33,26 @@ describe('BalanceController (e2e)', () => {
   });
 
   describe('POST /auth/balance/deposit', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
     let userId: string;
 
     beforeEach(async () => {
       const userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
       userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
     it('should increase balance after deposit', async () => {
       const depositResp = await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 500 }),
       );
       expect(depositResp.status).toBe(200);
       expect(depositResp.body.type).toBe('deposit');
       expect(depositResp.body.amount).toBe(500);
 
-      const balanceResp = await balanceHelper.getBalance(accessToken);
+      const balanceResp = await balanceHelper.getBalance(headers);
 
       expect(balanceResp.status).toBe(200);
       expect(balanceResp.body.balance).toBe(500);
@@ -60,7 +60,7 @@ describe('BalanceController (e2e)', () => {
 
     it('should return 400 when amount exceeds maximum', async () => {
       const response = await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 10001 }),
       );
 
@@ -69,7 +69,7 @@ describe('BalanceController (e2e)', () => {
 
     it('should return 400 when amount is negative', async () => {
       const response = await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: -100 }),
       );
 
@@ -78,7 +78,7 @@ describe('BalanceController (e2e)', () => {
 
     it('should return 400 when userId is not a valid UUID', async () => {
       const response = await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId: 'invalid-uuid', amount: 500 }),
       );
 
@@ -89,45 +89,49 @@ describe('BalanceController (e2e)', () => {
       // Expected
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const response = await balanceHelper.deposit(accessToken, undefined);
+      const response = await balanceHelper.deposit(headers, undefined);
 
       expect(response.status).toBe(400);
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when invalid token is provided', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
+        const invalidHeaders = {
+          'x-user-id': 'invalid',
+          'x-user-role': 'user',
+        };
         const response = await balanceHelper.deposit(
-          'invalid-token',
+          invalidHeaders,
           createDepositDto({
             userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
             amount: 500,
           }),
         );
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
 
   describe('POST /auth/balance/reserve', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
     let userId: string;
 
     beforeEach(async () => {
       const userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
       userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
     it('should decrease balance after reserve', async () => {
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 1000 }),
       );
 
       const reserveResp = await balanceHelper.reserve(
-        accessToken,
+        headers,
         createReserveDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -138,37 +142,20 @@ describe('BalanceController (e2e)', () => {
       expect(reserveResp.body.type).toBe('reserve');
       expect(reserveResp.body.amount).toBe(100);
 
-      const balanceResp = await balanceHelper.getBalance(accessToken);
+      const balanceResp = await balanceHelper.getBalance(headers);
 
       expect(balanceResp.status).toBe(200);
       expect(balanceResp.body.balance).toBe(900);
     });
 
-    it('should return 400 when balance is not specified', async () => {
-      const response = await balanceHelper.reserve(
-        accessToken,
-        createReserveDto({
-          userId,
-          bookingId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
-          amount: 100,
-        }),
-      );
-
-      expect(response.status).toBe(400);
-      // Expected
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(response.body.message).toContain('Insufficient balance');
-    });
-
-    it('should return 400 when reserve amount exceeds balance', async () => {
+    it('should return 409 when reserve amount exceeds balance', async () => {
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 100 }),
       );
 
       const response = await balanceHelper.reserve(
-        accessToken,
+        headers,
         createReserveDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -176,7 +163,7 @@ describe('BalanceController (e2e)', () => {
         }),
       );
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(409);
       // Expected
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -184,7 +171,7 @@ describe('BalanceController (e2e)', () => {
     });
 
     it('should return 400 when bookingId is missing', async () => {
-      const response = await balanceHelper.reserve(accessToken, {
+      const response = await balanceHelper.reserve(headers, {
         userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
         // Expected because the bookingId is missing
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -198,7 +185,7 @@ describe('BalanceController (e2e)', () => {
 
     it('should return 400 when bookingId is not a valid UUID', async () => {
       const response = await balanceHelper.reserve(
-        accessToken,
+        headers,
         createReserveDto({ userId, bookingId: 'invalid-uuid', amount: 100 }),
       );
 
@@ -206,9 +193,13 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when no token is provided', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
+        const invalidHeaders = {
+          'x-user-id': 'invalid',
+          'x-user-role': 'user',
+        };
         const response = await balanceHelper.reserve(
-          'invalid-token',
+          invalidHeaders,
           createReserveDto({
             userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
             bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -216,30 +207,30 @@ describe('BalanceController (e2e)', () => {
           }),
         );
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
 
   describe('POST /auth/balance/release', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
     let userId: string;
 
     beforeEach(async () => {
       const userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
       userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
     it('should increase balance after release', async () => {
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 1000 }),
       );
 
       await balanceHelper.reserve(
-        accessToken,
+        headers,
         createReserveDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -248,7 +239,7 @@ describe('BalanceController (e2e)', () => {
       );
 
       const releaseResp = await balanceHelper.release(
-        accessToken,
+        headers,
         createReleaseDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -259,7 +250,7 @@ describe('BalanceController (e2e)', () => {
       expect(releaseResp.body.type).toBe('release');
       expect(releaseResp.body.amount).toBe(100);
 
-      const balanceResp = await balanceHelper.getBalance(accessToken);
+      const balanceResp = await balanceHelper.getBalance(headers);
 
       expect(balanceResp.status).toBe(200);
       expect(balanceResp.body.balance).toBe(1000);
@@ -267,7 +258,7 @@ describe('BalanceController (e2e)', () => {
 
     it('should return 404 when release is for non-existent reserve', async () => {
       const response = await balanceHelper.release(
-        accessToken,
+        headers,
         createReleaseDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -280,7 +271,7 @@ describe('BalanceController (e2e)', () => {
 
     it('should return 400 when bookingId is not a valid UUID', async () => {
       const response = await balanceHelper.release(
-        accessToken,
+        headers,
         createReleaseDto({ userId, bookingId: 'invalid-uuid', amount: 100 }),
       );
 
@@ -288,9 +279,13 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when auth token is invalid', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
+        const invalidHeaders = {
+          'x-user-id': 'invalid',
+          'x-user-role': 'user',
+        };
         const response = await balanceHelper.release(
-          'invalid-token',
+          invalidHeaders,
           createReleaseDto({
             userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
             bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -298,30 +293,30 @@ describe('BalanceController (e2e)', () => {
           }),
         );
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
 
   describe('POST /auth/balance/refund', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
     let userId: string;
 
     beforeEach(async () => {
       const userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
       userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
     it('should increase balance after refund', async () => {
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 1000 }),
       );
 
       const refundResp = await balanceHelper.refund(
-        accessToken,
+        headers,
         createRefundDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -332,7 +327,7 @@ describe('BalanceController (e2e)', () => {
       expect(refundResp.body.type).toBe('refund');
       expect(refundResp.body.amount).toBe(100);
 
-      const balanceResp = await balanceHelper.getBalance(accessToken);
+      const balanceResp = await balanceHelper.getBalance(headers);
 
       expect(balanceResp.status).toBe(200);
       expect(balanceResp.body.balance).toBe(1100);
@@ -340,7 +335,7 @@ describe('BalanceController (e2e)', () => {
 
     it('should return 400 when refund amount is 0', async () => {
       const response = await balanceHelper.refund(
-        accessToken,
+        headers,
         createRefundDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -352,7 +347,7 @@ describe('BalanceController (e2e)', () => {
     });
 
     it('should return 400 when bookingId is missing', async () => {
-      const response = await balanceHelper.refund(accessToken, {
+      const response = await balanceHelper.refund(headers, {
         userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -364,9 +359,13 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when no token is invalid', async () => {
+      it('should return 400 when x-user-id has invalid format', async () => {
+        const invalidHeaders = {
+          'x-user-id': 'invalid',
+          'x-user-role': 'user',
+        };
         const response = await balanceHelper.refund(
-          'invalid-token',
+          invalidHeaders,
           createRefundDto({
             userId: 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
             bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -374,24 +373,24 @@ describe('BalanceController (e2e)', () => {
           }),
         );
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
 
   describe('GET /auth/transactions', () => {
-    let accessToken: string;
+    let headers: Record<string, string>;
     let userId: string;
 
     beforeEach(async () => {
       const userData = createRegisterDto();
       const auth = await authHelper.registerAndLoginFlat(userData);
-      accessToken = auth.accessToken;
       userId = auth.userId;
+      headers = authHelper.getUserHeaders(userId);
     });
 
     it('should return empty history for new user', async () => {
-      const response = await balanceHelper.getTransactions(accessToken);
+      const response = await balanceHelper.getTransactions(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.items).toEqual([]);
@@ -400,11 +399,11 @@ describe('BalanceController (e2e)', () => {
 
     it('should return history containing deposit transaction', async () => {
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 500 }),
       );
 
-      const response = await balanceHelper.getTransactions(accessToken);
+      const response = await balanceHelper.getTransactions(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.items.length).toBeGreaterThan(0);
@@ -414,16 +413,16 @@ describe('BalanceController (e2e)', () => {
 
     it('should return multiple transactions', async () => {
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 500 }),
       );
 
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 300 }),
       );
 
-      const response = await balanceHelper.getTransactions(accessToken);
+      const response = await balanceHelper.getTransactions(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.items.length).toBe(2);
@@ -432,16 +431,16 @@ describe('BalanceController (e2e)', () => {
 
     it('should support pagination', async () => {
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 500 }),
       );
 
       await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 300 }),
       );
 
-      const response = await balanceHelper.getTransactions(accessToken, {
+      const response = await balanceHelper.getTransactions(headers, {
         page: 1,
         limit: 1,
       });
@@ -454,10 +453,14 @@ describe('BalanceController (e2e)', () => {
     });
 
     describe('authentication errors', () => {
-      it('should return 401 when no token is provided', async () => {
-        const response = await balanceHelper.getTransactions('invalid-token');
+      it('should return 400 when x-user-id has invalid format', async () => {
+        const invalidHeaders = {
+          'x-user-id': 'invalid',
+          'x-user-role': 'user',
+        };
+        const response = await balanceHelper.getTransactions(invalidHeaders);
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(400);
       });
     });
   });
@@ -465,14 +468,13 @@ describe('BalanceController (e2e)', () => {
   describe('Full flow test', () => {
     it('should complete full balance flow: deposit → reserve → release', async () => {
       const userData = createRegisterDto();
-      const { accessToken, userId } =
-        await authHelper.registerAndLoginFlat(userData);
+      const { userId } = await authHelper.registerAndLoginFlat(userData);
+      const headers = authHelper.getUserHeaders(userId);
 
-      expect(accessToken).toBeDefined();
       expect(userId).toBeDefined();
 
       const response1 = await balanceHelper.deposit(
-        accessToken,
+        headers,
         createDepositDto({ userId, amount: 1000 }),
       );
 
@@ -480,13 +482,13 @@ describe('BalanceController (e2e)', () => {
       expect(response1.body.type).toBe('deposit');
       expect(response1.body.amount).toBe(1000);
 
-      const balanceResp1 = await balanceHelper.getBalance(accessToken);
+      const balanceResp1 = await balanceHelper.getBalance(headers);
 
       expect(balanceResp1.status).toBe(200);
       expect(balanceResp1.body.balance).toBe(1000);
 
       const reserveResp = await balanceHelper.reserve(
-        accessToken,
+        headers,
         createReserveDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -498,13 +500,13 @@ describe('BalanceController (e2e)', () => {
       expect(reserveResp.body.type).toBe('reserve');
       expect(reserveResp.body.amount).toBe(100);
 
-      const balanceResp2 = await balanceHelper.getBalance(accessToken);
+      const balanceResp2 = await balanceHelper.getBalance(headers);
 
       expect(balanceResp2.status).toBe(200);
       expect(balanceResp2.body.balance).toBe(900);
 
       const releaseResp = await balanceHelper.release(
-        accessToken,
+        headers,
         createReleaseDto({
           userId,
           bookingId: 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
@@ -516,13 +518,12 @@ describe('BalanceController (e2e)', () => {
       expect(releaseResp.body.type).toBe('release');
       expect(releaseResp.body.amount).toBe(100);
 
-      const balanceResp3 = await balanceHelper.getBalance(accessToken);
+      const balanceResp3 = await balanceHelper.getBalance(headers);
 
       expect(balanceResp3.status).toBe(200);
       expect(balanceResp3.body.balance).toBe(1000);
 
-      const transactionsResponse =
-        await balanceHelper.getTransactions(accessToken);
+      const transactionsResponse = await balanceHelper.getTransactions(headers);
 
       expect(transactionsResponse.status).toBe(200);
       expect(transactionsResponse.body.items.length).toBeGreaterThanOrEqual(3);

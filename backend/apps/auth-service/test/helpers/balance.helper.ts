@@ -12,58 +12,44 @@ export class BalanceHelper {
   constructor(private readonly request: request.SuperTest<request.Test>) {}
 
   deposit(
-    accessToken: string,
+    headers: Record<string, string>,
     dto: DepositDto,
   ): Promise<TestResponse<TransactionResponseDto>> {
-    return this.request
-      .post('/auth/balance/deposit')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(dto);
+    return this.request.post('/auth/balance/deposit').set(headers).send(dto);
   }
 
   reserve(
-    accessToken: string,
+    headers: Record<string, string>,
     dto: ReserveDto,
   ): Promise<TestResponse<TransactionResponseDto>> {
-    return this.request
-      .post('/auth/balance/reserve')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(dto);
+    return this.request.post('/auth/balance/reserve').set(headers).send(dto);
   }
 
   release(
-    accessToken: string,
+    headers: Record<string, string>,
     dto: ReleaseDto,
   ): Promise<TestResponse<TransactionResponseDto>> {
-    return this.request
-      .post('/auth/balance/release')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(dto);
+    return this.request.post('/auth/balance/release').set(headers).send(dto);
   }
 
   refund(
-    accessToken: string,
+    headers: Record<string, string>,
     dto: RefundDto,
   ): Promise<TestResponse<TransactionResponseDto>> {
-    return this.request
-      .post('/auth/balance/refund')
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send(dto);
+    return this.request.post('/auth/balance/refund').set(headers).send(dto);
   }
 
-  getBalance(accessToken: string): Promise<TestResponse<BalanceResponseDto>> {
-    return this.request
-      .get('/auth/balance')
-      .set('Authorization', `Bearer ${accessToken}`);
+  getBalance(
+    headers: Record<string, string>,
+  ): Promise<TestResponse<BalanceResponseDto>> {
+    return this.request.get('/auth/balance').set(headers);
   }
 
   getTransactions(
-    accessToken: string,
+    headers: Record<string, string>,
     query?: { page?: number; limit?: number },
   ): Promise<TestResponse<TransactionListResponseDto>> {
-    let req = this.request
-      .get('/auth/transactions')
-      .set('Authorization', `Bearer ${accessToken}`);
+    let req = this.request.get('/auth/transactions').set(headers);
 
     if (query) {
       const params = new URLSearchParams();

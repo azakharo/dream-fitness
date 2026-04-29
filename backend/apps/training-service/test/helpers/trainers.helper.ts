@@ -12,49 +12,48 @@ export class TrainersHelper {
   constructor(private request: request.SuperTest<request.Test>) {}
 
   async create(
-    token: string,
+    headers: Record<string, string>,
     data: CreateTrainerDto,
   ): Promise<TestResponse<TrainerResponseDto>> {
     const response = await this.request
       .post('/trainers')
-      .set('Authorization', `Bearer ${token}`)
+      .set(headers)
       .send(data);
     return response as unknown as TestResponse<TrainerResponseDto>;
   }
 
-  async findAll(token: string): Promise<TestResponse<TrainerResponseDto[]>> {
-    const response = await this.request
-      .get('/trainers')
-      .set('Authorization', `Bearer ${token}`);
+  async findAll(
+    headers: Record<string, string>,
+  ): Promise<TestResponse<TrainerResponseDto[]>> {
+    const response = await this.request.get('/trainers').set(headers);
     return response as unknown as TestResponse<TrainerResponseDto[]>;
   }
 
   async findById(
-    token: string,
+    headers: Record<string, string>,
     id: string,
   ): Promise<TestResponse<TrainerResponseDto>> {
-    const response = await this.request
-      .get(`/trainers/${id}`)
-      .set('Authorization', `Bearer ${token}`);
+    const response = await this.request.get(`/trainers/${id}`).set(headers);
     return response as unknown as TestResponse<TrainerResponseDto>;
   }
 
   async update(
-    token: string,
+    headers: Record<string, string>,
     id: string,
     data: UpdateTrainerDto,
   ): Promise<TestResponse<TrainerResponseDto>> {
     const response = await this.request
       .patch(`/trainers/${id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set(headers)
       .send(data);
     return response as unknown as TestResponse<TrainerResponseDto>;
   }
 
-  async remove(token: string, id: string): Promise<TestResponse<void>> {
-    const response = await this.request
-      .delete(`/trainers/${id}`)
-      .set('Authorization', `Bearer ${token}`);
+  async remove(
+    headers: Record<string, string>,
+    id: string,
+  ): Promise<TestResponse<void>> {
+    const response = await this.request.delete(`/trainers/${id}`).set(headers);
     return response as unknown as TestResponse<void>;
   }
 }

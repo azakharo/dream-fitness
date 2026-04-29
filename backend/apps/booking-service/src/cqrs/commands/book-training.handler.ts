@@ -22,7 +22,7 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
   ) {}
 
   async execute(command: BookTrainingCommand): Promise<Booking> {
-    const { userId, trainingId, jwtToken } = command;
+    const { userId, userRole, trainingId } = command;
 
     const existingBooking = await this.bookingRepository.findByUserAndTraining(
       userId,
@@ -34,7 +34,8 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
 
     const training = await this.trainingClientService.getTraining(
       trainingId,
-      jwtToken,
+      userId,
+      userRole,
     );
 
     const confirmedBookingsCount =
@@ -48,7 +49,12 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
     const bookingId = crypto.randomUUID();
     const price = training.price;
 
-    await this.authClientService.reservePoints(userId, price, bookingId);
+    await this.authClientService.reservePoints(
+      userId,
+      userRole,
+      price,
+      bookingId,
+    );
 
     const booking = this.bookingRepository.create({
       id: bookingId,
@@ -79,7 +85,12 @@ export class BookTrainingHandler implements ICommandHandler<BookTrainingCommand>
       );
       return savedBooking;
     } catch (error) {
-      await this.authClientService.releasePoints(userId, price, bookingId);
+      await this.authClientService.releasePoints(
+        userId,
+        userRole,
+        price,
+        bookingId,
+      );
       throw error;
     }
   }

@@ -15,11 +15,9 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@app/shared';
+import { InternalGuard } from '@app/shared';
 import { TrainersService } from './trainers.service';
 import { CreateTrainerDto } from './dto/create-trainer.dto';
 import { UpdateTrainerDto } from './dto/update-trainer.dto';
@@ -33,11 +31,9 @@ export class TrainersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Create a new trainer' })
   @ApiCreatedResponse({ type: TrainerResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CreateTrainerDto })
   async create(
     @Body() createTrainerDto: CreateTrainerDto,
@@ -46,21 +42,17 @@ export class TrainersController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Get list of active trainers' })
   @ApiOkResponse({ type: [TrainerResponseDto] })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(): Promise<TrainerResponseDto[]> {
     return this.trainersService.findActive();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Get trainer by ID' })
   @ApiOkResponse({ type: TrainerResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne(@Param('id') id: string): Promise<TrainerResponseDto> {
     const trainer = await this.trainersService.findById(id);
     if (!trainer) {
@@ -71,11 +63,9 @@ export class TrainersController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Update trainer' })
   @ApiOkResponse({ type: TrainerResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: UpdateTrainerDto })
   async update(
     @Param('id') id: string,
@@ -86,11 +76,9 @@ export class TrainersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Deactivate trainer' })
   @ApiOkResponse({ description: 'Trainer deactivated successfully' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.trainersService.remove(id);
   }

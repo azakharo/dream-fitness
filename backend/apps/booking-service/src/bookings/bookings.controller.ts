@@ -8,19 +8,15 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  Request,
 } from '@nestjs/common';
-import type { Request as ExpressRequest } from 'express';
 import {
   ApiTags,
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
-import { CurrentUser, JwtAuthGuard } from '@app/shared';
+import { CurrentUser, InternalGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BookingResponseDto } from './dto';
 import { BookingListResponseDto } from './dto/booking-list-response.dto';
@@ -33,9 +29,8 @@ import type { AuthenticatedUser } from '@app/shared';
 import { Booking } from './entities/booking.entity';
 
 @ApiTags('Bookings')
-@ApiBearerAuth()
 @Controller('bookings')
-@UseGuards(JwtAuthGuard)
+@UseGuards(InternalGuard)
 export class BookingsController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -57,19 +52,13 @@ export class BookingsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Book a training' })
   @ApiCreatedResponse({ type: BookingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CreateBookingDto })
   async create(
     @Body() dto: CreateBookingDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req: ExpressRequest,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<BookTrainingCommand, Booking>(
-      new BookTrainingCommand(
-        user.id,
-        dto.trainingId,
-        req.headers.authorization,
-      ),
+      new BookTrainingCommand(user.id, user.role, dto.trainingId),
     );
     return this.toBookingResponseDto(booking);
   }
@@ -77,7 +66,6 @@ export class BookingsController {
   @Get()
   @ApiOperation({ summary: 'Get user bookings with filters' })
   @ApiOkResponse({ type: BookingResponseDto, isArray: true })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findAll(
     @CurrentUser() user: AuthenticatedUser,
     @Query() filters: BookingFilterDto,
@@ -97,7 +85,6 @@ export class BookingsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get booking by ID' })
   @ApiOkResponse({ type: BookingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async findOne(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -112,25 +99,16 @@ export class BookingsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Cancel a booking' })
   @ApiOkResponse({ type: BookingResponseDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiBody({ type: CancelBookingDto })
   async cancel(
     @Param('id') id: string,
     @Body() dto: CancelBookingDto,
     @CurrentUser() user: AuthenticatedUser,
-    @Request() req: ExpressRequest,
   ): Promise<BookingResponseDto> {
     const booking = await this.commandBus.execute<
       CancelBookingCommand,
       Booking
-    >(
-      new CancelBookingCommand(
-        id,
-        user.id,
-        dto.reason,
-        req.headers.authorization,
-      ),
-    );
+    >(new CancelBookingCommand(id, user.id, user.role, dto.reason));
     return this.toBookingResponseDto(booking);
   }
 }

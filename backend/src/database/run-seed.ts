@@ -42,13 +42,30 @@ async function runSeed() {
     testUser.balance = 0;
     testUser.status = UserStatus.ACTIVE;
 
-    // Save users using repository
+    // Save users using repository (upsert to handle duplicates)
     const userRepository = dataSource.getRepository(User);
-    await userRepository.save(adminUser);
-    console.log('✅ Admin user created');
 
-    await userRepository.save(testUser);
-    console.log('✅ Test user created');
+    // Check if admin user exists, if not create
+    const existingAdmin = await userRepository.findOne({
+      where: { email: 'admin@dreamfitness.com' },
+    });
+    if (!existingAdmin) {
+      await userRepository.save(adminUser);
+      console.log('✅ Admin user created');
+    } else {
+      console.log('ℹ️ Admin user already exists, skipping');
+    }
+
+    // Check if test user exists, if not create
+    const existingTestUser = await userRepository.findOne({
+      where: { email: 'test@example.com' },
+    });
+    if (!existingTestUser) {
+      await userRepository.save(testUser);
+      console.log('✅ Test user created');
+    } else {
+      console.log('ℹ️ Test user already exists, skipping');
+    }
 
     console.log('🌱 Seed completed successfully!');
   } catch (error) {

@@ -29,14 +29,18 @@ export class TrainingClientService {
 
   async getTraining(
     trainingId: string,
-    jwtToken?: string,
+    userId?: string,
+    userRole?: string,
   ): Promise<TrainingResponseDto> {
     try {
       const url = `${this.configService.getTrainingServiceUrl()}/trainings/${trainingId}`;
 
       const headers: Record<string, string> = {};
-      if (jwtToken) {
-        headers['Authorization'] = jwtToken;
+      if (userId) {
+        headers['X-User-Id'] = userId;
+      }
+      if (userRole) {
+        headers['X-User-Role'] = userRole;
       }
 
       const response = await firstValueFrom(
@@ -70,14 +74,18 @@ export class TrainingClientService {
 
   async getAvailability(
     trainingId: string,
-    jwtToken?: string,
+    userId?: string,
+    userRole?: string,
   ): Promise<AvailabilityResponse> {
     try {
       const url = `${this.configService.getTrainingServiceUrl()}/trainings/${trainingId}/availability`;
 
       const headers: Record<string, string> = {};
-      if (jwtToken) {
-        headers['Authorization'] = jwtToken;
+      if (userId) {
+        headers['X-User-Id'] = userId;
+      }
+      if (userRole) {
+        headers['X-User-Role'] = userRole;
       }
 
       const response = await firstValueFrom(

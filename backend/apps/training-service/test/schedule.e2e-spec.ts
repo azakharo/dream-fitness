@@ -8,6 +8,7 @@ import {
   createTrainerDto,
   futureDate,
   createTrainingDto,
+  NON_EXISTENT_ID,
 } from './fixtures/training.fixtures';
 
 describe('ScheduleController (e2e)', () => {
@@ -39,13 +40,15 @@ describe('ScheduleController (e2e)', () => {
 
   describe('GET /schedule/week', () => {
     it('should return weekly schedule with trainings', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
-      const trainerResponse = await trainersHelper.create(token, trainerData);
+      const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
 
+      const startDate = futureDate(1);
+
       const training1 = createTrainingDto(trainerId, {
-        scheduledAt: futureDate(1),
+        scheduledAt: startDate,
         title: 'Morning Yoga',
       });
       const training2 = createTrainingDto(trainerId, {
@@ -53,10 +56,10 @@ describe('ScheduleController (e2e)', () => {
         title: 'Pilates Class',
       });
 
-      await trainingsHelper.create(token, training1);
-      await trainingsHelper.create(token, training2);
+      await trainingsHelper.create(headers, training1);
+      await trainingsHelper.create(headers, training2);
 
-      const response = await scheduleHelper.getWeekSchedule(token);
+      const response = await scheduleHelper.getWeekSchedule(headers, startDate);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('weekStart');
@@ -72,23 +75,23 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should return schedule for specific week', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
-      const trainerResponse = await trainersHelper.create(token, trainerData);
+      const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
 
       const training = createTrainingDto(trainerId, {
         scheduledAt: futureDate(1),
       });
 
-      await trainingsHelper.create(token, training);
+      await trainingsHelper.create(headers, training);
 
       const nextWeekMonday = new Date();
       nextWeekMonday.setDate(nextWeekMonday.getDate() + 7);
       nextWeekMonday.setHours(0, 0, 0, 0);
       const weekDate = nextWeekMonday.toISOString();
 
-      const response = await scheduleHelper.getWeekSchedule(token, weekDate);
+      const response = await scheduleHelper.getWeekSchedule(headers, weekDate);
 
       expect(response.status).toBe(200);
       expect(response.body.weekStart).toBe(weekDate);
@@ -96,9 +99,9 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should return empty days for week without trainings', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
 
-      const response = await scheduleHelper.getWeekSchedule(token);
+      const response = await scheduleHelper.getWeekSchedule(headers);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('weekStart');
@@ -116,18 +119,18 @@ describe('ScheduleController (e2e)', () => {
       });
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/schedule/week');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
   describe('GET /schedule/trainer/:id', () => {
     it('should return trainer schedule with trainings', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
-      const trainerResponse = await trainersHelper.create(token, trainerData);
+      const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
 
       const training = createTrainingDto(trainerId, {
@@ -135,10 +138,10 @@ describe('ScheduleController (e2e)', () => {
         title: 'Personal Training',
       });
 
-      await trainingsHelper.create(token, training);
+      await trainingsHelper.create(headers, training);
 
       const response = await scheduleHelper.getTrainerSchedule(
-        token,
+        headers,
         trainerId,
       );
 
@@ -152,21 +155,20 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should return 404 for non-existent trainer', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000001';
+      const headers = authHelper.getAdminHeaders();
 
       const response = await scheduleHelper.getTrainerSchedule(
-        token,
-        nonExistentId,
+        headers,
+        NON_EXISTENT_ID,
       );
 
       expect(response.status).toBe(404);
     });
 
     it('should filter by date range', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
-      const trainerResponse = await trainersHelper.create(token, trainerData);
+      const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
 
       const training1 = createTrainingDto(trainerId, {
@@ -178,14 +180,14 @@ describe('ScheduleController (e2e)', () => {
         title: 'Training 2',
       });
 
-      await trainingsHelper.create(token, training1);
-      await trainingsHelper.create(token, training2);
+      await trainingsHelper.create(headers, training1);
+      await trainingsHelper.create(headers, training2);
 
       const dateFrom = futureDate(0);
       const dateTo = futureDate(5);
 
       const response = await scheduleHelper.getTrainerSchedule(
-        token,
+        headers,
         trainerId,
         dateFrom,
         dateTo,
@@ -197,9 +199,9 @@ describe('ScheduleController (e2e)', () => {
     });
 
     it('should use default 30-day range when no dates provided', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto({ name: 'Test Trainer' });
-      const trainerResponse = await trainersHelper.create(token, trainerData);
+      const trainerResponse = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerResponse.body.id;
 
       const training = createTrainingDto(trainerId, {
@@ -207,10 +209,10 @@ describe('ScheduleController (e2e)', () => {
         title: 'Default Range Training',
       });
 
-      await trainingsHelper.create(token, training);
+      await trainingsHelper.create(headers, training);
 
       const response = await scheduleHelper.getTrainerSchedule(
-        token,
+        headers,
         trainerId,
       );
 
@@ -218,12 +220,12 @@ describe('ScheduleController (e2e)', () => {
       expect(response.body.trainings.length).toBeGreaterThan(0);
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper
         .getRequest()
         .get('/schedule/trainer/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 });

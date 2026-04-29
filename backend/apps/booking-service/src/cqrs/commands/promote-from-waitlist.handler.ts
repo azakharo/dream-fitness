@@ -26,7 +26,15 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
   async execute(command: PromoteFromWaitlistCommand) {
     const { trainingId } = command;
 
-    const training = await this.trainingClientService.getTraining(trainingId);
+    // Use a valid RFC 4122 UUID for system user
+    // Version 4 (random), variant 8 (RFC 4122)
+    const systemUserId = '00000000-0000-4000-8000-000000000001';
+    const systemRole = 'system';
+    const training = await this.trainingClientService.getTraining(
+      trainingId,
+      systemUserId,
+      systemRole,
+    );
     const confirmedBookingsCount =
       await this.bookingRepository.countConfirmedByTrainingId(trainingId);
     const availableSlots = training.capacity - confirmedBookingsCount;
@@ -50,6 +58,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
       try {
         await this.authClientService.reservePoints(
           waitlistEntry.userId,
+          systemRole,
           price,
           bookingId,
         );
@@ -114,6 +123,7 @@ export class PromoteFromWaitlistHandler implements ICommandHandler<PromoteFromWa
         );
         await this.authClientService.releasePoints(
           waitlistEntry.userId,
+          systemRole,
           price,
           bookingId,
         );

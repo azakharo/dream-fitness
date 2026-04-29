@@ -52,4 +52,4 @@ async function seedTestDatabase() {
   }
 }
 
-seedTestDatabase();
+void seedTestDatabase();

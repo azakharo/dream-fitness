@@ -7,6 +7,7 @@ import {
   createTrainerDto,
   createTrainingDto,
   futureDate,
+  NON_EXISTENT_ID,
 } from './fixtures/training.fixtures';
 import { mockEventsPublisher } from './mocks/events.module.mock';
 import { TrainingType } from '@app/shared/enums';
@@ -40,13 +41,13 @@ describe('TrainingsController (e2e)', () => {
 
   describe('POST /trainings', () => {
     it('should create a training with valid data and active trainer', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(201);
       expect(response.body).toBeDefined();
@@ -59,61 +60,59 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should publish training.created event', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      await trainingsHelper.create(token, trainingData);
+      await trainingsHelper.create(headers, trainingData);
 
       expect(mockEventsPublisher.publishTrainingCreated).toHaveBeenCalled();
     });
 
     it('should return 404 when trainer does not exist', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
-      const trainingData = createTrainingDto(
-        '00000000-0000-0000-0000-000000000001',
-      );
+      const headers = authHelper.getAdminHeaders();
+      const trainingData = createTrainingDto(NON_EXISTENT_ID);
 
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(404);
     });
 
     it('should return 400 when trainer is not active', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
-      await trainersHelper.remove(token, trainerId);
+      await trainersHelper.remove(headers, trainerId);
 
       const trainingData = createTrainingDto(trainerId);
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(400);
     });
 
     it('should return 400 when scheduledAt is in the past', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
         scheduledAt: futureDate(-1),
       });
 
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(400);
     });
 
     it('should return 409 on schedule conflict', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const training1StartDt = addMinutes(new Date(), 60);
@@ -123,84 +122,84 @@ describe('TrainingsController (e2e)', () => {
         scheduledAt: training1StartDt.toISOString(),
         durationMinutes: 60,
       });
-      await trainingsHelper.create(token, trainingData1);
+      await trainingsHelper.create(headers, trainingData1);
 
       const trainingData2 = createTrainingDto(trainerId, {
         scheduledAt: training2StartDt.toISOString(),
         durationMinutes: 60,
       });
-      const response = await trainingsHelper.create(token, trainingData2);
+      const response = await trainingsHelper.create(headers, trainingData2);
 
       expect(response.status).toBe(409);
     });
 
     it('should return 400 when title is missing', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
         title: '',
       });
 
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(400);
     });
 
     it('should return 400 when type is invalid', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
         type: 'INVALID_TYPE' as TrainingType,
       });
 
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(400);
     });
 
     it('should return 400 when capacity exceeds 100', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
         capacity: 101,
       });
 
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(400);
     });
 
     it('should return 400 when durationMinutes is less than 15', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
         durationMinutes: 10,
       });
 
-      const response = await trainingsHelper.create(token, trainingData);
+      const response = await trainingsHelper.create(headers, trainingData);
 
       expect(response.status).toBe(400);
     });
 
     it('should return 400 when extra fields are provided', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
-      const response = await trainingsHelper.create(token, {
+      const response = await trainingsHelper.create(headers, {
         ...createTrainingDto(trainerId),
         extraField: 'should be ignored',
       } as CreateTrainingDto);
@@ -208,45 +207,45 @@ describe('TrainingsController (e2e)', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().post('/trainings').send({});
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
   describe('GET /trainings', () => {
     it('should return paginated list of trainings', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const firstTrainingStartDt = addMinutes(new Date(), 30);
 
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           title: 'Training 1',
           scheduledAt: firstTrainingStartDt.toISOString(),
         }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           title: 'Training 2',
           scheduledAt: addMinutes(firstTrainingStartDt, 120).toISOString(),
         }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           title: 'Training 3',
           scheduledAt: addMinutes(firstTrainingStartDt, 240).toISOString(),
         }),
       );
 
-      const response = await trainingsHelper.findAll(token);
+      const response = await trainingsHelper.findAll(headers);
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
@@ -254,9 +253,9 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return empty list when no trainings exist', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
 
-      const response = await trainingsHelper.findAll(token);
+      const response = await trainingsHelper.findAll(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.data).toEqual([]);
@@ -264,13 +263,13 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should filter by type', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           type: TrainingType.YOGA,
           title: 'Yoga 1',
@@ -278,7 +277,7 @@ describe('TrainingsController (e2e)', () => {
         }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           type: TrainingType.CROSSFIT,
           title: 'Crossfit 1',
@@ -286,7 +285,7 @@ describe('TrainingsController (e2e)', () => {
         }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           type: TrainingType.YOGA,
           title: 'Yoga 2',
@@ -294,7 +293,7 @@ describe('TrainingsController (e2e)', () => {
         }),
       );
 
-      const response = await trainingsHelper.findAll(token, {
+      const response = await trainingsHelper.findAll(headers, {
         type: TrainingType.YOGA,
       });
 
@@ -306,32 +305,32 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should filter by trainerId', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData1 = createTrainerDto({ name: 'Trainer 1' });
       const trainerData2 = createTrainerDto({ name: 'Trainer 2' });
-      const trainerRes1 = await trainersHelper.create(token, trainerData1);
-      const trainerRes2 = await trainersHelper.create(token, trainerData2);
+      const trainerRes1 = await trainersHelper.create(headers, trainerData1);
+      const trainerRes2 = await trainersHelper.create(headers, trainerData2);
 
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerRes1.body.id, {
           title: 'Training 1',
           scheduledAt: futureDate(1),
         }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerRes2.body.id, { title: 'Training 2' }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerRes1.body.id, {
           title: 'Training 3',
           scheduledAt: futureDate(2),
         }),
       );
 
-      const response = await trainingsHelper.findAll(token, {
+      const response = await trainingsHelper.findAll(headers, {
         trainerId: trainerRes1.body.id,
       });
 
@@ -343,9 +342,9 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should filter by date range', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const date1 = futureDate(1);
@@ -353,28 +352,28 @@ describe('TrainingsController (e2e)', () => {
       const date3 = futureDate(3);
 
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           scheduledAt: date1,
           title: 'Training 1',
         }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           scheduledAt: date2,
           title: 'Training 2',
         }),
       );
       await trainingsHelper.create(
-        token,
+        headers,
         createTrainingDto(trainerId, {
           scheduledAt: date3,
           title: 'Training 3',
         }),
       );
 
-      const response = await trainingsHelper.findAll(token, {
+      const response = await trainingsHelper.findAll(headers, {
         dateFrom: date1,
         dateTo: date2,
       });
@@ -385,14 +384,14 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should respect pagination (page, limit)', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       for (let i = 1; i <= 5; i++) {
         await trainingsHelper.create(
-          token,
+          headers,
           createTrainingDto(trainerId, {
             title: `Training ${i}`,
             scheduledAt: futureDate(i),
@@ -400,7 +399,7 @@ describe('TrainingsController (e2e)', () => {
         );
       }
 
-      const response = await trainingsHelper.findAll(token, {
+      const response = await trainingsHelper.findAll(headers, {
         page: 1,
         limit: 2,
       });
@@ -410,25 +409,28 @@ describe('TrainingsController (e2e)', () => {
       expect(response.body.total).toBe(5);
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainings');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
   describe('GET /trainings/:id', () => {
     it('should return training details by ID', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
       const response = await trainingsHelper.findById(
-        token,
+        headers,
         createResponse.body.id,
       );
 
@@ -446,36 +448,38 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000002';
+      const headers = authHelper.getAdminHeaders();
 
       const response = await appHelper
         .getRequest()
-        .get(`/trainings/${nonExistentId}`)
-        .set('Authorization', `Bearer ${token}`);
+        .get(`/trainings/${NON_EXISTENT_ID}`)
+        .set(headers);
 
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().get('/trainings/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
   describe('GET /trainings/:id/availability', () => {
     it('should return availability info', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, { capacity: 10 });
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
       const response = await trainingsHelper.getAvailability(
-        token,
+        headers,
         createResponse.body.id,
       );
 
@@ -488,16 +492,19 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return isAvailable=true when slots available', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, { capacity: 5 });
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
       const response = await trainingsHelper.getAvailability(
-        token,
+        headers,
         createResponse.body.id,
       );
 
@@ -506,41 +513,43 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000003';
+      const headers = authHelper.getAdminHeaders();
 
       const response = await appHelper
         .getRequest()
-        .get(`/trainings/${nonExistentId}/availability`)
-        .set('Authorization', `Bearer ${token}`);
+        .get(`/trainings/${NON_EXISTENT_ID}/availability`)
+        .set(headers);
 
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper
         .getRequest()
         .get('/trainings/123/availability');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
   describe('PATCH /trainings/:id', () => {
     it('should update training title', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
         title: 'Original Title',
       });
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
       const updateData = { title: 'Updated Title' };
       const response = await trainingsHelper.update(
-        token,
+        headers,
         createResponse.body.id,
         updateData,
       );
@@ -551,36 +560,42 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should publish training.updated event', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId, {
         title: 'Original Title',
       });
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
       const updateData = { title: 'Updated Title' };
-      await trainingsHelper.update(token, createResponse.body.id, updateData);
+      await trainingsHelper.update(headers, createResponse.body.id, updateData);
 
       expect(mockEventsPublisher.publishTrainingUpdated).toHaveBeenCalled();
     });
 
     it('should return 400 when updating cancelled training', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
-      await trainingsHelper.cancel(token, createResponse.body.id);
+      await trainingsHelper.cancel(headers, createResponse.body.id);
 
       const updateData = { title: 'Updated Title' };
       const response = await trainingsHelper.update(
-        token,
+        headers,
         createResponse.body.id,
         updateData,
       );
@@ -589,48 +604,50 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000004';
+      const headers = authHelper.getAdminHeaders();
       const updateData = { title: 'Updated Title' };
 
       const response = await appHelper
         .getRequest()
-        .patch(`/trainings/${nonExistentId}`)
-        .set('Authorization', `Bearer ${token}`)
+        .patch(`/trainings/${NON_EXISTENT_ID}`)
+        .set(headers)
         .send(updateData);
 
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper
         .getRequest()
         .patch('/trainings/123')
         .send({ title: 'Updated' });
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 
   describe('DELETE /trainings/:id', () => {
     it('should cancel training (set status=cancelled)', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
       const response = await trainingsHelper.cancel(
-        token,
+        headers,
         createResponse.body.id,
       );
 
       expect(response.status).toBe(200);
 
       const getResponse = await trainingsHelper.findById(
-        token,
+        headers,
         createResponse.body.id,
       );
 
@@ -638,32 +655,38 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should publish training.cancelled event', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
-      await trainingsHelper.cancel(token, createResponse.body.id);
+      await trainingsHelper.cancel(headers, createResponse.body.id);
 
       expect(mockEventsPublisher.publishTrainingCancelled).toHaveBeenCalled();
     });
 
     it('should return 400 when cancelling already cancelled training', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
+      const headers = authHelper.getAdminHeaders();
       const trainerData = createTrainerDto();
-      const trainerRes = await trainersHelper.create(token, trainerData);
+      const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
       const trainingData = createTrainingDto(trainerId);
-      const createResponse = await trainingsHelper.create(token, trainingData);
+      const createResponse = await trainingsHelper.create(
+        headers,
+        trainingData,
+      );
 
-      await trainingsHelper.cancel(token, createResponse.body.id);
+      await trainingsHelper.cancel(headers, createResponse.body.id);
 
       const response = await trainingsHelper.cancel(
-        token,
+        headers,
         createResponse.body.id,
       );
 
@@ -671,18 +694,17 @@ describe('TrainingsController (e2e)', () => {
     });
 
     it('should return 404 for non-existent training', async () => {
-      const token = authHelper.generateAdminToken('test-user-id');
-      const nonExistentId = '00000000-0000-0000-0000-000000000005';
+      const headers = authHelper.getAdminHeaders();
 
-      const response = await trainingsHelper.cancel(token, nonExistentId);
+      const response = await trainingsHelper.cancel(headers, NON_EXISTENT_ID);
 
       expect(response.status).toBe(404);
     });
 
-    it('should return 401 when no auth token', async () => {
+    it('should return 400 when no auth headers', async () => {
       const response = await appHelper.getRequest().delete('/trainings/123');
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
   });
 });

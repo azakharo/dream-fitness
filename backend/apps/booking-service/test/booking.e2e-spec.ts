@@ -27,7 +27,7 @@ describe('Bookings API (e2e)', () => {
     appHelper = new AppTestHelper();
     await appHelper.init();
     dbHelper = new DbHelper(appHelper.getDataSource());
-    authHelper = new AuthHelper(appHelper.getApp());
+    authHelper = new AuthHelper();
     bookingHelper = new BookingHelper(appHelper.getRequest());
   });
 
@@ -47,28 +47,25 @@ describe('Bookings API (e2e)', () => {
     );
     // The following mocks will be called if a test is wrong (forgot to add mock)
     mockAuthClientService.reservePoints.mockRejectedValue(
-      new Error('unexpected, should not be called'),
+      new Error('unexpected call of reservePoints (should not be called)'),
     );
     mockAuthClientService.refundPoints.mockRejectedValue(
-      new Error('unexpected, should not be called'),
+      new Error('unexpected call of refundPoints (should not be called)'),
     );
     mockAuthClientService.releasePoints.mockRejectedValue(
-      new Error('unexpected, should not be called'),
+      new Error('unexpected call of releasePoints (should not be called)'),
     );
   });
 
   describe('POST /bookings', () => {
     it('should create booking successfully', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
       const response = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(201);
@@ -79,48 +76,39 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 409 when no available slots', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
       const fullTraining = createTrainingMock({ capacity: 1 });
 
       mockTrainingClientService.getTraining.mockResolvedValueOnce(fullTraining);
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
-      await bookingHelper.createBooking(TEST_TRAINING.id, token);
+      await bookingHelper.createBooking(TEST_TRAINING.id, headers);
 
       const response = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(409);
     });
 
     it('should return 409 when duplicate booking', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
-      await bookingHelper.createBooking(TEST_TRAINING.id, token);
+      await bookingHelper.createBooking(TEST_TRAINING.id, headers);
 
       const response = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(409);
     });
 
     it('should return 404 when training not found', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
       mockTrainingClientService.getTraining.mockRejectedValue(
         new NotFoundException('Training not found'),
       );
@@ -129,34 +117,28 @@ describe('Bookings API (e2e)', () => {
 
       const response = await bookingHelper.createBooking(
         '33333333-3333-4333-a333-333333333333',
-        token,
+        headers,
       );
 
       expect(response.status).toBe(404);
     });
 
     it('should return 503 when training service unavailable', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
       mockTrainingClientService.getTraining.mockRejectedValue(
         new ServiceUnavailableException('Training service unavailable'),
       );
 
       const response = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(503);
     });
 
     it('should return 409 when insufficient balance', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockRejectedValueOnce(
         new ConflictException('Insufficient balance'),
@@ -164,7 +146,7 @@ describe('Bookings API (e2e)', () => {
 
       const response = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
 
       expect(response.status).toBe(409);
@@ -173,15 +155,12 @@ describe('Bookings API (e2e)', () => {
 
   describe('GET /bookings', () => {
     it('should return user bookings list with pagination', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      await bookingHelper.createBooking(TEST_TRAINING.id, token);
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
+      await bookingHelper.createBooking(TEST_TRAINING.id, headers);
 
-      const response = await bookingHelper.getBookings(token);
+      const response = await bookingHelper.getBookings(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.items).toBeDefined();
@@ -191,14 +170,11 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return empty list when no bookings', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
-      const response = await bookingHelper.getBookings(token);
+      const response = await bookingHelper.getBookings(headers);
 
       expect(response.status).toBe(200);
       expect(response.body.items).toEqual([]);
@@ -206,16 +182,13 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should filter by status', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
-      await bookingHelper.createBooking(TEST_TRAINING.id, token);
+      await bookingHelper.createBooking(TEST_TRAINING.id, headers);
 
-      const response = await bookingHelper.getBookings(token, {
+      const response = await bookingHelper.getBookings(headers, {
         status: BookingStatus.CONFIRMED,
       });
 
@@ -229,20 +202,17 @@ describe('Bookings API (e2e)', () => {
 
   describe('GET /bookings/:id', () => {
     it('should return booking by ID', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
 
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
       const bookingId = createResponse.body.id;
 
-      const response = await bookingHelper.getBookingById(bookingId, token);
+      const response = await bookingHelper.getBookingById(bookingId, headers);
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe(bookingId);
@@ -251,37 +221,28 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 404 when booking not found', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       const response = await bookingHelper.getBookingById(
         'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
-        token,
+        headers,
       );
 
       expect(response.status).toBe(404);
     });
 
     it('should return 403 when booking belongs to another user', async () => {
-      const token1 = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
-      const token2 = authHelper.getUserToken(
-        TEST_USERS.user2.id,
-        TEST_USERS.user2.email,
-      );
+      const headers1 = authHelper.getUserHeaders(TEST_USERS.user1.id);
+      const headers2 = authHelper.getUserHeaders(TEST_USERS.user2.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token1,
+        headers1,
       );
       const bookingId = createResponse.body.id;
 
-      const response = await bookingHelper.getBookingById(bookingId, token2);
+      const response = await bookingHelper.getBookingById(bookingId, headers2);
 
       expect(response.status).toBe(403);
     });
@@ -289,21 +250,18 @@ describe('Bookings API (e2e)', () => {
 
   describe('POST /bookings/:id/cancel', () => {
     it('should cancel booking successfully', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
       mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
 
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
       const bookingId = createResponse.body.id;
 
-      const response = await bookingHelper.cancelBooking(bookingId, token);
+      const response = await bookingHelper.cancelBooking(bookingId, headers);
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe(bookingId);
@@ -311,45 +269,36 @@ describe('Bookings API (e2e)', () => {
     });
 
     it('should return 409 when booking already cancelled', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       mockAuthClientService.reservePoints.mockResolvedValueOnce(undefined);
       mockAuthClientService.refundPoints.mockResolvedValueOnce(undefined);
 
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
       const bookingId = createResponse.body.id;
 
-      await bookingHelper.cancelBooking(bookingId, token);
-      const response = await bookingHelper.cancelBooking(bookingId, token);
+      await bookingHelper.cancelBooking(bookingId, headers);
+      const response = await bookingHelper.cancelBooking(bookingId, headers);
 
       expect(response.status).toBe(409);
     });
 
     it('should return 404 when booking not found', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       const response = await bookingHelper.cancelBooking(
         'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
-        token,
+        headers,
       );
 
       expect(response.status).toBe(404);
     });
 
     it('should return 409 when trying to cancel past training', async () => {
-      const token = authHelper.getUserToken(
-        TEST_USERS.user1.id,
-        TEST_USERS.user1.email,
-      );
+      const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
       const pastTraining = createTrainingMock({
         scheduledAt: '2020-01-01T10:00:00.000Z',
       });
@@ -361,11 +310,11 @@ describe('Bookings API (e2e)', () => {
 
       const createResponse = await bookingHelper.createBooking(
         TEST_TRAINING.id,
-        token,
+        headers,
       );
       const bookingId = createResponse.body.id;
 
-      const response = await bookingHelper.cancelBooking(bookingId, token);
+      const response = await bookingHelper.cancelBooking(bookingId, headers);
 
       expect(response.status).toBe(409);
     });

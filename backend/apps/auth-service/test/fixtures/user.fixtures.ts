@@ -19,8 +19,9 @@ export const TEST_USER: RegisterDto = {
 export function createRegisterDto(
   overrides?: Partial<RegisterDto>,
 ): RegisterDto {
+  const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   return {
-    email: 'test@example.com',
+    email: `test-${uniqueId}@example.com`,
     password: 'test12345',
     name: 'Test User',
     ...overrides,

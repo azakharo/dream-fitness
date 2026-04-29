@@ -11,13 +11,11 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, RefreshTokenDto } from '@app/contracts';
-import { JwtAuthGuard } from '@app/shared';
+import { InternalGuard } from '@app/shared';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -66,14 +64,12 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Logout user and invalidate refresh token' })
   @ApiOkResponse({
     description: 'Logout successful',
     schema: { example: { message: 'Logout successful' } },
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async logout() {
     await this.authService.logout();
     return { message: 'Logout successful' };

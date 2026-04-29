@@ -1,8 +1,12 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+// Determine environment-specific file based on NODE_ENV
+const nodeEnv = process.env.NODE_ENV || 'development';
+const envFiles = ['.env', `.env.${nodeEnv}`];
 
+// Load both files - later files override earlier ones
+dotenv.config({ path: envFiles });
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   host: process.env.DATABASE_HOST || 'localhost',
