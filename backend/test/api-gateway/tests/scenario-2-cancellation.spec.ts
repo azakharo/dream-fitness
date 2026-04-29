@@ -1,15 +1,16 @@
 import { expect, APIRequestContext } from '@playwright/test';
 import { bookingTest } from '../fixtures/booking.fixture';
+import { TEST_CONFIG } from '../test-config';
+
+const baseURL = TEST_CONFIG.baseURL;
 
 bookingTest.describe('Scenario 2: Training Cancellation', () => {
   let request: APIRequestContext;
-  let baseURL: string;
 
   bookingTest.beforeAll(async ({ playwright }) => {
     request = await playwright.request.newContext({
-      baseURL: process.env.API_BASE_URL || 'http://localhost:3000',
+      baseURL,
     });
-    baseURL = process.env.API_BASE_URL || 'http://localhost:3000';
   });
 
   bookingTest.afterAll(async () => {
