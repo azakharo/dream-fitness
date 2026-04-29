@@ -1,9 +1,16 @@
 import { test, expect, APIRequestContext } from '@playwright/test';
 import { trainingTest } from '../fixtures/training.fixture';
 import { TEST_CONFIG } from '../test-config';
-import { BookingResponseDto } from 'apps/booking-service/src/bookings/dto';
+import {
+  BookingListResponseDto,
+  BookingResponseDto,
+} from 'apps/booking-service/src/bookings/dto';
 import { RegisterResponseBody } from '@app/contracts';
 import { depositBalance } from '../global-setup';
+import {
+  WaitlistPositionResponseDto,
+  WaitlistResponseDto,
+} from 'apps/booking-service/src/waitlist/dto';
 
 const baseURL = TEST_CONFIG.baseURL;
 
@@ -112,12 +119,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
 
     expect(response.status()).toBe(201);
 
-    const responseBody = (await response.json()) as {
-      id: string;
-      trainingId: string;
-      userId: string;
-      position: number;
-    };
+    const responseBody = (await response.json()) as WaitlistResponseDto;
     expect(responseBody).toHaveProperty('id');
     expect(responseBody).toHaveProperty('trainingId', trainingId1);
     expect(responseBody).toHaveProperty('userId');
@@ -139,11 +141,8 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
 
       expect(response.status()).toBe(200);
 
-      const responseBody = (await response.json()) as {
-        trainingId: string;
-        position: number;
-      };
-      expect(responseBody).toHaveProperty('trainingId', trainingId1);
+      const responseBody =
+        (await response.json()) as WaitlistPositionResponseDto;
       expect(responseBody).toHaveProperty('position');
     },
   );
@@ -178,18 +177,13 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
 
       expect(bookingsResponse.status()).toBe(200);
 
-      const responseBody = (await bookingsResponse.json()) as {
-        bookings: Array<{
-          id: string;
-          trainingId: string;
-          userId: string;
-        }>;
-      };
-      expect(responseBody).toHaveProperty('bookings');
-      expect(Array.isArray(responseBody.bookings)).toBe(true);
+      const responseBody =
+        (await bookingsResponse.json()) as BookingListResponseDto;
+      expect(responseBody).toHaveProperty('items');
+      expect(Array.isArray(responseBody.items)).toBe(true);
 
       // Verify user2 now has a booking for trainingId1
-      const user2Booking = responseBody.bookings.find(
+      const user2Booking = responseBody.items.find(
         (booking) => booking.trainingId === trainingId1,
       );
       expect(user2Booking).toBeDefined();
