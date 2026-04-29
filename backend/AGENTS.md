@@ -6,8 +6,8 @@ Backend starter which uses Nest.js, TypeORM, Postgres.
 
 ## Основные документы по проекту
 
-- `../doc/ADR.md`
-- `../doc/PRD.md`
+- [PRD](../doc/PRD.md)
+- [ADR](../doc/ADR.md)
 
 ## Технологический стек
 

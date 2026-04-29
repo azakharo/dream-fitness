@@ -2,9 +2,9 @@
 
 ## Основные документы по проекту
 
-- `../doc/PRD.md`
-- `../doc/UI.md`
-- `../doc/Frontend-ADR.md`
+- [PRD](../doc/PRD.md)
+- [Требования к UI](../doc/UI.md)
+- [Frontend ADR](../doc/Frontend-ADR.md)
 
 ## Технологический стек
 

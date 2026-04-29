@@ -7,6 +7,6 @@
 
 ## Структура папок
 
-- ./doc - документация по проекту
-- ./backend - backend
-- ./frontend - frontend
+- [Документация по проекту](./doc)
+- [Backend](./backend)
+- [Frontend](./frontend)
