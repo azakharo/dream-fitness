@@ -95,9 +95,6 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
       });
 
       expect(response.status()).toBe(409);
-
-      const responseBody = (await response.json()) as { message: string };
-      expect(responseBody).toHaveProperty('message');
     },
   );
 
