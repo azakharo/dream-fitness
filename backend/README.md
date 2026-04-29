@@ -113,3 +113,60 @@ If you want to clear the DB data, then run instead:
 ```bash
 $ npm run start:test:infra -- -v
 ```
+
+## Run in production mode
+
+### Set production environment
+
+For that edit `.env.production` file.
+
+### Available npm scripts
+
+- docker:prod - run all
+- docker:prod:build - build or rebuild the images (add ' -- --no-cache' for full rebuild)
+- docker:prod:down - stop all
+- docker:prod:logs - view logs
+- docker:migrate:auto - run migration and create test users
+- docker:migrate:manual - run migration manually depending on the value of RUN_MIGRATIONS environment variable.
+- docker:seed:manual - create the test users depending on the value of RUN_SEED environment variables
+- docker:migrate:revert - revert migrations.
+
+### Run migrations and create admin and test users
+
+```bash
+$ npm run docker:migrate:auto
+```
+
+### Start services
+
+```bash
+$ npm run docker:prod
+```
+
+API is available on:
+`http://localhost:3000`
+
+API documentation is available on:
+`http://localhost:3000/api/docs`
+
+### View logs
+
+You can view logs in a separate console window by the following command:
+
+```bash
+$ npm run docker:prod:logs
+```
+
+### Stop services
+
+```bash
+$ npm run docker:prod:down
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run docker:prod:down -- -v
+```
+
+---
