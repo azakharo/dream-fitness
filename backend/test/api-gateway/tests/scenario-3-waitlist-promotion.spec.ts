@@ -2,7 +2,8 @@ import { test, expect, APIRequestContext } from '@playwright/test';
 import { trainingTest } from '../fixtures/training.fixture';
 import { TEST_CONFIG } from '../test-config';
 import { BookingResponseDto } from 'apps/booking-service/src/bookings/dto';
-import { DepositResponse, RegisterResponseBody } from '@app/contracts';
+import { RegisterResponseBody } from '@app/contracts';
+import { depositBalance } from '../global-setup';
 
 const baseURL = TEST_CONFIG.baseURL;
 
@@ -71,21 +72,10 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
   // Step 27 - should deposit balance to user2
   trainingTest(
     'should deposit balance to user2',
-    async ({ adminToken, user2Id }) => {
-      const response = await request.post(`/api/auth/balance/deposit`, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-        data: {
-          userId: user2Id,
-          amount: 5000,
-        },
-      });
+    async ({ adminToken, user2Id, request }) => {
+      const response = await depositBalance(request, user2Id, 5000, adminToken);
 
       expect(response.status()).toBe(200);
-
-      const responseBody = (await response.json()) as DepositResponse;
-      expect(responseBody).toHaveProperty('balance', 5000);
     },
   );
 

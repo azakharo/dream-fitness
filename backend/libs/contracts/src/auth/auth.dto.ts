@@ -103,7 +103,3 @@ export class RegisterResponseBody {
   user: Omit<User, 'password'>;
   tokens: LoginResponseBody;
 }
-
-export interface DepositResponse {
-  balance: number;
-}

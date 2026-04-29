@@ -1,10 +1,9 @@
-import type { APIRequestContext } from '@playwright/test';
+import type { APIRequestContext, APIResponse } from '@playwright/test';
 import {
   LoginResponseBody,
   UserDto,
   TrainerResponseDto,
   TrainingResponseDto,
-  DepositResponse,
 } from '@app/contracts';
 import { TEST_CONFIG } from './test-config';
 
@@ -79,24 +78,18 @@ async function createTraining(
   return data.id;
 }
 
-async function depositBalance(
+export function depositBalance(
   request: APIRequestContext,
   userId: string,
   amount: number,
   adminToken: string,
-): Promise<number> {
-  const response = await request.post(
-    `${TEST_CONFIG.baseURL}/api/auth/balance/deposit`,
-    {
-      headers: {
-        Authorization: `Bearer ${adminToken}`,
-      },
-      data: { userId, amount },
+): Promise<APIResponse> {
+  return request.post(`${TEST_CONFIG.baseURL}/api/auth/balance/deposit`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
     },
-  );
-
-  const data = (await response.json()) as DepositResponse;
-  return data.balance;
+    data: { userId, amount },
+  });
 }
 
 export default async function globalSetup() {
