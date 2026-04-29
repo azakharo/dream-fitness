@@ -54,7 +54,6 @@ export default async function globalTeardown() {
     'TRAINER_ID',
     'TRAINING_ID_1',
     'TRAINING_ID_2',
-    'TEST_USER_BALANCE',
   ];
 
   testDataIds.forEach((key) => {

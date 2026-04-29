@@ -170,3 +170,39 @@ $ npm run docker:prod:down -- -v
 ```
 
 ---
+
+## Run integration tests
+
+Test the whole system making requests to the api gateway from the outside.
+
+### Run migrations and create admin and test users
+
+```bash
+$ npm run docker:migrate:auto
+```
+
+### Start services
+
+```bash
+$ npm run docker:prod
+```
+
+### Run tests
+
+```bash
+$ npm run test:api-gateway
+```
+
+### Stop services
+
+```bash
+$ npm run docker:prod:down
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run docker:prod:down -- -v
+```
+
+---

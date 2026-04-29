@@ -8,6 +8,7 @@ import {
   IsNumber,
   IsPositive,
   IsDateString,
+  IsUUID,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
@@ -91,6 +92,10 @@ export class UserProfileDto {
 }
 
 export class UpdateBalanceDto {
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  @IsUUID()
+  userId: string;
+
   @ApiProperty({ example: 100, minimum: 0 })
   @IsNumber()
   @IsPositive()

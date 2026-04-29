@@ -148,7 +148,6 @@ export default async function globalSetup() {
 
   // Deposit balance 5000 to test user (admin does this)
   await depositBalance(request, testUser.userId, 5000, admin.token);
-  process.env.TEST_USER_BALANCE = '5000';
 
   // Clean up
   await request.dispose();
