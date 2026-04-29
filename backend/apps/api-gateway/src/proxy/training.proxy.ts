@@ -14,8 +14,19 @@ import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { type RequestWithUser, Roles } from '@app/shared';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+  ApiTags,
+  ApiBody,
+} from '@nestjs/swagger';
 import { ProxyService } from './proxy.service';
+import {
+  CreateTrainerDto,
+  UpdateTrainerDto,
+  CreateTrainingDto,
+  UpdateTrainingDto,
+} from '@app/contracts/training';
 
 const TRAINING_SERVICE_URL = 'TRAINING_SERVICE_URL';
 const TRAINING_SERVICE_DEFAULT_URL = 'http://localhost:3002';
@@ -58,7 +69,8 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
-  createTrainer(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: CreateTrainerDto })
+  createTrainer(@Req() req: RequestWithUser, @Body() body: CreateTrainerDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -73,10 +85,11 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
+  @ApiBody({ type: UpdateTrainerDto })
   updateTrainer(
     @Req() req: RequestWithUser,
     @Param('id') id: string,
-    @Body() body: unknown,
+    @Body() body: UpdateTrainerDto,
   ) {
     return this.proxyService.proxyRequest(
       req,
@@ -136,7 +149,8 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
-  createTraining(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: CreateTrainingDto })
+  createTraining(@Req() req: RequestWithUser, @Body() body: CreateTrainingDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -151,10 +165,11 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
+  @ApiBody({ type: UpdateTrainingDto })
   updateTraining(
     @Req() req: RequestWithUser,
     @Param('id') id: string,
-    @Body() body: unknown,
+    @Body() body: UpdateTrainingDto,
   ) {
     return this.proxyService.proxyRequest(
       req,

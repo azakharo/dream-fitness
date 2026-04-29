@@ -11,9 +11,19 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+  ApiTags,
+  ApiBody,
+} from '@nestjs/swagger';
 import type { RequestWithUser } from '@app/shared';
 import { ProxyService } from './proxy.service';
+import {
+  CreateBookingDto,
+  CancelBookingDto,
+  JoinWaitlistDto,
+} from '@app/contracts/booking';
 
 const BOOKING_SERVICE_URL = 'BOOKING_SERVICE_URL';
 const BOOKING_SERVICE_DEFAULT_URL = 'http://localhost:3003';
@@ -55,7 +65,8 @@ export class BookingProxyController {
   @Post('bookings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  createBooking(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: CreateBookingDto })
+  createBooking(@Req() req: RequestWithUser, @Body() body: CreateBookingDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -69,10 +80,15 @@ export class BookingProxyController {
   @Delete('bookings/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  cancelBooking(@Req() req: RequestWithUser, @Param('id') id: string) {
+  @ApiBody({ type: CancelBookingDto })
+  cancelBooking(
+    @Req() req: RequestWithUser,
+    @Param('id') id: string,
+    @Body() body: CancelBookingDto,
+  ) {
     return this.proxyService.proxyRequest(
       req,
-      null,
+      body,
       `/bookings/${id}`,
       'DELETE',
       BOOKING_SERVICE_URL,
@@ -115,7 +131,8 @@ export class BookingProxyController {
   @Post('waitlist')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  joinWaitlist(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: JoinWaitlistDto })
+  joinWaitlist(@Req() req: RequestWithUser, @Body() body: JoinWaitlistDto) {
     return this.proxyService.proxyRequest(
       req,
       body,

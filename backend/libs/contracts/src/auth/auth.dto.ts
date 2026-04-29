@@ -9,13 +9,16 @@ import {
   IsPositive,
   IsDateString,
 } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
 import { User } from 'apps/auth-service/src/users/entities/user.entity';
 
 export class LoginDto {
+  @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
   email: string;
 
+  @ApiProperty({ example: 'password123', minLength: 8, maxLength: 50 })
   @IsString()
   @MinLength(8)
   @MaxLength(50)
@@ -23,32 +26,39 @@ export class LoginDto {
 }
 
 export class RegisterDto {
+  @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
   email: string;
 
+  @ApiProperty({ example: 'password123', minLength: 8, maxLength: 50 })
   @IsString()
   @MinLength(8)
   @MaxLength(50)
   password: string;
 
+  @ApiProperty({ example: 'John Doe', minLength: 2 })
   @IsString()
   @MinLength(2)
   name: string;
 
+  @ApiPropertyOptional({ example: '+1234567890' })
   @IsOptional()
   @IsString()
   phone?: string;
 
+  @ApiPropertyOptional({ example: '1990-01-01' })
   @IsOptional()
   @IsDateString()
   birthDate?: string;
 
+  @ApiPropertyOptional({ enum: UserGender })
   @IsOptional()
   @IsEnum(UserGender)
   gender?: UserGender;
 }
 
 export class RefreshTokenDto {
+  @ApiProperty({ example: 'refresh-token-string' })
   @IsString()
   refreshToken: string;
 }
@@ -81,25 +91,34 @@ export class UserProfileDto {
 }
 
 export class UpdateBalanceDto {
+  @ApiProperty({ example: 100, minimum: 0 })
   @IsNumber()
   @IsPositive()
   amount: number;
 
+  @ApiPropertyOptional({ example: 'Deposit for training' })
   @IsOptional()
   @IsString()
   description?: string;
 }
 
 export class LoginResponseBody {
+  @ApiProperty({ example: 'jwt-access-token' })
   accessToken: string;
+
+  @ApiProperty({ example: 'jwt-refresh-token' })
   refreshToken: string;
 }
 
 export class LogoutResponseBody {
+  @ApiProperty({ example: 'Logged out successfully' })
   message: string;
 }
 
 export class RegisterResponseBody {
+  @ApiProperty()
   user: Omit<User, 'password'>;
+
+  @ApiProperty()
   tokens: LoginResponseBody;
 }

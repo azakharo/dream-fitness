@@ -10,9 +10,20 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+  ApiTags,
+  ApiBody,
+} from '@nestjs/swagger';
 import type { RequestWithUser } from '@app/shared';
 import { ProxyService } from './proxy.service';
+import {
+  RegisterDto,
+  LoginDto,
+  RefreshTokenDto,
+  UpdateBalanceDto,
+} from '@app/contracts/auth';
 
 const AUTH_SERVICE_URL = 'AUTH_SERVICE_URL';
 const AUTH_SERVICE_DEFAULT_URL = 'http://localhost:3001';
@@ -24,7 +35,8 @@ export class AuthProxyController {
 
   // Public endpoints (no auth)
   @Post('register')
-  register(@Req() req: Request, @Body() body: unknown) {
+  @ApiBody({ type: RegisterDto })
+  register(@Req() req: Request, @Body() body: RegisterDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -36,7 +48,8 @@ export class AuthProxyController {
   }
 
   @Post('login')
-  login(@Req() req: Request, @Body() body: unknown) {
+  @ApiBody({ type: LoginDto })
+  login(@Req() req: Request, @Body() body: LoginDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -48,7 +61,8 @@ export class AuthProxyController {
   }
 
   @Post('refresh')
-  refresh(@Req() req: Request, @Body() body: unknown) {
+  @ApiBody({ type: RefreshTokenDto })
+  refresh(@Req() req: Request, @Body() body: RefreshTokenDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -91,7 +105,8 @@ export class AuthProxyController {
   @Patch('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  updateProfile(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: RegisterDto })
+  updateProfile(@Req() req: RequestWithUser, @Body() body: RegisterDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -119,7 +134,8 @@ export class AuthProxyController {
   @Post('balance/deposit')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  deposit(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: UpdateBalanceDto })
+  deposit(@Req() req: RequestWithUser, @Body() body: UpdateBalanceDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -133,7 +149,8 @@ export class AuthProxyController {
   @Post('balance/reserve')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  reserve(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: UpdateBalanceDto })
+  reserve(@Req() req: RequestWithUser, @Body() body: UpdateBalanceDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -147,7 +164,8 @@ export class AuthProxyController {
   @Post('balance/release')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  release(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: UpdateBalanceDto })
+  release(@Req() req: RequestWithUser, @Body() body: UpdateBalanceDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -161,7 +179,8 @@ export class AuthProxyController {
   @Post('balance/refund')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  refund(@Req() req: RequestWithUser, @Body() body: unknown) {
+  @ApiBody({ type: UpdateBalanceDto })
+  refund(@Req() req: RequestWithUser, @Body() body: UpdateBalanceDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
