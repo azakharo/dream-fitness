@@ -1,6 +1,10 @@
 import { expect, APIRequestContext } from '@playwright/test';
 import { trainingTest } from '../fixtures/training.fixture';
 import { TEST_CONFIG } from '../test-config';
+import {
+  BookingListResponseDto,
+  BookingResponseDto,
+} from 'apps/booking-service/src/bookings/dto';
 
 const baseURL = TEST_CONFIG.baseURL;
 
@@ -32,11 +36,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
 
       expect(response.status()).toBe(201);
 
-      const responseBody = (await response.json()) as {
-        id: string;
-        trainingId: string;
-        userId: string;
-      };
+      const responseBody = (await response.json()) as BookingResponseDto;
       expect(responseBody).toHaveProperty('id');
       expect(responseBody).toHaveProperty('trainingId', trainingId1);
       expect(responseBody).toHaveProperty('userId');
@@ -56,12 +56,10 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
 
     expect(response.status()).toBe(200);
 
-    const responseBody = (await response.json()) as {
-      bookings: Array<{ id: string }>;
-    };
-    expect(responseBody).toHaveProperty('bookings');
-    expect(Array.isArray(responseBody.bookings)).toBe(true);
-    expect(responseBody.bookings.length).toBeGreaterThan(0);
+    const responseBody = (await response.json()) as BookingListResponseDto;
+    expect(responseBody).toHaveProperty('items');
+    expect(Array.isArray(responseBody.items)).toBe(true);
+    expect(responseBody.items.length).toBeGreaterThan(0);
   });
 
   // Step 18 - should return booking by ID
@@ -76,11 +74,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
 
       expect(response.status()).toBe(200);
 
-      const responseBody = (await response.json()) as {
-        id: string;
-        trainingId: string;
-        userId: string;
-      };
+      const responseBody = (await response.json()) as BookingResponseDto;
       expect(responseBody).toHaveProperty('id', bookingId);
       expect(responseBody).toHaveProperty('trainingId');
       expect(responseBody).toHaveProperty('userId');
@@ -109,7 +103,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
 
   // Step 20 - should reject non-existent training
   trainingTest('should reject non-existent training', async ({ userToken }) => {
-    const nonExistentTrainingId = '00000000-0000-0000-0000-000000000000';
+    const nonExistentTrainingId = '8579cb9f-dd90-42b9-b83a-2d1c615f62f8';
 
     const response = await request.post(`/api/bookings`, {
       headers: {

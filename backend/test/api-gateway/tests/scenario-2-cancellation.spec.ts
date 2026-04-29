@@ -57,7 +57,7 @@ bookingTest.describe('Scenario 2: Training Cancellation', () => {
 
   // Step 24 - should reject non-existent booking
   bookingTest('should reject non-existent booking', async ({ userToken }) => {
-    const nonExistentBookingId = '00000000-0000-0000-0000-000000000000';
+    const nonExistentBookingId = '8579cb9f-dd90-42b9-b83a-2d1c615f62f8';
 
     const response = await request.post(
       `/api/bookings/${nonExistentBookingId}/cancel`,
