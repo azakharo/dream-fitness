@@ -4,12 +4,9 @@ import {
   UserDto,
   TrainerResponseDto,
   TrainingResponseDto,
+  DepositResponse,
 } from '@app/contracts';
 import { TEST_CONFIG } from './test-config';
-
-interface DepositResponse {
-  balance: number;
-}
 
 async function login(
   request: APIRequestContext,
