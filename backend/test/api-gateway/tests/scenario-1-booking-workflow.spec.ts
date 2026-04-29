@@ -21,7 +21,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
   trainingTest(
     'should create booking successfully',
     async ({ userToken, trainingId1 }) => {
-      const response = await request.post(`${baseURL}/api/bookings`, {
+      const response = await request.post(`/api/bookings`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -48,7 +48,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
 
   // Step 17 - should return user bookings list
   trainingTest('should return user bookings list', async ({ userToken }) => {
-    const response = await request.get(`${baseURL}/api/bookings`, {
+    const response = await request.get(`/api/bookings`, {
       headers: {
         Authorization: `Bearer ${userToken}`,
       },
@@ -68,14 +68,11 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
   trainingTest(
     'should return booking by ID',
     async ({ userToken, bookingId }) => {
-      const response = await request.get(
-        `${baseURL}/api/bookings/${bookingId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+      const response = await request.get(`/api/bookings/${bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-      );
+      });
 
       expect(response.status()).toBe(200);
 
@@ -94,7 +91,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
   trainingTest(
     'should reject duplicate booking',
     async ({ userToken, trainingId1 }) => {
-      const response = await request.post(`${baseURL}/api/bookings`, {
+      const response = await request.post(`/api/bookings`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -114,7 +111,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
   trainingTest('should reject non-existent training', async ({ userToken }) => {
     const nonExistentTrainingId = '00000000-0000-0000-0000-000000000000';
 
-    const response = await request.post(`${baseURL}/api/bookings`, {
+    const response = await request.post(`/api/bookings`, {
       headers: {
         Authorization: `Bearer ${userToken}`,
       },
@@ -131,7 +128,7 @@ trainingTest.describe('Scenario 1: Booking Workflow', () => {
   trainingTest(
     'should reject request without token',
     async ({ trainingId1 }) => {
-      const response = await request.post(`${baseURL}/api/bookings`, {
+      const response = await request.post(`/api/bookings`, {
         data: {
           trainingId: trainingId1,
         },

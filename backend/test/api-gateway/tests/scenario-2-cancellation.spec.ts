@@ -21,14 +21,11 @@ bookingTest.describe('Scenario 2: Training Cancellation', () => {
   bookingTest(
     'should cancel booking successfully',
     async ({ userToken, bookingId }) => {
-      const response = await request.post(
-        `${baseURL}/api/bookings/${bookingId}/cancel`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+      const response = await request.post(`/api/bookings/${bookingId}/cancel`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-      );
+      });
 
       expect(response.status()).toBe(200);
 
@@ -45,14 +42,11 @@ bookingTest.describe('Scenario 2: Training Cancellation', () => {
   bookingTest(
     'should reject re-cancellation',
     async ({ userToken, bookingId }) => {
-      const response = await request.post(
-        `${baseURL}/api/bookings/${bookingId}/cancel`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+      const response = await request.post(`/api/bookings/${bookingId}/cancel`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-      );
+      });
 
       expect(response.status()).toBe(409);
 
@@ -66,7 +60,7 @@ bookingTest.describe('Scenario 2: Training Cancellation', () => {
     const nonExistentBookingId = '00000000-0000-0000-0000-000000000000';
 
     const response = await request.post(
-      `${baseURL}/api/bookings/${nonExistentBookingId}/cancel`,
+      `/api/bookings/${nonExistentBookingId}/cancel`,
       {
         headers: {
           Authorization: `Bearer ${userToken}`,

@@ -21,7 +21,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
   trainingTest(
     'should fill training with capacity 1',
     async ({ userToken, trainingId1 }) => {
-      const response = await request.post(`${baseURL}/api/bookings`, {
+      const response = await request.post(`/api/bookings`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -50,7 +50,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
   trainingTest('should create second user', async () => {
     const uniqueEmail = `user2_${Date.now()}@example.com`;
 
-    const response = await request.post(`${baseURL}/api/auth/register`, {
+    const response = await request.post(`/api/auth/register`, {
       data: {
         email: uniqueEmail,
         password: 'test12345',
@@ -80,18 +80,15 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
   trainingTest(
     'should deposit balance to user2',
     async ({ adminToken, user2Id }) => {
-      const response = await request.post(
-        `${baseURL}/api/auth/balance/deposit`,
-        {
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-          data: {
-            userId: user2Id,
-            amount: 5000,
-          },
+      const response = await request.post(`/api/auth/balance/deposit`, {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
         },
-      );
+        data: {
+          userId: user2Id,
+          amount: 5000,
+        },
+      });
 
       expect(response.status()).toBe(200);
 
@@ -106,7 +103,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
   trainingTest(
     'should reject booking full training',
     async ({ user2Token, trainingId1 }) => {
-      const response = await request.post(`${baseURL}/api/bookings`, {
+      const response = await request.post(`/api/bookings`, {
         headers: {
           Authorization: `Bearer ${user2Token}`,
         },
@@ -124,7 +121,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
 
   // Step 29 - should join waitlist
   trainingTest('should join waitlist', async ({ user2Token, trainingId1 }) => {
-    const response = await request.post(`${baseURL}/api/waitlist`, {
+    const response = await request.post(`/api/waitlist`, {
       headers: {
         Authorization: `Bearer ${user2Token}`,
       },
@@ -152,7 +149,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
     'should return waitlist position',
     async ({ user2Token, trainingId1 }) => {
       const response = await request.get(
-        `${baseURL}/api/waitlist/position?trainingId=${trainingId1}`,
+        `/api/waitlist/position?trainingId=${trainingId1}`,
         {
           headers: {
             Authorization: `Bearer ${user2Token}`,
@@ -179,7 +176,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
       const bookingId = process.env.BOOKING_ID_FILLED;
 
       const cancelResponse = await request.post(
-        `${baseURL}/api/bookings/${bookingId}/cancel`,
+        `/api/bookings/${bookingId}/cancel`,
         {
           headers: {
             Authorization: `Bearer ${userToken}`,
@@ -193,7 +190,7 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Then verify user2 got the booking via GET /api/bookings with user2Token
-      const bookingsResponse = await request.get(`${baseURL}/api/bookings`, {
+      const bookingsResponse = await request.get(`/api/bookings`, {
         headers: {
           Authorization: `Bearer ${user2Token}`,
         },
