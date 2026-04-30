@@ -1,11 +1,11 @@
-import type {components} from './api.generated';
-
-type Gender = components['schemas']['RegisterDto']['gender'];
-type TrainingType = components['schemas']['TrainingResponseDto']['type'];
-type TrainingStatus = components['schemas']['TrainingResponseDto']['status'];
-type TransactionType = components['schemas']['TransactionResponseDto']['type'];
-type BookingStatus = components['schemas']['BookingDto']['status'];
-type NotificationType = components['schemas']['NotificationDto']['type'];
+import type {
+  BookingStatus,
+  Gender,
+  NotificationType,
+  TrainingStatus,
+  TrainingType,
+  TransactionType,
+} from './types';
 
 export const GENDERS: Gender[] = ['male', 'female'];
 
