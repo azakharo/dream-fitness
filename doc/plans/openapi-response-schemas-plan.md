@@ -10,9 +10,14 @@ The current OpenAPI spec (`frontend/doc/openapi.json`) lacks response body schem
 
 ## Current State Analysis
 
-### Response DTOs Already Exist
+### Response DTOs Location
 
-The backend already has response DTOs defined in `backend/libs/contracts/`:
+Response DTOs are currently scattered across two locations:
+
+1. **`libs/contracts`** - shared DTOs for inter-service communication
+2. **Microservices** - internal DTOs specific to each service
+
+#### Existing DTOs in `libs/contracts`
 
 | Domain       | Response DTOs                                                                                  | File                                                  |
 | ------------ | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
@@ -21,29 +26,54 @@ The backend already has response DTOs defined in `backend/libs/contracts/`:
 | Booking      | `BookingDto`, `WaitlistDto`                                                                    | `libs/contracts/src/booking/booking.dto.ts`           |
 | Notification | `NotificationDto`                                                                              | `libs/contracts/src/notification/notification.dto.ts` |
 
+#### Existing DTOs in Microservices (need to be moved to contracts)
+
+| Microservice         | DTO                           | Current Location                                                                    |
+| -------------------- | ----------------------------- | ----------------------------------------------------------------------------------- |
+| auth-service         | `BalanceResponseDto`          | `apps/auth-service/src/balance/dto/balance-response.dto.ts`                         |
+| auth-service         | `TransactionListResponseDto`  | `apps/auth-service/src/balance/dto/transaction-list-response.dto.ts`                |
+| auth-service         | `TransactionResponseDto`      | `apps/auth-service/src/balance/dto/transaction-response.dto.ts`                     |
+| booking-service      | `BookingListResponseDto`      | `apps/booking-service/src/bookings/dto/booking-list-response.dto.ts`                |
+| booking-service      | `BookingResponseDto`          | `apps/booking-service/src/bookings/dto/booking-response.dto.ts`                     |
+| booking-service      | `WaitlistResponseDto`         | `apps/booking-service/src/waitlist/dto/waitlist-response.dto.ts`                    |
+| notification-service | `NotificationListResponseDto` | `apps/notification-service/src/notifications/dto/notification-list-response.dto.ts` |
+| notification-service | `NotificationResponseDto`     | `apps/notification-service/src/notifications/dto/notification-response.dto.ts`      |
+| notification-service | `UnreadCountResponseDto`      | `apps/notification-service/src/notifications/dto/unread-count-response.dto.ts`      |
+
 ### Missing: `@ApiResponse` Decorators
 
 The API Gateway proxy controllers (`backend/apps/api-gateway/src/proxy/*.proxy.ts`) only have `@ApiBody` decorators for request bodies, but no `@ApiResponse` decorators for responses.
 
 ## Implementation Plan
 
-### Phase 1: Add Missing Response DTOs
+### Phase 1: Consolidate Response DTOs in `libs/contracts`
 
-Some endpoints need additional response DTOs that don't exist yet:
+Move existing response DTOs from microservices to `libs/contracts` and create missing ones.
 
-1. **Balance endpoints** - Need:
-   - `BalanceResponseDto` (for `GET /api/auth/balance`)
-   - `TransactionListResponseDto` (for `GET /api/auth/transactions`)
+#### 1.1 Move Existing DTOs to `libs/contracts`
 
-2. **List endpoints** - Need wrapper DTOs:
-   - `TrainerListResponseDto`
-   - `TrainingListResponseDto`
-   - `BookingListResponseDto`
-   - `NotificationListResponseDto`
-   - `WaitlistResponseDto`
+| DTO                           | From (microservice)                                | To (libs/contracts)                                   |
+| ----------------------------- | -------------------------------------------------- | ----------------------------------------------------- |
+| `BalanceResponseDto`          | `apps/auth-service/src/balance/dto/`               | `libs/contracts/src/auth/auth.dto.ts`                 |
+| `TransactionListResponseDto`  | `apps/auth-service/src/balance/dto/`               | `libs/contracts/src/auth/auth.dto.ts`                 |
+| `TransactionResponseDto`      | `apps/auth-service/src/balance/dto/`               | `libs/contracts/src/auth/auth.dto.ts`                 |
+| `BookingListResponseDto`      | `apps/booking-service/src/bookings/dto/`           | `libs/contracts/src/booking/booking.dto.ts`           |
+| `BookingResponseDto`          | `apps/booking-service/src/bookings/dto/`           | `libs/contracts/src/booking/booking.dto.ts`           |
+| `WaitlistResponseDto`         | `apps/booking-service/src/waitlist/dto/`           | `libs/contracts/src/booking/booking.dto.ts`           |
+| `NotificationListResponseDto` | `apps/notification-service/src/notifications/dto/` | `libs/contracts/src/notification/notification.dto.ts` |
+| `NotificationResponseDto`     | `apps/notification-service/src/notifications/dto/` | `libs/contracts/src/notification/notification.dto.ts` |
+| `UnreadCountResponseDto`      | `apps/notification-service/src/notifications/dto/` | `libs/contracts/src/notification/notification.dto.ts` |
 
-3. **Count endpoints** - Need:
-   - `UnreadCountResponseDto`
+#### 1.2 Create Missing DTOs in `libs/contracts`
+
+| DTO                       | Location                                      | Purpose                   |
+| ------------------------- | --------------------------------------------- | ------------------------- |
+| `TrainerListResponseDto`  | `libs/contracts/src/training/training.dto.ts` | Wrapper for trainer list  |
+| `TrainingListResponseDto` | `libs/contracts/src/training/training.dto.ts` | Wrapper for training list |
+
+#### 1.3 Update Imports in Microservices
+
+After moving DTOs to contracts, update all microservice files that import these DTOs to use the centralized versions from `@app/contracts`.
 
 ### Phase 2: Add `@ApiResponse` Decorators
 
@@ -81,16 +111,38 @@ After adding decorators:
 
 ## Files to Modify
 
-### 1. Response DTOs (add missing ones)
+### 1. Move DTOs to `libs/contracts`
 
-| File                                                          | Add                                                     |
-| ------------------------------------------------------------- | ------------------------------------------------------- |
-| `backend/libs/contracts/src/auth/auth.dto.ts`                 | `BalanceResponseDto`, `TransactionListResponseDto`      |
-| `backend/libs/contracts/src/training/training.dto.ts`         | `TrainerListResponseDto`, `TrainingListResponseDto`     |
-| `backend/libs/contracts/src/booking/booking.dto.ts`           | `BookingListResponseDto`, `WaitlistResponseDto`         |
-| `backend/libs/contracts/src/notification/notification.dto.ts` | `NotificationListResponseDto`, `UnreadCountResponseDto` |
+| File                                                          | Action                                                                                 |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `backend/libs/contracts/src/auth/auth.dto.ts`                 | Add `BalanceResponseDto`, `TransactionListResponseDto`, `TransactionResponseDto`       |
+| `backend/libs/contracts/src/booking/booking.dto.ts`           | Add `BookingListResponseDto`, `BookingResponseDto`, `WaitlistResponseDto`              |
+| `backend/libs/contracts/src/notification/notification.dto.ts` | Add `NotificationListResponseDto`, `NotificationResponseDto`, `UnreadCountResponseDto` |
+| `backend/libs/contracts/src/training/training.dto.ts`         | Add `TrainerListResponseDto`, `TrainingListResponseDto` (new)                          |
 
-### 2. Proxy Controllers (add `@ApiResponse`)
+### 2. Delete Old DTO Files from Microservices
+
+| File                                                                                        | Action |
+| ------------------------------------------------------------------------------------------- | ------ |
+| `backend/apps/auth-service/src/balance/dto/balance-response.dto.ts`                         | Delete |
+| `backend/apps/auth-service/src/balance/dto/transaction-list-response.dto.ts`                | Delete |
+| `backend/apps/auth-service/src/balance/dto/transaction-response.dto.ts`                     | Delete |
+| `backend/apps/booking-service/src/bookings/dto/booking-list-response.dto.ts`                | Delete |
+| `backend/apps/booking-service/src/bookings/dto/booking-response.dto.ts`                     | Delete |
+| `backend/apps/booking-service/src/waitlist/dto/waitlist-response.dto.ts`                    | Delete |
+| `backend/apps/notification-service/src/notifications/dto/notification-list-response.dto.ts` | Delete |
+| `backend/apps/notification-service/src/notifications/dto/notification-response.dto.ts`      | Delete |
+| `backend/apps/notification-service/src/notifications/dto/unread-count-response.dto.ts`      | Delete |
+
+### 3. Update Imports in Microservices
+
+| Microservice         | Files to Update                                    | New Import Source |
+| -------------------- | -------------------------------------------------- | ----------------- |
+| auth-service         | `balance.controller.ts`, `balance.service.ts`      | `@app/contracts`  |
+| booking-service      | `bookings.controller.ts`, `waitlist.controller.ts` | `@app/contracts`  |
+| notification-service | `notifications.controller.ts`                      | `@app/contracts`  |
+
+### 4. Proxy Controllers (add `@ApiResponse`)
 
 | File                                                       | Endpoints to Update |
 | ---------------------------------------------------------- | ------------------- |
@@ -162,6 +214,15 @@ After adding decorators:
 
 ## Estimated Scope
 
-- **New DTOs**: ~8 response DTOs
-- **Modified files**: 8 files (4 DTO files + 4 proxy controllers)
+### Phase 1: Consolidate DTOs
+- **Move existing DTOs**: 9 DTOs from microservices to `libs/contracts`
+- **Create new DTOs**: 2 DTOs (`TrainerListResponseDto`, `TrainingListResponseDto`)
+- **Delete old files**: 9 DTO files in microservices
+- **Update imports**: ~6-10 files in microservices
+
+### Phase 2: Add @ApiResponse Decorators
 - **Decorators to add**: ~35 `@ApiResponse` decorators
+- **Modified proxy controllers**: 4 files
+
+### Phase 3: Regenerate OpenAPI Spec
+- Start API Gateway and export `/api/docs-json` to `frontend/doc/openapi.json`
