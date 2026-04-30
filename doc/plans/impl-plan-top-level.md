@@ -427,14 +427,8 @@
 
 - [ ] Скопировать OpenAPI спецификацию из backend: `frontend/doc/openapi.json`
 - [ ] Сгенерировать TypeScript типы: `npx openapi-typescript frontend/doc/openapi.json -o frontend/src/types/api.generated.ts`
-- [ ] Создать структуру папок для enum'ов: `frontend/src/types/enums/`
-- [ ] Скопировать enum'ы из backend:
-  - [ ] `UserGender`, `UserRole`, `UserStatus` → `types/enums/user.enums.ts`
-  - [ ] `TrainingType`, `TrainingStatus` → `types/enums/training.enums.ts`
-  - [ ] `BookingStatus` → `types/enums/booking.enums.ts`
-  - [ ] `NotificationType` → `types/enums/notification.enums.ts`
-- [ ] Создать `types/enums/index.ts` для re-export всех enum'ов
-- [ ] Создать `types/index.ts` для re-export всех типов
+- [ ] Создать `types/constants.ts` с runtime values для UI (dropdowns, filters)
+- [ ] Создать `types/index.ts` для re-export всех типов и констант
 
 ### 7.3. Auth Flow
 

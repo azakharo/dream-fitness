@@ -327,87 +327,105 @@ export const api = {
 
 ---
 
-## 4.2. Enum Sharing Strategy
+## 4.2. Runtime Constants for UI
 
 ### Решение
 
-**Копирование enum'ов из backend во frontend** с сохранением структуры и значений.
+**Использовать сгенерированные union types + runtime constants** для UI компонентов (dropdowns, filters).
 
 ### Обоснование
 
-| Аргумент            | Обоснование                                       |
-| ------------------- | ------------------------------------------------- |
-| Type Safety         | Единые типы для frontend и backend                |
-| IDE Support         | Автодополнение и валидация значений               |
-| No runtime overhead | Enum'ы компилируются в константы                  |
-| Simplicity          | Проще чем генерация из OpenAPI (enum'ы стабильны) |
+| Аргумент               | Обоснование                                              |
+| ---------------------- | -------------------------------------------------------- |
+| Single Source of Truth | Типы генерируются из OpenAPI, всегда синхронизированы   |
+| No manual sync         | Не нужно копировать enum'ы из backend                    |
+| Type Safety            | TypeScript проверяет соответствие значений типам         |
+| Runtime values         | Массивы значений для dropdowns и итерации                |
 
-### Enum'ы для копирования
+### Реализация
+
+openapi-typescript генерирует union types, не TypeScript enum'ы:
 
 ```typescript
-// types/enums/user.enums.ts
-export enum UserGender {
-  MALE = "male",
-  FEMALE = "female",
-}
-
-export enum UserRole {
-  CLIENT = "client",
-  ADMIN = "admin",
-}
-
-export enum UserStatus {
-  ACTIVE = "active",
-  BLOCKED = "blocked",
-}
-
-// types/enums/training.enums.ts
-export enum TrainingType {
-  YOGA = "yoga",
-  PILATES = "pilates",
-  CROSSFIT = "crossfit",
-  BOXING = "boxing",
-  STRENGTH = "strength",
-  CARDIO = "cardio",
-  DANCE = "dance",
-  STRETCHING = "stretching",
-}
-
-export enum TrainingStatus {
-  SCHEDULED = "scheduled",
-  CANCELLED = "cancelled",
-  COMPLETED = "completed",
-}
-
-// types/enums/booking.enums.ts
-export enum BookingStatus {
-  CONFIRMED = "confirmed",
-  CANCELLED = "cancelled",
-}
-
-// types/enums/notification.enums.ts
-export enum NotificationType {
-  BOOKING_CONFIRMATION = "booking_confirmation",
-  BOOKING_CANCELLATION = "booking_cancellation",
-  BALANCE_CHANGE = "balance_change",
-  TRAINING_REMINDER = "training_reminder",
-  WAITLIST_JOINED = "waitlist_joined",
-  WAITLIST_PROMOTED = "waitlist_promoted",
-}
+// types/api.generated.ts - автогенерируется
+export type components = {
+  schemas: {
+    TrainingType: "yoga" | "pilates" | "crossfit" | "boxing" | "strength" | "cardio" | "dance" | "stretching";
+    UserGender: "male" | "female";
+    UserRole: "client" | "admin";
+    BookingStatus: "confirmed" | "cancelled";
+    // ...
+  }
+};
 ```
+
+Для UI компонентов (dropdowns, filters) создаём runtime constants:
+
+```typescript
+// types/constants.ts
+import type { components } from "./api.generated";
+
+// Extract types for convenience
+type TrainingType = components["schemas"]["TrainingType"];
+type UserGender = components["schemas"]["UserGender"];
+type UserRole = components["schemas"]["UserRole"];
+
+// Runtime values for UI (dropdowns, filters)
+export const TRAINING_TYPES: TrainingType[] = [
+  "yoga",
+  "pilates",
+  "crossfit",
+  "boxing",
+  "strength",
+  "cardio",
+  "dance",
+  "stretching",
+];
+
+export const USER_GENDERS: UserGender[] = ["male", "female"];
+
+export const USER_ROLES: UserRole[] = ["client", "admin"];
+
+// Dropdown options with labels
+export const TRAINING_TYPE_OPTIONS = TRAINING_TYPES.map((type) => ({
+  value: type,
+  label: type.charAt(0).toUpperCase() + type.slice(1), // "Yoga", "Pilates", etc.
+}));
+
+export const USER_GENDER_OPTIONS = USER_GENDERS.map((gender) => ({
+  value: gender,
+  label: gender === "male" ? "Мужской" : "Женский",
+}));
+```
+
+### Использование в компонентах
+
+```typescript
+// components/training-filter.tsx
+import { TRAINING_TYPE_OPTIONS } from "@/types/constants";
+import { Select } from "@/components/ui/select";
+
+export const TrainingFilter = () => {
+  return (
+    <Select options={TRAINING_TYPE_OPTIONS} placeholder="Выберите тип тренировки" />
+  );
+};
+```
+
+### Преимущества подхода
+
+- ✅ Типы всегда синхронизированы с backend через openapi-typescript
+- ✅ TypeScript проверит, что значения в constants соответствуют типам
+- ✅ Если backend добавит новое значение — TypeScript покажет ошибку в constants.ts
+- ✅ Нет дублирования enum'ов между backend и frontend
 
 ### Структура файлов
 
 ```
 frontend/src/types/
-├── api.generated.ts      # Автогенерируется из OpenAPI
-├── enums/
-│   ├── index.ts          # Re-export всех enum'ов
-│   ├── user.enums.ts     # UserGender, UserRole, UserStatus
-│   ├── training.enums.ts # TrainingType, TrainingStatus
-│   ├── booking.enums.ts  # BookingStatus
-│   └── notification.enums.ts # NotificationType
-└── index.ts              # Re-export всех типов
+├── api.generated.ts      # Автогенерируется из OpenAPI (НЕ РЕДАКТИРОВАТЬ)
+├── constants.ts          # Runtime values для UI (dropdowns, filters)
+└── index.ts              # Re-export всех типов и констант
 ```
 
 ---
@@ -732,14 +750,9 @@ frontend/
 │   │   └── user.schema.ts
 │   │
 │   ├── types/                     # TypeScript types
-│   │   ├── api.generated.ts       # Автогенерируется из OpenAPI
-│   │   ├── enums/
-│   │   │   ├── index.ts           # Re-export всех enum'ов
-│   │   │   ├── user.enums.ts      # UserGender, UserRole, UserStatus
-│   │   │   ├── training.enums.ts  # TrainingType, TrainingStatus
-│   │   │   ├── booking.enums.ts   # BookingStatus
-│   │   │   └── notification.enums.ts # NotificationType
-│   │   └── index.ts               # Re-export всех типов
+│   │   ├── api.generated.ts       # Автогенерируется из OpenAPI (НЕ РЕДАКТИРОВАТЬ)
+│   │   ├── constants.ts           # Runtime values для UI (dropdowns, filters)
+│   │   └── index.ts               # Re-export всех типов и констант
 │   │
 │   ├── App.tsx
 │   ├── main.tsx
