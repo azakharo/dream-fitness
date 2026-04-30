@@ -420,9 +420,23 @@
 - [ ] Установить TanStack Router и Query
 - [ ] Установить Zustand
 - [ ] Установить ky, react-hook-form, zod
+- [ ] Установить openapi-typescript (dev dependency)
 - [ ] Настроить API client с ky
 
-### 7.2. Auth Flow
+### 7.2. Type Generation
+
+- [ ] Скопировать OpenAPI спецификацию из backend: `frontend/doc/openapi.json`
+- [ ] Сгенерировать TypeScript типы: `npx openapi-typescript frontend/doc/openapi.json -o frontend/src/types/api.generated.ts`
+- [ ] Создать структуру папок для enum'ов: `frontend/src/types/enums/`
+- [ ] Скопировать enum'ы из backend:
+  - [ ] `UserGender`, `UserRole`, `UserStatus` → `types/enums/user.enums.ts`
+  - [ ] `TrainingType`, `TrainingStatus` → `types/enums/training.enums.ts`
+  - [ ] `BookingStatus` → `types/enums/booking.enums.ts`
+  - [ ] `NotificationType` → `types/enums/notification.enums.ts`
+- [ ] Создать `types/enums/index.ts` для re-export всех enum'ов
+- [ ] Создать `types/index.ts` для re-export всех типов
+
+### 7.3. Auth Flow
 
 - [ ] Auth store (Zustand)
 - [ ] Login page
@@ -430,14 +444,14 @@
 - [ ] Protected routes
 - [ ] Token refresh handling
 
-### 7.3. Layouts
+### 7.4. Layouts
 
 - [ ] ClientLayout (top nav desktop, bottom nav mobile)
 - [ ] AdminLayout (sidebar)
 - [ ] Header component
 - [ ] Notifications bell
 
-### 7.4. Client Pages
+### 7.5. Client Pages
 
 **Dashboard:**
 
@@ -476,7 +490,7 @@
 - [ ] Mark as read
 - [ ] Filter by type
 
-### 7.5. Admin Pages
+### 7.6. Admin Pages
 
 **Admin Dashboard:**
 
@@ -502,7 +516,7 @@
 - [ ] Loading charts
 - [ ] Financial reports
 
-### 7.6. Common Components
+### 7.7. Common Components
 
 - [ ] Loading spinner
 - [ ] Empty states

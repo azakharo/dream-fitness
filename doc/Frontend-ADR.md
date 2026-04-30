@@ -249,6 +249,169 @@ export const useCreateBooking = () => {
 
 ---
 
+## 4.1. Type Generation from OpenAPI
+
+### Решение
+
+**openapi-typescript** для генерации TypeScript типов из OpenAPI спецификации backend.
+
+### Обоснование
+
+| Аргумент               | Обоснование                                       |
+| ---------------------- | ------------------------------------------------- |
+| Single Source of Truth | Типы генерируются из OpenAPI спецификации backend |
+| Type Safety            | Полная типизация API запросов и ответов           |
+| Auto-sync              | Обновление типов при изменении API                |
+| No manual maintenance  | Исключает ручное написание и поддержку API типов  |
+
+### Реализация
+
+```bash
+# Установка
+npm i -D -E openapi-typescript
+
+# Генерация типов
+npx openapi-typescript frontend/doc/openapi.json -o frontend/src/types/api.generated.ts
+```
+
+### Использование
+
+```typescript
+// types/api.generated.ts - автогенерируемый файл
+// НЕ РЕДАКТИРОВАТЬ ВРУЧНУЮ
+
+import type { paths, components } from "./api.generated";
+
+// Типы для API ответов
+type Training = components["schemas"]["TrainingResponseDto"];
+type Booking = components["schemas"]["BookingResponseDto"];
+type User = components["schemas"]["UserResponseDto"];
+
+// Типы для API запросов
+type CreateBookingRequest = components["schemas"]["CreateBookingDto"];
+type LoginRequest = components["schemas"]["LoginDto"];
+
+// Типизированные API методы
+export const api = {
+  getTrainings: () =>
+    kyInstance
+      .get("trainings")
+      .json<components["schemas"]["TrainingResponseDto"][]>(),
+
+  createBooking: (body: components["schemas"]["CreateBookingDto"]) =>
+    kyInstance
+      .post("bookings", { json: body })
+      .json<components["schemas"]["BookingResponseDto"]>(),
+};
+```
+
+### Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Type Generation Flow                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Backend: Swagger генерирует OpenAPI spec                    │
+│     /api/docs-json → openapi.json                               │
+│                                                                 │
+│  2. Copy openapi.json to frontend/doc/openapi.json              │
+│                                                                 │
+│  3. Run: npx openapi-typescript frontend/doc/openapi.json       │
+│        -o frontend/src/types/api.generated.ts                   │
+│                                                                 │
+│  4. Import и использование типов в компонентах и hooks          │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 4.2. Enum Sharing Strategy
+
+### Решение
+
+**Копирование enum'ов из backend во frontend** с сохранением структуры и значений.
+
+### Обоснование
+
+| Аргумент            | Обоснование                                       |
+| ------------------- | ------------------------------------------------- |
+| Type Safety         | Единые типы для frontend и backend                |
+| IDE Support         | Автодополнение и валидация значений               |
+| No runtime overhead | Enum'ы компилируются в константы                  |
+| Simplicity          | Проще чем генерация из OpenAPI (enum'ы стабильны) |
+
+### Enum'ы для копирования
+
+```typescript
+// types/enums/user.enums.ts
+export enum UserGender {
+  MALE = "male",
+  FEMALE = "female",
+}
+
+export enum UserRole {
+  CLIENT = "client",
+  ADMIN = "admin",
+}
+
+export enum UserStatus {
+  ACTIVE = "active",
+  BLOCKED = "blocked",
+}
+
+// types/enums/training.enums.ts
+export enum TrainingType {
+  YOGA = "yoga",
+  PILATES = "pilates",
+  CROSSFIT = "crossfit",
+  BOXING = "boxing",
+  STRENGTH = "strength",
+  CARDIO = "cardio",
+  DANCE = "dance",
+  STRETCHING = "stretching",
+}
+
+export enum TrainingStatus {
+  SCHEDULED = "scheduled",
+  CANCELLED = "cancelled",
+  COMPLETED = "completed",
+}
+
+// types/enums/booking.enums.ts
+export enum BookingStatus {
+  CONFIRMED = "confirmed",
+  CANCELLED = "cancelled",
+}
+
+// types/enums/notification.enums.ts
+export enum NotificationType {
+  BOOKING_CONFIRMATION = "booking_confirmation",
+  BOOKING_CANCELLATION = "booking_cancellation",
+  BALANCE_CHANGE = "balance_change",
+  TRAINING_REMINDER = "training_reminder",
+  WAITLIST_JOINED = "waitlist_joined",
+  WAITLIST_PROMOTED = "waitlist_promoted",
+}
+```
+
+### Структура файлов
+
+```
+frontend/src/types/
+├── api.generated.ts      # Автогенерируется из OpenAPI
+├── enums/
+│   ├── index.ts          # Re-export всех enum'ов
+│   ├── user.enums.ts     # UserGender, UserRole, UserStatus
+│   ├── training.enums.ts # TrainingType, TrainingStatus
+│   ├── booking.enums.ts  # BookingStatus
+│   └── notification.enums.ts # NotificationType
+└── index.ts              # Re-export всех типов
+```
+
+---
+
 ## 5. Формы и валидация
 
 ### Решение
@@ -569,10 +732,14 @@ frontend/
 │   │   └── user.schema.ts
 │   │
 │   ├── types/                     # TypeScript types
-│   │   ├── api.ts
-│   │   ├── user.ts
-│   │   ├── training.ts
-│   │   └── booking.ts
+│   │   ├── api.generated.ts       # Автогенерируется из OpenAPI
+│   │   ├── enums/
+│   │   │   ├── index.ts           # Re-export всех enum'ов
+│   │   │   ├── user.enums.ts      # UserGender, UserRole, UserStatus
+│   │   │   ├── training.enums.ts  # TrainingType, TrainingStatus
+│   │   │   ├── booking.enums.ts   # BookingStatus
+│   │   │   └── notification.enums.ts # NotificationType
+│   │   └── index.ts               # Re-export всех типов
 │   │
 │   ├── App.tsx
 │   ├── main.tsx
