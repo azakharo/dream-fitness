@@ -425,7 +425,8 @@
 
 ### 7.2. Type Generation
 
-- [ ] Скопировать OpenAPI спецификацию из backend: `frontend/doc/openapi.json`
+OpenAPI спецификация из backend уже лежит здесь: `frontend/doc/openapi.json`.
+
 - [ ] Сгенерировать TypeScript типы: `npx openapi-typescript frontend/doc/openapi.json -o frontend/src/types/api.generated.ts`
 - [ ] Создать `types/constants.ts` с runtime values для UI (dropdowns, filters)
 - [ ] Создать `types/index.ts` для re-export всех типов и констант
