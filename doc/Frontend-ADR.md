@@ -2,8 +2,10 @@
 
 ## Контекст
 
-Смотри ./UI.md — функциональные требования к фронтенду.
-Смотри ./ADR.md — backend-архитектура.
+- [Функциональные требования к фронтенду](./UI.md)
+- [архитектура Backend](./ADR.md)
+- [OpenApi спецификация REST API Backend](../frontend/doc/openapi.json)
+- [Краткое описание REST API Backend](../frontend/doc/API.md)
 
 ---
 
@@ -17,7 +19,7 @@
 | UI Kit         | shadcn/ui + Radix           | Latest |
 | Styling        | Tailwind CSS                | 4.2    |
 | HTTP Client    | ky                          | 1.7    |
-| React Compiler | babel-plugin-react-compiler | 1.0    |
+| React Compiler | babel-plugin-react-compiler | latest |
 
 ---
 
@@ -625,7 +627,6 @@ export default defineConfig({
 Выбранный стек обеспечивает:
 
 - **Знакомый инструментарий** — минимум сюрпризов при разработке
-- **Фокус на backend** — учебная цель проекта достигается эффективнее
 - **Type Safety** — TypeScript + Zod = меньше runtime ошибок
 - **Performance** — React Compiler + Zustand + TanStack Query = оптимальная скорость
 - **DX** — современные инструменты с хорошим developer experience
