@@ -1,23 +1,13 @@
 import {create} from 'zustand';
 import {persist, createJSONStorage} from 'zustand/middleware';
+import type {components} from '@/types/api.generated';
 
-export interface User {
-  id: string;
-  email: string;
-  role: 'client' | 'admin';
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
+type User = components['schemas']['UserProfileDto'];
 interface AuthState {
   accessToken: string | null;
   user: User | null;
   isLoading: boolean;
 }
-
 interface AuthActions {
   logout: () => void;
   refreshTokens: () => Promise<void>;
@@ -26,9 +16,7 @@ interface AuthActions {
   setLoading: (loading: boolean) => void;
 }
 
-interface RefreshResponse {
-  accessToken: string;
-}
+type RefreshResponse = components['schemas']['LoginResponseBody'];
 
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(

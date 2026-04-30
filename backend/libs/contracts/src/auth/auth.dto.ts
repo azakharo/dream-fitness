@@ -66,29 +66,69 @@ export class RefreshTokenDto {
 }
 
 export class UserDto {
+  @ApiProperty()
   id: string;
+
+  @ApiProperty()
   email: string;
+
+  @ApiProperty()
   name: string;
+
+  @ApiPropertyOptional()
   phone: string | null;
+
+  @ApiPropertyOptional()
   birthDate: string | null;
+
+  @ApiPropertyOptional({ enum: UserGender })
   gender: UserGender | null;
+
+  @ApiProperty({ enum: UserRole })
   role: UserRole;
+
+  @ApiProperty()
   balance: number;
+
+  @ApiProperty({ enum: UserStatus })
   status: UserStatus;
+
+  @ApiProperty()
   createdAt: string;
 }
 
 export class UserProfileDto {
+  @ApiProperty()
   id: string;
+
+  @ApiProperty()
   email: string;
+
+  @ApiProperty()
   name: string;
+
+  @ApiPropertyOptional()
   phone: string | null;
+
+  @ApiPropertyOptional()
   birthDate: string | null;
+
+  @ApiPropertyOptional({ enum: UserGender })
   gender: UserGender | null;
+
+  @ApiProperty({ enum: UserRole })
   role: UserRole;
+
+  @ApiProperty()
   balance: number;
+
+  @ApiProperty({ enum: UserStatus })
   status: UserStatus;
+
+  @ApiProperty()
   createdAt: string;
+
+  @ApiProperty()
   updatedAt: string;
 }
 
