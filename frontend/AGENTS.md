@@ -7,6 +7,7 @@
 - [Frontend ADR](../doc/Frontend-ADR.md)
 - [OpenAPI 3.0 спецификация API бекенда](./doc/openapi.json)
 - [Краткое описание API бекенда](./doc/API.md)
+- [Все типы данных, предоставляемые backend API](./src/types/types.ts)
 
 ## Технологический стек
 
@@ -23,3 +24,4 @@
 - Production build: `npm run build`
 - Проверка кода на наличие ошибок Typescript: `npm run ts`
 - Линтинг и автоформатирование кода: `npm run lint`
+- Авто-генерация типов данных, предоставляемых backend API, из OpenAPI spec: `npm run gen:types`
