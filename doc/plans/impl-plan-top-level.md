@@ -526,6 +526,8 @@
 - [ ] E2E тесты (Playwright):
   - Auth flow: login → redirect to dashboard
   - Booking flow: schedule → select training → book → confirmation
+  - Cancellation flow
+  - Waitlist promotion flow
   - Admin flow: login → create training → verify in schedule
 - [ ] `npm run lint` — без ошибок
 - [ ] `npm run build` — успешная сборка
