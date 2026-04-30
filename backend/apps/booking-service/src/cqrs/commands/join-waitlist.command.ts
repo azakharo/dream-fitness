@@ -1,5 +1,5 @@
 import { Command } from '@nestjs/cqrs';
-import { WaitlistResponseDto } from '../../waitlist/dto';
+import { WaitlistResponseDto } from '@app/contracts/booking';
 
 export class JoinWaitlistCommand extends Command<WaitlistResponseDto> {
   constructor(

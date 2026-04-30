@@ -11,9 +11,19 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+  ApiTags,
+  ApiResponse,
+} from '@nestjs/swagger';
 import type { RequestWithUser } from '@app/shared';
 import { ProxyService } from './proxy.service';
+import {
+  NotificationListResponseDto,
+  UnreadCountResponseDto,
+  NotificationDto,
+} from '@app/contracts/notification';
 
 const NOTIFICATION_SERVICE_URL = 'NOTIFICATION_SERVICE_URL';
 const NOTIFICATION_SERVICE_DEFAULT_URL = 'http://localhost:3004';
@@ -27,6 +37,12 @@ export class NotificationProxyController {
   @Get('notifications')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Notifications retrieved',
+    type: NotificationListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getNotifications(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -41,6 +57,12 @@ export class NotificationProxyController {
   @Get('notifications/unread-count')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Unread count retrieved',
+    type: UnreadCountResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getUnreadCount(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -55,6 +77,13 @@ export class NotificationProxyController {
   @Get('notifications/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Notification retrieved',
+    type: NotificationDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Notification not found' })
   getNotificationById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -69,6 +98,13 @@ export class NotificationProxyController {
   @Patch('notifications/:id/read')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Notification marked as read',
+    type: NotificationDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Notification not found' })
   markAsRead(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -83,6 +119,12 @@ export class NotificationProxyController {
   @Patch('notifications/read-all')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'All notifications marked as read',
+    schema: { type: 'object', properties: { updated: { type: 'number' } } },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   markAllAsRead(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -97,6 +139,13 @@ export class NotificationProxyController {
   @Delete('notifications/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Notification deleted',
+    schema: { type: 'object', properties: { deleted: { type: 'boolean' } } },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Notification not found' })
   deleteNotification(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -111,6 +160,12 @@ export class NotificationProxyController {
   @Delete('notifications')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'All notifications deleted',
+    schema: { type: 'object', properties: { deleted: { type: 'number' } } },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   deleteAllNotifications(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,

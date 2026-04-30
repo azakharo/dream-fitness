@@ -5,9 +5,11 @@ import {
   NotificationFilter,
 } from './repositories/notification.repository';
 import { Notification } from './entities/notification.entity';
-import { NotificationResponseDto } from './dto/notification-response.dto';
-import { NotificationListResponseDto } from './dto/notification-list-response.dto';
-import { UnreadCountResponseDto } from './dto/unread-count-response.dto';
+import {
+  NotificationResponseDto,
+  NotificationListResponseDto,
+  UnreadCountResponseDto,
+} from '@app/contracts/notification';
 import { NotificationNotFoundException } from '../common/exceptions';
 
 @Injectable()

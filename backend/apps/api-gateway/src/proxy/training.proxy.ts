@@ -19,6 +19,7 @@ import {
   ApiExcludeEndpoint,
   ApiTags,
   ApiBody,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { ProxyService } from './proxy.service';
 import {
@@ -26,6 +27,10 @@ import {
   UpdateTrainerDto,
   CreateTrainingDto,
   UpdateTrainingDto,
+  TrainerListResponseDto,
+  TrainerResponseDto,
+  TrainingListResponseDto,
+  TrainingResponseDto,
 } from '@app/contracts/training';
 
 const TRAINING_SERVICE_URL = 'TRAINING_SERVICE_URL';
@@ -40,6 +45,12 @@ export class TrainingProxyController {
   @Get('trainers')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Trainers retrieved',
+    type: TrainerListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getTrainers(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -54,6 +65,13 @@ export class TrainingProxyController {
   @Get('trainers/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Trainer retrieved',
+    type: TrainerResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Trainer not found' })
   getTrainerById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -70,6 +88,14 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiBody({ type: CreateTrainerDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Trainer created',
+    type: TrainerResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   createTrainer(@Req() req: RequestWithUser, @Body() body: CreateTrainerDto) {
     return this.proxyService.proxyRequest(
       req,
@@ -86,6 +112,15 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiBody({ type: UpdateTrainerDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Trainer updated',
+    type: TrainerResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  @ApiResponse({ status: 404, description: 'Trainer not found' })
   updateTrainer(
     @Req() req: RequestWithUser,
     @Param('id') id: string,
@@ -105,6 +140,14 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Trainer deleted',
+    schema: { type: 'object', properties: { deleted: { type: 'boolean' } } },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  @ApiResponse({ status: 404, description: 'Trainer not found' })
   deleteTrainer(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -120,6 +163,12 @@ export class TrainingProxyController {
   @Get('trainings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Trainings retrieved',
+    type: TrainingListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getTrainings(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -134,6 +183,13 @@ export class TrainingProxyController {
   @Get('trainings/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Training retrieved',
+    type: TrainingResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Training not found' })
   getTrainingById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -150,6 +206,14 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiBody({ type: CreateTrainingDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Training created',
+    type: TrainingResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   createTraining(@Req() req: RequestWithUser, @Body() body: CreateTrainingDto) {
     return this.proxyService.proxyRequest(
       req,
@@ -166,6 +230,15 @@ export class TrainingProxyController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiBody({ type: UpdateTrainingDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Training updated',
+    type: TrainingResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  @ApiResponse({ status: 404, description: 'Training not found' })
   updateTraining(
     @Req() req: RequestWithUser,
     @Param('id') id: string,
@@ -185,6 +258,14 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Training deleted',
+    schema: { type: 'object', properties: { deleted: { type: 'boolean' } } },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
+  @ApiResponse({ status: 404, description: 'Training not found' })
   deleteTraining(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -200,6 +281,12 @@ export class TrainingProxyController {
   @Get('schedule')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Schedule retrieved',
+    type: TrainingListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getSchedule(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -214,6 +301,12 @@ export class TrainingProxyController {
   @Get('schedule/:date')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Schedule for date retrieved',
+    type: TrainingListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getScheduleByDate(@Req() req: RequestWithUser, @Param('date') date: string) {
     return this.proxyService.proxyRequest(
       req,

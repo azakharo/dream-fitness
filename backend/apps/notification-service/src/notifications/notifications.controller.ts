@@ -19,12 +19,11 @@ import {
 import { InternalGuard, InternalUser } from '@app/shared';
 import { NotificationsService } from './notifications.service';
 import {
-  NotificationFilterDto,
   NotificationResponseDto,
   NotificationListResponseDto,
   UnreadCountResponseDto,
-  CreateNotificationAdminDto,
-} from './dto';
+} from '@app/contracts/notification';
+import { NotificationFilterDto, CreateNotificationAdminDto } from './dto';
 import { NotificationFilter } from './repositories/notification.repository';
 import { AdminGuard } from '../auth/guards';
 

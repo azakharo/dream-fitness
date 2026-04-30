@@ -110,3 +110,45 @@ export class NotificationFilterDto {
   @Max(50)
   limit?: number;
 }
+
+export class NotificationResponseDto {
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  id: string;
+
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  userId: string;
+
+  @ApiProperty({ enum: NotificationType })
+  type: NotificationType;
+
+  @ApiProperty({ example: 'Training Reminder' })
+  title: string;
+
+  @ApiProperty({ example: 'Your training starts in 30 minutes' })
+  content: string;
+
+  @ApiProperty({ example: false })
+  isRead: boolean;
+
+  @ApiProperty({ example: '2024-01-15T10:00:00Z' })
+  createdAt: Date;
+}
+
+export class NotificationListResponseDto {
+  @ApiProperty({ type: [NotificationResponseDto] })
+  items: NotificationResponseDto[];
+
+  @ApiProperty({ example: 25 })
+  total: number;
+
+  @ApiProperty({ example: 1 })
+  page: number;
+
+  @ApiProperty({ example: 10 })
+  limit: number;
+}
+
+export class UnreadCountResponseDto {
+  @ApiProperty({ example: 5 })
+  count: number;
+}

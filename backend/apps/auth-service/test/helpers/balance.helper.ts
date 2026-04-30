@@ -4,9 +4,11 @@ import { DepositDto } from '../../src/balance/dto/deposit.dto';
 import { ReserveDto } from '../../src/balance/dto/reserve.dto';
 import { ReleaseDto } from '../../src/balance/dto/release.dto';
 import { RefundDto } from '../../src/balance/dto/refund.dto';
-import { TransactionResponseDto } from '../../src/balance/dto/transaction-response.dto';
-import { TransactionListResponseDto } from '../../src/balance/dto/transaction-list-response.dto';
-import { BalanceResponseDto } from '../../src/balance/dto/balance-response.dto';
+import {
+  TransactionResponseDto,
+  TransactionListResponseDto,
+  BalanceResponseDto,
+} from '@app/contracts';
 
 export class BalanceHelper {
   constructor(private readonly request: request.SuperTest<request.Test>) {}

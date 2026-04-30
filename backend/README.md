@@ -49,13 +49,13 @@ API documentation is available on:
 ### Stop dev infrastructure
 
 ```bash
-$ npm run start:dev:infra
+$ npm run stop:dev:infra
 ```
 
 If you want to clear the DB data, then run instead:
 
 ```bash
-$ npm run start:dev:infra -- -v
+$ npm run stop:dev:infra -- -v
 ```
 
 ---
@@ -105,13 +105,13 @@ E2E tests start a real NestJS application, connect to the test database (`dreamf
 ### Step 4: Stop test infrastructure
 
 ```bash
-$ npm run start:test:infra
+$ npm run stop:test:infra
 ```
 
 If you want to clear the DB data, then run instead:
 
 ```bash
-$ npm run start:test:infra -- -v
+$ npm run stop:test:infra -- -v
 ```
 
 ## Run in production mode

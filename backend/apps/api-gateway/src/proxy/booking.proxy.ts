@@ -16,6 +16,7 @@ import {
   ApiExcludeEndpoint,
   ApiTags,
   ApiBody,
+  ApiResponse,
 } from '@nestjs/swagger';
 import type { RequestWithUser } from '@app/shared';
 import { ProxyService } from './proxy.service';
@@ -23,6 +24,10 @@ import {
   CreateBookingDto,
   CancelBookingDto,
   JoinWaitlistDto,
+  BookingListResponseDto,
+  BookingDto,
+  WaitlistResponseDto,
+  WaitlistDto,
 } from '@app/contracts/booking';
 
 const BOOKING_SERVICE_URL = 'BOOKING_SERVICE_URL';
@@ -37,6 +42,12 @@ export class BookingProxyController {
   @Get('bookings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Bookings retrieved',
+    type: BookingListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getBookings(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -51,6 +62,13 @@ export class BookingProxyController {
   @Get('bookings/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Booking retrieved',
+    type: BookingDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Booking not found' })
   getBookingById(@Req() req: RequestWithUser, @Param('id') id: string) {
     return this.proxyService.proxyRequest(
       req,
@@ -66,6 +84,18 @@ export class BookingProxyController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiBody({ type: CreateBookingDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Booking created',
+    type: BookingDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Training not found' })
+  @ApiResponse({
+    status: 409,
+    description: 'Booking already exists or no available slots',
+  })
   createBooking(@Req() req: RequestWithUser, @Body() body: CreateBookingDto) {
     return this.proxyService.proxyRequest(
       req,
@@ -81,6 +111,17 @@ export class BookingProxyController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiBody({ type: CancelBookingDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Booking cancelled',
+    type: BookingDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Booking not found' })
+  @ApiResponse({
+    status: 409,
+    description: 'Booking already cancelled or past training',
+  })
   cancelBooking(
     @Req() req: RequestWithUser,
     @Param('id') id: string,
@@ -100,6 +141,13 @@ export class BookingProxyController {
   @Get('waitlist')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Waitlist retrieved',
+    type: WaitlistResponseDto,
+    isArray: true,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   getWaitlist(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
@@ -114,6 +162,13 @@ export class BookingProxyController {
   @Get('waitlist/:trainingId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Waitlist position retrieved',
+    type: WaitlistDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Not on waitlist' })
   getWaitlistPosition(
     @Req() req: RequestWithUser,
     @Param('trainingId') trainingId: string,
@@ -132,6 +187,18 @@ export class BookingProxyController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiBody({ type: JoinWaitlistDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Added to waitlist',
+    type: WaitlistDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Training not found' })
+  @ApiResponse({
+    status: 409,
+    description: 'Already on waitlist or has active booking',
+  })
   joinWaitlist(@Req() req: RequestWithUser, @Body() body: JoinWaitlistDto) {
     return this.proxyService.proxyRequest(
       req,
@@ -146,6 +213,13 @@ export class BookingProxyController {
   @Delete('waitlist/:trainingId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Left waitlist',
+    schema: { type: 'object', properties: { deleted: { type: 'boolean' } } },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Not on waitlist' })
   leaveWaitlist(
     @Req() req: RequestWithUser,
     @Param('trainingId') trainingId: string,

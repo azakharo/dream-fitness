@@ -118,3 +118,54 @@ export class WaitlistFilterDto {
   @Max(50)
   limit?: number;
 }
+
+export class BookingResponseDto {
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  id: string;
+
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  userId: string;
+
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  trainingId: string;
+
+  @ApiProperty({ enum: BookingStatus })
+  status: BookingStatus;
+
+  @ApiProperty({ example: '2024-01-15T10:00:00Z' })
+  createdAt: string;
+
+  @ApiProperty({ example: '2024-01-15T10:00:00Z' })
+  updatedAt: string;
+}
+
+export class BookingListResponseDto {
+  @ApiProperty({ type: [BookingResponseDto] })
+  items: BookingResponseDto[];
+
+  @ApiProperty({ example: 25 })
+  total: number;
+
+  @ApiProperty({ example: 1 })
+  page: number;
+
+  @ApiProperty({ example: 10 })
+  limit: number;
+}
+
+export class WaitlistResponseDto {
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  id: string;
+
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  userId: string;
+
+  @ApiProperty({ example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' })
+  trainingId: string;
+
+  @ApiProperty({ example: 3 })
+  position: number;
+
+  @ApiProperty({ example: '2024-01-15T10:00:00Z' })
+  joinedAt: string;
+}

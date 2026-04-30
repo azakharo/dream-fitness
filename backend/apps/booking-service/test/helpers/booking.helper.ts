@@ -1,7 +1,9 @@
 import request from 'supertest';
 import { Response } from 'supertest';
-import { BookingResponseDto } from '../../src/bookings/dto/booking-response.dto';
-import { BookingListResponseDto } from '../../src/bookings/dto/booking-list-response.dto';
+import {
+  BookingResponseDto,
+  BookingListResponseDto,
+} from '@app/contracts/booking';
 
 export type TestResponse<T> = Omit<Response, 'body'> & {
   body: T;

@@ -13,6 +13,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
 import { User } from 'apps/auth-service/src/users/entities/user.entity';
+import { TransactionResponseDto } from './transaction.dto';
 
 export class LoginDto {
   @ApiProperty({ example: 'user@example.com' })
@@ -126,4 +127,23 @@ export class RegisterResponseBody {
 
   @ApiProperty()
   tokens: LoginResponseBody;
+}
+
+export class BalanceResponseDto {
+  @ApiProperty({ example: 1500 })
+  balance!: number;
+}
+
+export class TransactionListResponseDto {
+  @ApiProperty({ type: [TransactionResponseDto] })
+  items!: TransactionResponseDto[];
+
+  @ApiProperty({ example: 25 })
+  total!: number;
+
+  @ApiProperty({ example: 1 })
+  page!: number;
+
+  @ApiProperty({ example: 10 })
+  limit!: number;
 }

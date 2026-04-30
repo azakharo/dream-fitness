@@ -4,7 +4,7 @@ import { TEST_CONFIG } from '../test-config';
 import {
   BookingListResponseDto,
   BookingResponseDto,
-} from 'apps/booking-service/src/bookings/dto';
+} from '@app/contracts/booking';
 
 const baseURL = TEST_CONFIG.baseURL;
 
