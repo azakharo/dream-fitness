@@ -17,6 +17,10 @@
 - Tailwind CSS
 - **UI Library:** [shadcn/ui](https://ui.shadcn.com/) with Radix UI — доступные UI компоненты на базе Radix примитивов
 
+## Структура папок проекта
+
+[Структура проекта](../doc/Frontend-ADR.md#7-структура-проекта)
+
 ## Основные npm команды
 
 - Установка зависимостей: `npm install`
