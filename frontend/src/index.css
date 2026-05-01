@@ -25,6 +25,8 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
@@ -49,72 +51,112 @@
 }
 
 :root {
+    /* DreamFitness Theme: Lime - Energy & Vitality */
     --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --foreground: oklch(0.15 0.02 130);
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card-foreground: oklch(0.15 0.02 130);
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.15 0.02 130);
+
+    /* Primary - Lime */
+    --primary: oklch(0.68 0.22 130);
+    --primary-foreground: oklch(0.98 0.02 130);
+
+    /* Secondary - Neutral */
+    --secondary: oklch(0.96 0.01 130);
+    --secondary-foreground: oklch(0.25 0.02 130);
+
+    /* Muted - Soft backgrounds */
+    --muted: oklch(0.96 0.01 130);
+    --muted-foreground: oklch(0.50 0.02 130);
+
+    /* Accent - Light lime */
+    --accent: oklch(0.94 0.10 130);
+    --accent-foreground: oklch(0.35 0.12 130);
+
+    /* Semantic colors */
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    --success: oklch(0.72 0.19 142);
+    --warning: oklch(0.80 0.16 85);
+
+    /* Form elements */
+    --border: oklch(0.90 0.01 130);
+    --input: oklch(0.92 0.01 130);
+    --ring: oklch(0.68 0.22 130);
+
+    /* Chart colors - Lime gradient */
+    --chart-1: oklch(0.68 0.22 130);
+    --chart-2: oklch(0.62 0.20 140);
+    --chart-3: oklch(0.56 0.18 150);
+    --chart-4: oklch(0.50 0.16 155);
+    --chart-5: oklch(0.45 0.14 160);
+
+    /* Border radius */
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+
+    /* Sidebar - Admin panel */
+    --sidebar: oklch(0.98 0.01 130);
+    --sidebar-foreground: oklch(0.15 0.02 130);
+    --sidebar-primary: oklch(0.68 0.22 130);
+    --sidebar-primary-foreground: oklch(0.98 0.02 130);
+    --sidebar-accent: oklch(0.94 0.10 130);
+    --sidebar-accent-foreground: oklch(0.35 0.12 130);
+    --sidebar-border: oklch(0.90 0.01 130);
+    --sidebar-ring: oklch(0.68 0.22 130);
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    /* DreamFitness Theme: Lime Dark - Vibrant in darkness */
+    --background: oklch(0.15 0.02 130);
+    --foreground: oklch(0.96 0.01 130);
+    --card: oklch(0.18 0.02 130);
+    --card-foreground: oklch(0.96 0.01 130);
+    --popover: oklch(0.18 0.02 130);
+    --popover-foreground: oklch(0.96 0.01 130);
+
+    /* Primary - Lime - Bright in dark mode */
+    --primary: oklch(0.75 0.22 130);
+    --primary-foreground: oklch(0.15 0.02 130);
+
+    /* Secondary - Dark accent */
+    --secondary: oklch(0.25 0.02 130);
+    --secondary-foreground: oklch(0.96 0.01 130);
+
+    /* Muted - Subtle backgrounds */
+    --muted: oklch(0.25 0.02 130);
+    --muted-foreground: oklch(0.70 0.02 130);
+
+    /* Accent - Dark lime */
+    --accent: oklch(0.30 0.08 130);
+    --accent-foreground: oklch(0.96 0.01 130);
+
+    /* Semantic colors */
+    --destructive: oklch(0.65 0.20 25);
+    --success: oklch(0.75 0.18 145);
+    --warning: oklch(0.82 0.15 85);
+
+    /* Form elements */
+    --border: oklch(0.30 0.02 130);
+    --input: oklch(0.25 0.02 130);
+    --ring: oklch(0.75 0.22 130);
+
+    /* Chart colors - Lime gradient (brighter in dark) */
+    --chart-1: oklch(0.75 0.22 130);
+    --chart-2: oklch(0.68 0.20 140);
+    --chart-3: oklch(0.62 0.18 150);
+    --chart-4: oklch(0.56 0.16 155);
+    --chart-5: oklch(0.50 0.14 160);
+
+    /* Sidebar - Admin panel */
+    --sidebar: oklch(0.18 0.02 130);
+    --sidebar-foreground: oklch(0.96 0.01 130);
+    --sidebar-primary: oklch(0.75 0.22 130);
+    --sidebar-primary-foreground: oklch(0.15 0.02 130);
+    --sidebar-accent: oklch(0.30 0.08 130);
+    --sidebar-accent-foreground: oklch(0.96 0.01 130);
+    --sidebar-border: oklch(0.30 0.02 130);
+    --sidebar-ring: oklch(0.75 0.22 130);
 }
 
 @layer base {
@@ -127,4 +169,21 @@
   html {
     @apply font-sans;
     }
+}
+
+/* DreamFitness: Gradient utilities for energy & movement */
+.gradient-primary {
+    background: linear-gradient(135deg, oklch(0.75 0.22 125), oklch(0.65 0.20 135));
+}
+
+.gradient-primary-hover {
+    background: linear-gradient(135deg, oklch(0.70 0.24 128), oklch(0.60 0.22 138));
+}
+
+.shadow-primary {
+    box-shadow: 0 4px 14px oklch(0.68 0.22 130 / 0.35);
+}
+
+.shadow-primary-lg {
+    box-shadow: 0 8px 24px oklch(0.68 0.22 130 / 0.40);
 }

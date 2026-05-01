@@ -335,12 +335,12 @@ export const api = {
 
 ### Обоснование
 
-| Аргумент               | Обоснование                                              |
-| ---------------------- | -------------------------------------------------------- |
-| Single Source of Truth | Типы генерируются из OpenAPI, всегда синхронизированы   |
-| No manual sync         | Не нужно копировать enum'ы из backend                    |
-| Type Safety            | TypeScript проверяет соответствие значений типам         |
-| Runtime values         | Массивы значений для dropdowns и итерации                |
+| Аргумент               | Обоснование                                           |
+| ---------------------- | ----------------------------------------------------- |
+| Single Source of Truth | Типы генерируются из OpenAPI, всегда синхронизированы |
+| No manual sync         | Не нужно копировать enum'ы из backend                 |
+| Type Safety            | TypeScript проверяет соответствие значений типам      |
+| Runtime values         | Массивы значений для dropdowns и итерации             |
 
 ### Реализация
 
@@ -350,12 +350,20 @@ openapi-typescript генерирует union types, не TypeScript enum'ы:
 // types/api.generated.ts - автогенерируется
 export type components = {
   schemas: {
-    TrainingType: "yoga" | "pilates" | "crossfit" | "boxing" | "strength" | "cardio" | "dance" | "stretching";
+    TrainingType:
+      | "yoga"
+      | "pilates"
+      | "crossfit"
+      | "boxing"
+      | "strength"
+      | "cardio"
+      | "dance"
+      | "stretching";
     UserGender: "male" | "female";
     UserRole: "client" | "admin";
     BookingStatus: "confirmed" | "cancelled";
     // ...
-  }
+  };
 };
 ```
 
@@ -798,6 +806,95 @@ export default defineConfig({
     },
   },
 });
+```
+
+---
+
+## 9. Тема приложения (Design System)
+
+### Решение
+
+**Lime Theme** — энергичная, динамичная цветовая схема с оттенками лайма.
+
+### Направление дизайна
+
+**Энергичный и динамичный** — яркие зелёные градиенты, насыщенные цвета, ощущение энергии и движения.
+
+**Референсы:**
+
+- Fitbit — яркие, насыщенные цвета
+- Spotify (лаймовый бренд) — энергичный молодёжный стиль
+- MyFitnessPal — динамичный спортивный интерфейс
+
+### Цветовая палитра
+
+| Переменная         | Светлая тема                         | Тёмная тема                          | Назначение                   |
+| ------------------ | ------------------------------------ | ------------------------------------ | ---------------------------- |
+| Primary            | `oklch(0.68 0.22 130)`               | `oklch(0.75 0.22 130)`               | Основной цвет кнопок, ссылок |
+| Primary Foreground | `oklch(0.98 0.02 130)`               | `oklch(0.15 0.02 130)`               | Текст на primary             |
+| Accent             | `oklch(0.94 0.10 130)`               | `oklch(0.30 0.08 130)`               | Фон для карточек, бейджей    |
+| Success            | `oklch(0.72 0.19 142)`               | `oklch(0.75 0.18 145)`               | Успешные действия            |
+| Warning            | `oklch(0.80 0.16 85)`                | `oklch(0.82 0.15 85)`                | Предупреждения               |
+| Chart gradient     | `oklch(0.68-0.45 0.22-0.14 130-160)` | `oklch(0.75-0.50 0.22-0.14 130-160)` | Графики и визуализации       |
+
+### Цветовой профиль
+
+```
+Primary (Lime):  oklch(0.68 0.22 130)  — сочный, энергичный зелёный
+Light Lime:      oklch(0.85 0.18 130)  — hover состояния
+Dark Lime:       oklch(0.50 0.18 130)  — текст на светлом фоне
+Accent BG:       oklch(0.94 0.10 130)  — светлый lime для фонов
+```
+
+### CSS утилиты
+
+```css
+/* Градиенты для energy-эффектов */
+.gradient-primary {
+  background: linear-gradient(
+    135deg,
+    oklch(0.75 0.22 125),
+    oklch(0.65 0.2 135)
+  );
+}
+.gradient-primary-hover {
+  background: linear-gradient(135deg, oklch(0.7 0.24 128), oklch(0.6 0.22 138));
+}
+
+/* Тени с lime-оттенком */
+.shadow-primary {
+  box-shadow: 0 4px 14px oklch(0.68 0.22 130 / 0.35);
+}
+.shadow-primary-lg {
+  box-shadow: 0 8px 24px oklch(0.68 0.22 130 / 0.4);
+}
+```
+
+### Структура файлов темы
+
+```
+frontend/src/
+├── index.css              # CSS переменные темы + утилиты
+└── components/
+    └── ui/                 # shadcn/ui компоненты
+```
+
+### Использование в компонентах
+
+```tsx
+// Используем семантические классы
+<Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+  Записаться
+</Button>
+
+// Градиенты для акцентных элементов
+<div className="gradient-primary shadow-primary rounded-xl">
+  {/* ... */}
+</div>
+
+// Семантические цвета
+<Badge variant="success">Успешно</Badge>
+<Badge variant="warning">Ожидание</Badge>
 ```
 
 ---
