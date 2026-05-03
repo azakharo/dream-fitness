@@ -70,14 +70,15 @@ POST /api/auth/login
 }
 ```
 
-**Response:** `201 Created`
+**Response:** `200 OK`
 
 ```json
 {
-  "accessToken": "jwt-access-token",
-  "refreshToken": "jwt-refresh-token"
+  "accessToken": "jwt-access-token"
 }
 ```
+
+// Set-Cookie: refreshToken=...
 
 ---
 
@@ -87,15 +88,16 @@ POST /api/auth/login
 POST /api/auth/refresh
 ```
 
-**Request Body:**
+**NO Request Body:**
+Cookie: refreshToken=...
+
+**Response:** `200 ОК`
 
 ```json
 {
-  "refreshToken": "jwt-refresh-token"
+  "accessToken": "jwt-access-token"
 }
 ```
-
-**Response:** `201 Created`
 
 ---
 
