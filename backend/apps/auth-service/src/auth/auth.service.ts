@@ -111,7 +111,7 @@ export class AuthService {
         await this.jwtService.verifyAsync<JwtPayload>(refreshToken);
       const user = await this.userRepository.findByIdWithBalance(payload.sub);
       if (!user) {
-        throw new Error('User not found');
+        throw new InvalidRefreshTokenException();
       }
 
       return this.generateTokens(user);

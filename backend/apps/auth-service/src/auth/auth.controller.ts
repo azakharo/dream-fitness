@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Req,
   Res,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -94,7 +95,7 @@ export class AuthController {
     ];
 
     if (!refreshToken) {
-      throw new Error('Refresh token not found in cookies');
+      throw new BadRequestException('Refresh token not found in cookies');
     }
 
     const tokens = await this.authService.refresh(refreshToken);
