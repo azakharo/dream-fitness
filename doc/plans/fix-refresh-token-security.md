@@ -1,5 +1,11 @@
 # Fix Refresh Token Security Issue
 
+> **Status**: Ready for implementation
+> **Decisions**:
+>
+> - Token rotation: No (can be added later)
+> - Cookie secure flag: Auto-detect based on NODE_ENV
+
 ## Problem Statement
 
 According to [`doc/ADR.md:431`](doc/ADR.md:431), the refresh token should be stored in an **HTTP-only cookie**:
@@ -115,15 +121,17 @@ This is a security vulnerability because:
 ## Cookie Configuration
 
 ```typescript
-// Recommended cookie settings
-{
-  httpOnly: true,      // Not accessible via JavaScript
-  secure: true,        // Only sent over HTTPS (use false for local dev)
-  sameSite: 'strict',  // CSRF protection
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  path: '/',           // Available for all routes
-}
+// Cookie settings - auto-detect based on NODE_ENV
+const cookieOptions = {
+  httpOnly: true, // Not accessible via JavaScript
+  secure: process.env.NODE_ENV === "production", // HTTPS only in production
+  sameSite: "strict" as const, // CSRF protection
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+  path: "/", // Available for all routes
+};
 ```
+
+**Note:** In development (`NODE_ENV !== 'production'`), `secure: false` allows cookies over HTTP. In production, `secure: true` ensures cookies are only sent over HTTPS.
 
 ---
 
@@ -188,15 +196,8 @@ Cookie: refreshToken=...
 
 ## Security Considerations
 
-1. **HTTPS Required** - Cookies with `secure: true` only work over HTTPS
+1. **HTTPS Required** - Cookies with `secure: true` only work over HTTPS (production)
 2. **CSRF Protection** - `sameSite: 'strict'` provides CSRF protection
-3. **Development** - Use `secure: false` for local development
+3. **Development** - `secure: false` allows HTTP in development mode
 4. **CORS** - Ensure credentials are allowed: `credentials: 'include'`
-
----
-
-## Questions for User
-
-1. Should we implement token rotation (generate new refresh token on each refresh)?
-2. Should we add CSRF token protection in addition to sameSite cookie?
-3. How should we handle development vs production cookie settings?
+5. **Token Rotation** - Not implemented in this phase (can be added later)
