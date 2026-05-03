@@ -386,21 +386,29 @@ import {useNavigate} from '@tanstack/react-router';
 import {useAuthStore} from '@/stores/auth-store';
 import {api} from '@/lib/api-client';
 import {ROUTES} from '@/lib/routes';
-import type {LoginDto, RegisterDto, UserProfileDto} from '@/types';
+import type {
+  LoginDto,
+  RegisterDto,
+  UserProfileDto,
+  LoginResponseBody,
+} from '@/types';
 
 export const useLogin = () => {
   const navigate = useNavigate();
   const {setAccessToken, setUser} = useAuthStore();
 
   return useMutation({
-    mutationFn: (data: LoginDto) =>
-      api.post<{accessToken: string; user: UserProfileDto}>(
-        '/auth/login',
-        data,
-      ),
-    onSuccess: response => {
-      setAccessToken(response.accessToken);
-      setUser(response.user);
+    mutationFn: async (data: LoginDto) => {
+      // 1. Login to get tokens
+      const tokens = await api.post<LoginResponseBody>('/auth/login', data);
+      // 2. Store access token
+      setAccessToken(tokens.accessToken);
+      // 3. Fetch user profile with the new token
+      const user = await api.get<UserProfileDto>('/auth/me');
+      return {tokens, user};
+    },
+    onSuccess: ({user}) => {
+      setUser(user);
       navigate({to: ROUTES.DASHBOARD});
     },
   });
@@ -751,18 +759,22 @@ createRoot(document.getElementById('root')!).render(
 Добавить инициализацию в [`stores/auth-store.ts`](../../src/stores/auth-store.ts):
 
 ```typescript
+import {api} from '@/lib/api-client';
+
 // Добавить функцию инициализации
 export const initializeAuth = async () => {
-  const {accessToken, setLoading, refreshTokens} = useAuthStore.getState();
+  const {accessToken, setLoading, setUser, logout} = useAuthStore.getState();
 
   setLoading(true);
 
   if (accessToken) {
     try {
-      // Попытка получить профиль пользователя
-      await useAuthStore.getState().refreshTokens();
+      // Получить профиль пользователя с существующим токеном
+      const user = await api.get<UserProfileDto>('/auth/me');
+      setUser(user);
     } catch {
-      // Токен невалидный, пользователь будет разлогинен
+      // Токен невалидный, очистить состояние
+      logout();
     }
   }
 
@@ -815,28 +827,40 @@ flowchart TD
         C -->|Yes| D[redirect → /dashboard]
         C -->|No| E[Render LoginPage]
         E --> F[Submit credentials]
-        F --> G{API Response}
-        G -->|Success| H[Store tokens in Zustand]
-        H --> I[navigate → /dashboard]
-        G -->|Error| J[Show error message]
+        F --> G{POST /auth/login}
+        G -->|Success| H[Store accessToken in Zustand]
+        H --> I{GET /auth/me}
+        I -->|Success| J[Store user in Zustand]
+        J --> K[navigate → /dashboard]
+        I -->|Error| L[Clear tokens, show error]
+        G -->|Error| M[Show error message]
     end
 
     subgraph "Token Refresh Flow"
-        K[API Request] --> L{Response 401?}
-        L -->|No| M[Return response]
-        L -->|Yes| N[Call /auth/refresh]
-        N --> O{Refresh Success?}
-        O -->|Yes| P[Update accessToken]
-        P --> Q[Retry original request]
-        O -->|No| R[logout]
-        R --> S[redirect → /login]
+        N[API Request] --> O{Response 401?}
+        O -->|No| P[Return response]
+        O -->|Yes| Q[Call /auth/refresh]
+        Q --> R{Refresh Success?}
+        R -->|Yes| S[Update accessToken]
+        S --> T[Retry original request]
+        R -->|No| U[logout]
+        U --> V[redirect → /login]
     end
 
     subgraph "Protected Route Flow"
-        T[User visits /dashboard] --> U{Route: _client.tsx}
-        U --> V{beforeLoad: accessToken?}
-        V -->|No| W[redirect → /login]
-        V -->|Yes| X[Render DashboardPage]
+        W[User visits /dashboard] --> X{Route: _client.tsx}
+        X --> Y{beforeLoad: accessToken?}
+        Y -->|No| Z[redirect → /login]
+        Y -->|Yes| AA[Render DashboardPage]
+    end
+
+    subgraph "App Initialization"
+        AB[App starts] --> AC{accessToken in store?}
+        AC -->|No| AD[Set loading false]
+        AC -->|Yes| AE[Set loading true]
+        AE --> AF{GET /auth/me}
+        AF -->|Success| AG[Store user, set loading false]
+        AF -->|Error| AH[logout, set loading false]
     end
 ```
 
@@ -855,6 +879,7 @@ flowchart TD
 
 **Минимальные проверки:**
 
+- [ ] `npm run ts` — без ошибок
 - [ ] `npm run lint` — без ошибок
 - [ ] `npm run build` — успешная сборка
 - [ ] Ручная проверка: Login flow работает
