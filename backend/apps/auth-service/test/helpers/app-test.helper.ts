@@ -4,6 +4,7 @@ import {
   INestApplication,
   ValidationPipeOptions,
 } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 import { AppModule } from '../../src/app.module';
 import { MockEventsModule } from '../mocks/events.module.mock';
 import { DataSource } from 'typeorm';
@@ -33,6 +34,7 @@ export class AppTestHelper {
     };
 
     this.app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
+    this.app.use(cookieParser());
 
     await this.app.init();
 
