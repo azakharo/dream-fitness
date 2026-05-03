@@ -75,7 +75,7 @@
     "docker:migrate:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate",
     "docker:seed:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:seed",
     "docker:migrate:revert": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert",
-    "test:api-gateway": "dotenv -e .env -e .env.development -- playwright test --config=test/api-gateway/playwright.config.ts",
+    "test:api-gateway": "dotenv -e .env -e .env.development -- playwright test --config=test/api-gateway/playwright.config.ts --max-failures=1",
     "test:api-gateway:ui": "dotenv -e .env -e .env.development -- playwright test --config=test/api-gateway/playwright.config.ts --ui",
     "test:api-gateway:report": "dotenv -e .env -e .env.development -- playwright show-report test/api-gateway/playwright-report"
   },
