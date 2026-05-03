@@ -5,8 +5,8 @@
 - [PRD](../doc/PRD.md)
 - [Требования к UI](../doc/UI.md)
 - [Frontend ADR](../doc/Frontend-ADR.md)
-- [OpenAPI 3.0 спецификация API бекенда](./doc/openapi.json)
-- [Краткое описание API бекенда](./doc/API.md)
+- [OpenAPI 3.0 спецификация API бекенда](../doc/openapi.json)
+- [Краткое описание API бекенда](../doc/API.md)
 - [Все типы данных, предоставляемые backend API](./src/types/types.ts)
 
 ## Технологический стек

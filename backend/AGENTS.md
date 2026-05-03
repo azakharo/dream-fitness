@@ -8,6 +8,8 @@ Backend starter which uses Nest.js, TypeORM, Postgres.
 
 - [PRD](../doc/PRD.md)
 - [ADR](../doc/ADR.md)
+- [OpenAPI 3.0 спецификация API бекенда](../doc/openapi.json)
+- [Краткое описание API бекенда](../doc/API.md)
 
 ## Технологический стек
 
