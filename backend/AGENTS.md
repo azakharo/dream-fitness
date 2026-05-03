@@ -19,6 +19,29 @@ Backend starter which uses Nest.js, TypeORM, Postgres.
 - **Database:** PostgreSQL
 - **Docs:** Swagger (OpenAPI)
 
+## Структура папок
+
+```
+backend/
+├── apps/                   # Microservices
+│   ├── api-gateway/        # Entry point, routing, JWT auth, proxy
+│   ├── auth-service/       # Authentication, users, balance/transactions
+│   ├── booking-service/    # Training bookings, waitlist (CQRS)
+│   ├── notification-service/ # Email notifications, RabbitMQ consumers
+│   └── training-service/   # Trainings, trainers, schedule
+├── libs/                   # Shared libraries
+│   ├── contracts/          # DTOs and events for inter-service communication
+│   └── shared/             # Common utilities, guards, filters, RabbitMQ config, decorators, interceptors
+├── src/                    # Database
+│   ├── data-source.ts      # TypeORM configuration
+│   ├── database/           # Reset and seed scripts
+│   └── migrations/         # Database migration files
+├── scripts/                # Utility scripts (Docker entrypoints, DB setup)
+└── test/                   # E2E tests (Playwright)
+```
+
+Each microservice follows Nest.js conventions: `controllers/`, `services/`, `entities/`, `repositories/`, `dto/`, `modules/`.
+
 ## Основные npm команды
 
 - Установка зависимостей: `npm install`
