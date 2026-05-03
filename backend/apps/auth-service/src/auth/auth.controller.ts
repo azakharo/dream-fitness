@@ -118,11 +118,12 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     await this.authService.logout();
 
-    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict' as const,
       path: '/',
+      maxAge: 0,
     });
 
     return { message: 'Logout successful' };

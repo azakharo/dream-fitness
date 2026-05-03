@@ -160,11 +160,13 @@ describe('AuthController', () => {
       const response = await controller.logout(mockRes as unknown as Response);
 
       expect(mockAuthService.logout).toHaveBeenCalled();
-      expect(mockRes.clearCookie).toHaveBeenCalledWith(
+      expect(mockRes.cookie).toHaveBeenCalledWith(
         'refreshToken',
+        '',
         expect.objectContaining({
           httpOnly: true,
           sameSite: 'strict',
+          maxAge: 0,
         }),
       );
       expect(response).toEqual({ message: 'Logout successful' });
