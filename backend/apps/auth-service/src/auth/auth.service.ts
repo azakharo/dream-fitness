@@ -5,18 +5,25 @@ import { compare, hash } from 'bcrypt';
 import { UserRepository } from '../users/repositories/user.repository';
 import { ConfigService } from '../config';
 import { User } from '../users/entities/user.entity';
-import {
-  LoginDto,
-  RegisterDto,
-  LoginResponseBody,
-  RegisterResponseBody,
-} from '@app/contracts';
+import { LoginDto, RegisterDto, UserResponseDto } from '@app/contracts';
 import type { StringValue } from 'ms';
 import { JwtPayload } from '@app/shared';
 import { EventsPublisher } from '../events/events.publisher';
 import { UserAlreadyExistsException } from '../common/exceptions/user-already-exists.exception';
 import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
 import { InvalidRefreshTokenException } from '../common/exceptions/invalid-refresh-token.exception';
+
+// Internal type for token pair - used internally for cookie handling
+interface TokenPair {
+  accessToken: string;
+  refreshToken: string;
+}
+
+// Internal type for register result - includes tokens for cookie setting
+interface RegisterResult {
+  user: UserResponseDto;
+  tokens: TokenPair;
+}
 
 @Injectable()
 export class AuthService {
@@ -27,7 +34,7 @@ export class AuthService {
     private readonly eventsPublisher: EventsPublisher,
   ) {}
 
-  async register(createUserDto: RegisterDto): Promise<RegisterResponseBody> {
+  async register(createUserDto: RegisterDto): Promise<RegisterResult> {
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(
       createUserDto.email,
@@ -65,13 +72,23 @@ export class AuthService {
     // Generate tokens
     const tokens = this.generateTokens(user);
 
-    // Return user without password hash
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword as Omit<User, 'password'>, tokens };
+    // Return user without password hash, converted to UserResponseDto
+    const userResponse: UserResponseDto = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      birthDate: user.birthDate ? user.birthDate.toISOString() : null,
+      gender: user.gender,
+      role: user.role,
+      balance: user.balance,
+      status: user.status,
+      createdAt: user.createdAt.toISOString(),
+    };
+    return { user: userResponse, tokens };
   }
 
-  async login(loginDto: LoginDto): Promise<LoginResponseBody> {
+  async login(loginDto: LoginDto): Promise<TokenPair> {
     const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
       throw new InvalidCredentialsException();
@@ -88,13 +105,13 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  async refresh(refreshToken: string): Promise<LoginResponseBody> {
+  async refresh(refreshToken: string): Promise<TokenPair> {
     try {
       const payload =
         await this.jwtService.verifyAsync<JwtPayload>(refreshToken);
       const user = await this.userRepository.findByIdWithBalance(payload.sub);
       if (!user) {
-        throw new Error('User not found');
+        throw new InvalidRefreshTokenException();
       }
 
       return this.generateTokens(user);
@@ -108,7 +125,7 @@ export class AuthService {
     // This could be implemented with a cache of revoked tokens
   }
 
-  generateTokens(user: User): LoginResponseBody {
+  generateTokens(user: User): TokenPair {
     const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.configService.get('JWT_ACCESS_TTL') as StringValue,

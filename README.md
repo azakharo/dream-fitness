@@ -63,34 +63,7 @@ TBD
 
 ### Installation
 
-```bash
-# Cloning the repository
-git clone <repository-url>
-cd DreamFitness
-
-# Installing backend dependencies
-cd backend
-npm install
-
-# Installing frontend dependencies
-cd ../frontend
-npm install
-```
-
-### Running
-
-```bash
-# Running PostgreSQL via Docker
-cd backend
-docker-compose up -d
-
-# Running backend
-npm run start:dev
-
-# Running frontend (in a new terminal)
-cd ../frontend
-npm run dev
-```
+[Backend Installation](backend/README.md)
 
 ---
 

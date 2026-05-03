@@ -2,8 +2,10 @@
 
 ## Контекст
 
-Смотри ./UI.md — функциональные требования к фронтенду.
-Смотри ./ADR.md — backend-архитектура.
+- [Функциональные требования к фронтенду](./UI.md)
+- [архитектура Backend](./ADR.md)
+- [OpenApi спецификация REST API Backend](../frontend/doc/openapi.json)
+- [Краткое описание REST API Backend](../frontend/doc/API.md)
 
 ---
 
@@ -17,7 +19,7 @@
 | UI Kit         | shadcn/ui + Radix           | Latest |
 | Styling        | Tailwind CSS                | 4.2    |
 | HTTP Client    | ky                          | 1.7    |
-| React Compiler | babel-plugin-react-compiler | 1.0    |
+| React Compiler | babel-plugin-react-compiler | latest |
 
 ---
 
@@ -243,6 +245,195 @@ export const useCreateBooking = () => {
     },
   });
 };
+```
+
+---
+
+## 4.1. Type Generation from OpenAPI
+
+### Решение
+
+**openapi-typescript** для генерации TypeScript типов из OpenAPI спецификации backend.
+
+### Обоснование
+
+| Аргумент               | Обоснование                                       |
+| ---------------------- | ------------------------------------------------- |
+| Single Source of Truth | Типы генерируются из OpenAPI спецификации backend |
+| Type Safety            | Полная типизация API запросов и ответов           |
+| Auto-sync              | Обновление типов при изменении API                |
+| No manual maintenance  | Исключает ручное написание и поддержку API типов  |
+
+### Реализация
+
+```bash
+# Установка
+npm i -D -E openapi-typescript
+
+# Генерация типов
+npx openapi-typescript frontend/doc/openapi.json -o frontend/src/types/api.generated.ts
+```
+
+### Использование
+
+```typescript
+// types/api.generated.ts - автогенерируемый файл
+// НЕ РЕДАКТИРОВАТЬ ВРУЧНУЮ
+
+import type { paths, components } from "./api.generated";
+
+// Типы для API ответов
+type Training = components["schemas"]["TrainingResponseDto"];
+type Booking = components["schemas"]["BookingResponseDto"];
+type User = components["schemas"]["UserResponseDto"];
+
+// Типы для API запросов
+type CreateBookingRequest = components["schemas"]["CreateBookingDto"];
+type LoginRequest = components["schemas"]["LoginDto"];
+
+// Типизированные API методы
+export const api = {
+  getTrainings: () =>
+    kyInstance
+      .get("trainings")
+      .json<components["schemas"]["TrainingResponseDto"][]>(),
+
+  createBooking: (body: components["schemas"]["CreateBookingDto"]) =>
+    kyInstance
+      .post("bookings", { json: body })
+      .json<components["schemas"]["BookingResponseDto"]>(),
+};
+```
+
+### Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Type Generation Flow                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. Backend: Swagger генерирует OpenAPI spec                    │
+│     /api/docs-json → openapi.json                               │
+│                                                                 │
+│  2. Copy openapi.json to frontend/doc/openapi.json              │
+│                                                                 │
+│  3. Run: npx openapi-typescript frontend/doc/openapi.json       │
+│        -o frontend/src/types/api.generated.ts                   │
+│                                                                 │
+│  4. Import и использование типов в компонентах и hooks          │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 4.2. Runtime Constants for UI
+
+### Решение
+
+**Использовать сгенерированные union types + runtime constants** для UI компонентов (dropdowns, filters).
+
+### Обоснование
+
+| Аргумент               | Обоснование                                           |
+| ---------------------- | ----------------------------------------------------- |
+| Single Source of Truth | Типы генерируются из OpenAPI, всегда синхронизированы |
+| No manual sync         | Не нужно копировать enum'ы из backend                 |
+| Type Safety            | TypeScript проверяет соответствие значений типам      |
+| Runtime values         | Массивы значений для dropdowns и итерации             |
+
+### Реализация
+
+openapi-typescript генерирует union types, не TypeScript enum'ы:
+
+```typescript
+// types/api.generated.ts - автогенерируется
+export type components = {
+  schemas: {
+    TrainingType:
+      | "yoga"
+      | "pilates"
+      | "crossfit"
+      | "boxing"
+      | "strength"
+      | "cardio"
+      | "dance"
+      | "stretching";
+    UserGender: "male" | "female";
+    UserRole: "client" | "admin";
+    BookingStatus: "confirmed" | "cancelled";
+    // ...
+  };
+};
+```
+
+Для UI компонентов (dropdowns, filters) создаём runtime constants:
+
+```typescript
+// types/constants.ts
+import type { components } from "./api.generated";
+
+// Extract types for convenience
+type TrainingType = components["schemas"]["TrainingType"];
+type UserGender = components["schemas"]["UserGender"];
+type UserRole = components["schemas"]["UserRole"];
+
+// Runtime values for UI (dropdowns, filters)
+export const TRAINING_TYPES: TrainingType[] = [
+  "yoga",
+  "pilates",
+  "crossfit",
+  "boxing",
+  "strength",
+  "cardio",
+  "dance",
+  "stretching",
+];
+
+export const USER_GENDERS: UserGender[] = ["male", "female"];
+
+export const USER_ROLES: UserRole[] = ["client", "admin"];
+
+// Dropdown options with labels
+export const TRAINING_TYPE_OPTIONS = TRAINING_TYPES.map((type) => ({
+  value: type,
+  label: type.charAt(0).toUpperCase() + type.slice(1), // "Yoga", "Pilates", etc.
+}));
+
+export const USER_GENDER_OPTIONS = USER_GENDERS.map((gender) => ({
+  value: gender,
+  label: gender === "male" ? "Мужской" : "Женский",
+}));
+```
+
+### Использование в компонентах
+
+```typescript
+// components/training-filter.tsx
+import { TRAINING_TYPE_OPTIONS } from "@/types/constants";
+import { Select } from "@/components/ui/select";
+
+export const TrainingFilter = () => {
+  return (
+    <Select options={TRAINING_TYPE_OPTIONS} placeholder="Выберите тип тренировки" />
+  );
+};
+```
+
+### Преимущества подхода
+
+- ✅ Типы всегда синхронизированы с backend через openapi-typescript
+- ✅ TypeScript проверит, что значения в constants соответствуют типам
+- ✅ Если backend добавит новое значение — TypeScript покажет ошибку в constants.ts
+- ✅ Нет дублирования enum'ов между backend и frontend
+
+### Структура файлов
+
+```
+frontend/src/types/
+├── api.generated.ts      # Автогенерируется из OpenAPI (НЕ РЕДАКТИРОВАТЬ)
+├── constants.ts          # Runtime values для UI (dropdowns, filters)
+└── index.ts              # Re-export всех типов и констант
 ```
 
 ---
@@ -567,10 +758,9 @@ frontend/
 │   │   └── user.schema.ts
 │   │
 │   ├── types/                     # TypeScript types
-│   │   ├── api.ts
-│   │   ├── user.ts
-│   │   ├── training.ts
-│   │   └── booking.ts
+│   │   ├── api.generated.ts       # Автогенерируется из OpenAPI (НЕ РЕДАКТИРОВАТЬ)
+│   │   ├── constants.ts           # Runtime values для UI (dropdowns, filters)
+│   │   └── index.ts               # Re-export всех типов и констант
 │   │
 │   ├── App.tsx
 │   ├── main.tsx
@@ -620,12 +810,100 @@ export default defineConfig({
 
 ---
 
+## 9. Тема приложения (Design System)
+
+### Решение
+
+**Lime Theme** — энергичная, динамичная цветовая схема с оттенками лайма.
+
+### Направление дизайна
+
+**Энергичный и динамичный** — яркие зелёные градиенты, насыщенные цвета, ощущение энергии и движения.
+
+**Референсы:**
+
+- Fitbit — яркие, насыщенные цвета
+- Spotify (лаймовый бренд) — энергичный молодёжный стиль
+- MyFitnessPal — динамичный спортивный интерфейс
+
+### Цветовая палитра
+
+| Переменная         | Светлая тема                         | Тёмная тема                          | Назначение                   |
+| ------------------ | ------------------------------------ | ------------------------------------ | ---------------------------- |
+| Primary            | `oklch(0.68 0.22 130)`               | `oklch(0.75 0.22 130)`               | Основной цвет кнопок, ссылок |
+| Primary Foreground | `oklch(0.98 0.02 130)`               | `oklch(0.15 0.02 130)`               | Текст на primary             |
+| Accent             | `oklch(0.94 0.10 130)`               | `oklch(0.30 0.08 130)`               | Фон для карточек, бейджей    |
+| Success            | `oklch(0.72 0.19 142)`               | `oklch(0.75 0.18 145)`               | Успешные действия            |
+| Warning            | `oklch(0.80 0.16 85)`                | `oklch(0.82 0.15 85)`                | Предупреждения               |
+| Chart gradient     | `oklch(0.68-0.45 0.22-0.14 130-160)` | `oklch(0.75-0.50 0.22-0.14 130-160)` | Графики и визуализации       |
+
+### Цветовой профиль
+
+```
+Primary (Lime):  oklch(0.68 0.22 130)  — сочный, энергичный зелёный
+Light Lime:      oklch(0.85 0.18 130)  — hover состояния
+Dark Lime:       oklch(0.50 0.18 130)  — текст на светлом фоне
+Accent BG:       oklch(0.94 0.10 130)  — светлый lime для фонов
+```
+
+### CSS утилиты
+
+```css
+/* Градиенты для energy-эффектов */
+.gradient-primary {
+  background: linear-gradient(
+    135deg,
+    oklch(0.75 0.22 125),
+    oklch(0.65 0.2 135)
+  );
+}
+.gradient-primary-hover {
+  background: linear-gradient(135deg, oklch(0.7 0.24 128), oklch(0.6 0.22 138));
+}
+
+/* Тени с lime-оттенком */
+.shadow-primary {
+  box-shadow: 0 4px 14px oklch(0.68 0.22 130 / 0.35);
+}
+.shadow-primary-lg {
+  box-shadow: 0 8px 24px oklch(0.68 0.22 130 / 0.4);
+}
+```
+
+### Структура файлов темы
+
+```
+frontend/src/
+├── index.css              # CSS переменные темы + утилиты
+└── components/
+    └── ui/                 # shadcn/ui компоненты
+```
+
+### Использование в компонентах
+
+```tsx
+// Используем семантические классы
+<Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+  Записаться
+</Button>
+
+// Градиенты для акцентных элементов
+<div className="gradient-primary shadow-primary rounded-xl">
+  {/* ... */}
+</div>
+
+// Семантические цвета
+<Badge variant="success">Успешно</Badge>
+<Badge variant="warning">Ожидание</Badge>
+```
+
+---
+
 ## Последствия
 
 Выбранный стек обеспечивает:
 
 - **Знакомый инструментарий** — минимум сюрпризов при разработке
-- **Фокус на backend** — учебная цель проекта достигается эффективнее
 - **Type Safety** — TypeScript + Zod = меньше runtime ошибок
 - **Performance** — React Compiler + Zustand + TanStack Query = оптимальная скорость
 - **DX** — современные инструменты с хорошим developer experience

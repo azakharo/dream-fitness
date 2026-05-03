@@ -18,7 +18,8 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser, InternalGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { WaitlistResponseDto, WaitlistQueryDto } from './dto';
+import { WaitlistResponseDto } from '@app/contracts/booking';
+import { WaitlistQueryDto } from './dto';
 import { WaitlistPositionResponseDto } from './dto/waitlist-position-response.dto';
 import { JoinWaitlistDto } from '@app/contracts/booking';
 import { JoinWaitlistCommand, LeaveWaitlistCommand } from '../cqrs/commands';

@@ -10,8 +10,10 @@ import { DepositDto } from './dto/deposit.dto';
 import { ReserveDto } from './dto/reserve.dto';
 import { ReleaseDto } from './dto/release.dto';
 import { RefundDto } from './dto/refund.dto';
-import { TransactionResponseDto } from './dto/transaction-response.dto';
-import { TransactionListResponseDto } from './dto/transaction-list-response.dto';
+import {
+  TransactionResponseDto,
+  TransactionListResponseDto,
+} from '@app/contracts';
 import { PaginationParams, TransactionType } from '@app/shared';
 import { UserRepository } from '../users/repositories/user.repository';
 import { InsufficientBalanceException } from '../common/exceptions/insufficient-balance.exception';

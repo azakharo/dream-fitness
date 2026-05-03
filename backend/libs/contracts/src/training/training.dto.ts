@@ -314,3 +314,19 @@ export class TrainingFilterDto {
   @Max(50)
   limit?: number;
 }
+
+export class TrainerListResponseDto {
+  @ApiProperty({ type: [TrainerResponseDto] })
+  items: TrainerResponseDto[];
+
+  @ApiProperty({ example: 10 })
+  count: number;
+}
+
+export class TrainingListResponseDto {
+  @ApiProperty({ type: [TrainingResponseDto] })
+  items: TrainingResponseDto[];
+
+  @ApiProperty({ example: 25 })
+  count: number;
+}

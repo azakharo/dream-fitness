@@ -420,9 +420,18 @@
 - [ ] Установить TanStack Router и Query
 - [ ] Установить Zustand
 - [ ] Установить ky, react-hook-form, zod
+- [ ] Установить openapi-typescript (dev dependency)
 - [ ] Настроить API client с ky
 
-### 7.2. Auth Flow
+### 7.2. Type Generation
+
+OpenAPI спецификация из backend уже лежит здесь: `frontend/doc/openapi.json`.
+
+- [ ] Сгенерировать TypeScript типы: `npx openapi-typescript frontend/doc/openapi.json -o frontend/src/types/api.generated.ts`
+- [ ] Создать `types/constants.ts` с runtime values для UI (dropdowns, filters)
+- [ ] Создать `types/index.ts` для re-export всех типов и констант
+
+### 7.3. Auth Flow
 
 - [ ] Auth store (Zustand)
 - [ ] Login page
@@ -430,14 +439,14 @@
 - [ ] Protected routes
 - [ ] Token refresh handling
 
-### 7.3. Layouts
+### 7.4. Layouts
 
 - [ ] ClientLayout (top nav desktop, bottom nav mobile)
 - [ ] AdminLayout (sidebar)
 - [ ] Header component
 - [ ] Notifications bell
 
-### 7.4. Client Pages
+### 7.5. Client Pages
 
 **Dashboard:**
 
@@ -476,7 +485,7 @@
 - [ ] Mark as read
 - [ ] Filter by type
 
-### 7.5. Admin Pages
+### 7.6. Admin Pages
 
 **Admin Dashboard:**
 
@@ -502,7 +511,7 @@
 - [ ] Loading charts
 - [ ] Financial reports
 
-### 7.6. Common Components
+### 7.7. Common Components
 
 - [ ] Loading spinner
 - [ ] Empty states
@@ -526,6 +535,8 @@
 - [ ] E2E тесты (Playwright):
   - Auth flow: login → redirect to dashboard
   - Booking flow: schedule → select training → book → confirmation
+  - Cancellation flow
+  - Waitlist promotion flow
   - Admin flow: login → create training → verify in schedule
 - [ ] `npm run lint` — без ошибок
 - [ ] `npm run build` — успешная сборка

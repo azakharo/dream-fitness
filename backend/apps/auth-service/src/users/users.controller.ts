@@ -34,7 +34,7 @@ export class UsersController {
   async getProfile(@InternalUser() user: AuthUser): Promise<UserResponseDto> {
     const userProfile = await this.usersService.getUserById(user.id);
     if (!userProfile) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
     return userProfile;
   }
@@ -54,7 +54,7 @@ export class UsersController {
       updateUserDto,
     );
     if (!updatedUser) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
     return updatedUser;
   }

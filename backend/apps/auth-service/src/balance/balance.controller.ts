@@ -15,8 +15,10 @@ import { DepositDto } from './dto/deposit.dto';
 import { ReserveDto } from './dto/reserve.dto';
 import { ReleaseDto } from './dto/release.dto';
 import { RefundDto } from './dto/refund.dto';
-import { TransactionResponseDto } from './dto/transaction-response.dto';
-import { TransactionListResponseDto } from './dto/transaction-list-response.dto';
+import {
+  TransactionResponseDto,
+  TransactionListResponseDto,
+} from '@app/contracts';
 import { CurrentUser } from '@app/shared';
 import type { PaginationParams, AuthenticatedUser } from '@app/shared';
 

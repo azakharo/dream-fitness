@@ -4,13 +4,11 @@ import { TEST_CONFIG } from '../test-config';
 import {
   BookingListResponseDto,
   BookingResponseDto,
-} from 'apps/booking-service/src/bookings/dto';
+} from '@app/contracts/booking';
 import { RegisterResponseBody } from '@app/contracts';
 import { depositBalance } from '../global-setup';
-import {
-  WaitlistPositionResponseDto,
-  WaitlistResponseDto,
-} from 'apps/booking-service/src/waitlist/dto';
+import { WaitlistPositionResponseDto } from 'apps/booking-service/src/waitlist/dto';
+import { WaitlistResponseDto } from '@app/contracts/booking';
 
 const baseURL = TEST_CONFIG.baseURL;
 
@@ -67,12 +65,12 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
     expect(response.status()).toBe(201);
 
     const responseBody = (await response.json()) as RegisterResponseBody;
-    expect(responseBody).toHaveProperty('tokens');
+    expect(responseBody).toHaveProperty('accessToken');
     expect(responseBody).toHaveProperty('user');
     expect(responseBody.user).toHaveProperty('id');
 
     // Store user2 info
-    process.env.USER2_TOKEN = responseBody.tokens.accessToken;
+    process.env.USER2_TOKEN = responseBody.accessToken;
     process.env.USER2_ID = responseBody.user.id;
   });
 

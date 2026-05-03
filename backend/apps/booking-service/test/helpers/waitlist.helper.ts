@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { Response } from 'supertest';
-import { WaitlistResponseDto } from '../../src/waitlist/dto/waitlist-response.dto';
+import { WaitlistResponseDto } from '@app/contracts/booking';
 import { WaitlistPositionResponseDto } from '../../src/waitlist/dto/waitlist-position-response.dto';
 
 export type TestResponse<T> = Omit<Response, 'body'> & {

@@ -8,7 +8,7 @@ import { WaitlistJoinedEvent } from '../events';
 import { AlreadyOnWaitlistException } from '../../common/exceptions';
 import { DuplicateBookingException } from '../../common/exceptions';
 import { JoinWaitlistCommand } from './join-waitlist.command';
-import { WaitlistResponseDto } from '../../waitlist/dto';
+import { WaitlistResponseDto } from '@app/contracts/booking';
 import { formatDateTime } from '@app/shared';
 
 @CommandHandler(JoinWaitlistCommand)

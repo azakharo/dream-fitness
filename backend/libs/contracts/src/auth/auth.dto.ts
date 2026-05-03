@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
-import { User } from 'apps/auth-service/src/users/entities/user.entity';
+import { TransactionResponseDto } from './transaction.dto';
 
 export class LoginDto {
   @ApiProperty({ example: 'user@example.com' })
@@ -58,36 +58,104 @@ export class RegisterDto {
   gender?: UserGender;
 }
 
-export class RefreshTokenDto {
-  @ApiProperty({ example: 'refresh-token-string' })
-  @IsString()
-  refreshToken: string;
+// RefreshTokenDto removed - refresh token is now stored in HTTP-only cookies
+
+export class UserResponseDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiPropertyOptional()
+  phone: string | null;
+
+  @ApiPropertyOptional()
+  birthDate: string | null;
+
+  @ApiPropertyOptional({ enum: UserGender })
+  gender: UserGender | null;
+
+  @ApiProperty({ enum: UserRole })
+  role: UserRole;
+
+  @ApiProperty()
+  balance: number;
+
+  @ApiProperty({ enum: UserStatus })
+  status: UserStatus;
+
+  @ApiProperty()
+  createdAt: string;
 }
 
 export class UserDto {
+  @ApiProperty()
   id: string;
+
+  @ApiProperty()
   email: string;
+
+  @ApiProperty()
   name: string;
+
+  @ApiPropertyOptional()
   phone: string | null;
+
+  @ApiPropertyOptional()
   birthDate: string | null;
+
+  @ApiPropertyOptional({ enum: UserGender })
   gender: UserGender | null;
+
+  @ApiProperty({ enum: UserRole })
   role: UserRole;
+
+  @ApiProperty()
   balance: number;
+
+  @ApiProperty({ enum: UserStatus })
   status: UserStatus;
+
+  @ApiProperty()
   createdAt: string;
 }
 
 export class UserProfileDto {
+  @ApiProperty()
   id: string;
+
+  @ApiProperty()
   email: string;
+
+  @ApiProperty()
   name: string;
+
+  @ApiPropertyOptional()
   phone: string | null;
+
+  @ApiPropertyOptional()
   birthDate: string | null;
+
+  @ApiPropertyOptional({ enum: UserGender })
   gender: UserGender | null;
+
+  @ApiProperty({ enum: UserRole })
   role: UserRole;
+
+  @ApiProperty()
   balance: number;
+
+  @ApiProperty({ enum: UserStatus })
   status: UserStatus;
+
+  @ApiProperty()
   createdAt: string;
+
+  @ApiProperty()
   updatedAt: string;
 }
 
@@ -110,9 +178,6 @@ export class UpdateBalanceDto {
 export class LoginResponseBody {
   @ApiProperty({ example: 'jwt-access-token' })
   accessToken: string;
-
-  @ApiProperty({ example: 'jwt-refresh-token' })
-  refreshToken: string;
 }
 
 export class LogoutResponseBody {
@@ -122,8 +187,32 @@ export class LogoutResponseBody {
 
 export class RegisterResponseBody {
   @ApiProperty()
-  user: Omit<User, 'password'>;
+  accessToken: string;
 
   @ApiProperty()
-  tokens: LoginResponseBody;
+  user: UserResponseDto;
+}
+
+export class RefreshResponseBody {
+  @ApiProperty({ example: 'jwt-access-token' })
+  accessToken: string;
+}
+
+export class BalanceResponseDto {
+  @ApiProperty({ example: 1500 })
+  balance!: number;
+}
+
+export class TransactionListResponseDto {
+  @ApiProperty({ type: [TransactionResponseDto] })
+  items!: TransactionResponseDto[];
+
+  @ApiProperty({ example: 25 })
+  total!: number;
+
+  @ApiProperty({ example: 1 })
+  page!: number;
+
+  @ApiProperty({ example: 10 })
+  limit!: number;
 }

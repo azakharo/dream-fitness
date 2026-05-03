@@ -18,11 +18,12 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser, InternalGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { BookingResponseDto } from './dto';
-import { BookingListResponseDto } from './dto/booking-list-response.dto';
+import {
+  BookingResponseDto,
+  BookingListResponseDto,
+} from '@app/contracts/booking';
 import { BookingFilterDto } from './dto/booking-filter.dto';
-import { CreateBookingDto } from '@app/contracts/booking';
-import { CancelBookingDto } from '@app/contracts/booking';
+import { CreateBookingDto, CancelBookingDto } from '@app/contracts/booking';
 import { BookTrainingCommand, CancelBookingCommand } from '../cqrs/commands';
 import { GetUserBookingsQuery, GetBookingByIdQuery } from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
