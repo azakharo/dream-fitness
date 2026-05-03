@@ -391,6 +391,7 @@ import type {
   RegisterDto,
   UserProfileDto,
   LoginResponseBody,
+  RegisterResponseBody,
 } from '@/types';
 
 export const useLogin = () => {
@@ -416,11 +417,23 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   const navigate = useNavigate();
+  const {setAccessToken, setUser} = useAuthStore();
 
   return useMutation({
-    mutationFn: (data: RegisterDto) => api.post('/auth/register', data),
-    onSuccess: () => {
-      navigate({to: ROUTES.LOGIN});
+    mutationFn: async (data: RegisterDto) => {
+      // Backend returns { accessToken, user } and sets refreshToken cookie
+      const response = await api.post<RegisterResponseBody>(
+        '/auth/register',
+        data,
+      );
+      return response;
+    },
+    onSuccess: ({accessToken, user}) => {
+      // Store tokens and user - user is now authenticated
+      setAccessToken(accessToken);
+      setUser(user);
+      // Navigate directly to dashboard (no need to login again)
+      navigate({to: ROUTES.DASHBOARD});
     },
   });
 };
@@ -836,31 +849,44 @@ flowchart TD
         G -->|Error| M[Show error message]
     end
 
+    subgraph "Register Flow"
+        N[User visits /register] --> O{Route: _auth.tsx}
+        O --> P{beforeLoad: accessToken?}
+        P -->|Yes| Q[redirect → /dashboard]
+        P -->|No| R[Render RegisterPage]
+        R --> S[Submit registration data]
+        S --> T{POST /auth/register}
+        T -->|Success| U[Store accessToken + user in Zustand]
+        U --> V[refreshToken set via HTTP-only cookie]
+        V --> W[navigate → /dashboard]
+        T -->|Error| X[Show error message]
+    end
+
     subgraph "Token Refresh Flow"
-        N[API Request] --> O{Response 401?}
-        O -->|No| P[Return response]
-        O -->|Yes| Q[Call /auth/refresh]
-        Q --> R{Refresh Success?}
-        R -->|Yes| S[Update accessToken]
-        S --> T[Retry original request]
-        R -->|No| U[logout]
-        U --> V[redirect → /login]
+        Y[API Request] --> Z{Response 401?}
+        Z -->|No| AA[Return response]
+        Z -->|Yes| AB[Call /auth/refresh]
+        AB --> AC{Refresh Success?}
+        AC -->|Yes| AD[Update accessToken]
+        AD --> AE[Retry original request]
+        AC -->|No| AF[logout]
+        AF --> AG[redirect → /login]
     end
 
     subgraph "Protected Route Flow"
-        W[User visits /dashboard] --> X{Route: _client.tsx}
-        X --> Y{beforeLoad: accessToken?}
-        Y -->|No| Z[redirect → /login]
-        Y -->|Yes| AA[Render DashboardPage]
+        AH[User visits /dashboard] --> AI{Route: _client.tsx}
+        AI --> AJ{beforeLoad: accessToken?}
+        AJ -->|No| AK[redirect → /login]
+        AJ -->|Yes| AL[Render DashboardPage]
     end
 
     subgraph "App Initialization"
-        AB[App starts] --> AC{accessToken in store?}
-        AC -->|No| AD[Set loading false]
-        AC -->|Yes| AE[Set loading true]
-        AE --> AF{GET /auth/me}
-        AF -->|Success| AG[Store user, set loading false]
-        AF -->|Error| AH[logout, set loading false]
+        AM[App starts] --> AN{accessToken in store?}
+        AN -->|No| AO[Set loading false]
+        AN -->|Yes| AP[Set loading true]
+        AP --> AQ{GET /auth/me}
+        AQ -->|Success| AR[Store user, set loading false]
+        AQ -->|Error| AS[logout, set loading false]
     end
 ```
 

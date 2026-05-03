@@ -53,6 +53,13 @@ POST /api/auth/register
 
 **Response:** `201 Created`
 
+```json
+{
+  "accessToken": "jwt-access-token",
+  "user": "user-created-object"
+}
+```
+
 ---
 
 ### Login

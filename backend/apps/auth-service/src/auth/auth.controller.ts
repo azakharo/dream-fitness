@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from '@app/contracts';
+import { LoginDto, RegisterDto, RegisterResponseBody } from '@app/contracts';
 import { InternalGuard } from '@app/shared';
 
 const REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
@@ -38,7 +38,10 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user account' })
-  @ApiCreatedResponse({ description: 'User registered successfully' })
+  @ApiCreatedResponse({
+    description: 'User registered successfully',
+    type: RegisterResponseBody,
+  })
   @ApiBody({ type: RegisterDto })
   async register(
     @Body() registerDto: RegisterDto,
