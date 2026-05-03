@@ -136,6 +136,11 @@ export type RegisterForm = z.infer<typeof registerSchema>;
 
 ### 3. TanStack Router Setup
 
+Используем **Route Groups** для организации маршрутов без дублирования кода:
+
+- `_auth.tsx` — layout route для публичных страниц (login, register)
+- `_client.tsx` — layout route для защищённых страниц (dashboard, schedule, etc.)
+
 #### 3.1. Создать [`routes/__root.tsx`](../../src/routes/__root.tsx)
 
 Базовый layout с QueryClientProvider:
@@ -162,43 +167,102 @@ export const Route = createRootRoute({
 });
 ```
 
-#### 3.2. Создать [`routes/login.tsx`](../../src/routes/login.tsx)
+#### 3.2. Создать [`routes/_auth.tsx`](../../src/routes/_auth.tsx)
+
+Layout route для публичных страниц. Проверяет, что пользователь НЕ авторизован:
 
 ```typescript
-import {createFileRoute, redirect} from '@tanstack/react-router';
-import {LoginPage} from '@/pages/auth/login';
-import {useAuthStore} from '@/stores/auth-store';
+import { createFileRoute, redirect, Outlet } from '@tanstack/react-router';
+import { useAuthStore } from '@/stores/auth-store';
 
-export const Route = createFileRoute('/login')({
+/**
+ * Layout route для публичных страниц (login, register).
+ * Если пользователь уже авторизован — редирект на dashboard.
+ * Префикс _ означает Route Group — маршрут не добавляется к URL.
+ */
+export const Route = createFileRoute('/_auth')({
   beforeLoad: () => {
-    const {accessToken} = useAuthStore.getState();
+    const { accessToken } = useAuthStore.getState();
     if (accessToken) {
-      throw redirect({to: '/dashboard'});
+      throw redirect({ to: '/dashboard' });
     }
   },
+  component: () => <Outlet />,
+});
+```
+
+#### 3.3. Создать [`routes/_auth.login.tsx`](../../src/routes/_auth.login.tsx)
+
+Наследует проверку авторизации от `_auth.tsx`:
+
+```typescript
+import {createFileRoute} from '@tanstack/react-router';
+import {LoginPage} from '@/pages/auth/login';
+
+export const Route = createFileRoute('/_auth/login')({
   component: LoginPage,
 });
 ```
 
-#### 3.3. Создать [`routes/register.tsx`](../../src/routes/register.tsx)
+#### 3.4. Создать [`routes/_auth.register.tsx`](../../src/routes/_auth.register.tsx)
+
+Наследует проверку авторизации от `_auth.tsx`:
 
 ```typescript
-import {createFileRoute, redirect} from '@tanstack/react-router';
+import {createFileRoute} from '@tanstack/react-router';
 import {RegisterPage} from '@/pages/auth/register';
-import {useAuthStore} from '@/stores/auth-store';
 
-export const Route = createFileRoute('/register')({
-  beforeLoad: () => {
-    const {accessToken} = useAuthStore.getState();
-    if (accessToken) {
-      throw redirect({to: '/dashboard'});
-    }
-  },
+export const Route = createFileRoute('/_auth/register')({
   component: RegisterPage,
 });
 ```
 
-#### 3.4. Создать [`routes/index.tsx`](../../src/routes/index.tsx)
+#### 3.5. Создать [`routes/_client.tsx`](../../src/routes/_client.tsx)
+
+Layout route для защищённых страниц. Проверяет, что пользователь авторизован:
+
+```typescript
+import { createFileRoute, redirect, Outlet } from '@tanstack/react-router';
+import { useAuthStore } from '@/stores/auth-store';
+
+/**
+ * Layout route для защищённых страниц клиента.
+ * Если пользователь не авторизован — редирект на login.
+ */
+export const Route = createFileRoute('/_client')({
+  beforeLoad: () => {
+    const { accessToken, isLoading } = useAuthStore.getState();
+
+    if (isLoading) {
+      // Можно показать спиннер или вернуть pending state
+      return;
+    }
+
+    if (!accessToken) {
+      throw redirect({ to: '/login' });
+    }
+  },
+  component: () => <Outlet />,
+});
+```
+
+#### 3.6. Создать [`routes/_client.dashboard.tsx`](../../src/routes/_client.dashboard.tsx)
+
+Пример защищённой страницы:
+
+```typescript
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/_client/dashboard')({
+  component: DashboardPage,
+});
+
+const DashboardPage = () => {
+  return <div>Dashboard</div>;
+};
+```
+
+#### 3.7. Создать [`routes/index.tsx`](../../src/routes/index.tsx)
 
 Редирект на dashboard или login:
 
@@ -217,18 +281,21 @@ export const Route = createFileRoute('/')({
 });
 ```
 
-#### 3.5. Создать [`router.tsx`](../../src/router.tsx)
+#### 3.8. Создать [`router.tsx`](../../src/router.tsx)
 
 ```typescript
-import {createRouter, createRouteTree} from '@tanstack/react-router';
+import {createRouter} from '@tanstack/react-router';
 import {Route as rootRoute} from './routes/__root';
-import {Route as loginRoute} from './routes/login';
-import {Route as registerRoute} from './routes/register';
+import {Route as authRoute} from './routes/_auth';
+import {Route as authLoginRoute} from './routes/_auth.login';
+import {Route as authRegisterRoute} from './routes/_auth.register';
+import {Route as clientRoute} from './routes/_client';
+import {Route as clientDashboardRoute} from './routes/_client.dashboard';
 import {Route as indexRoute} from './routes/index';
 
 const routeTree = rootRoute.addChildren([
-  loginRoute,
-  registerRoute,
+  authRoute.addChildren([authLoginRoute, authRegisterRoute]),
+  clientRoute.addChildren([clientDashboardRoute]),
   indexRoute,
 ]);
 
@@ -638,40 +705,68 @@ initializeAuth();
 
 ---
 
+## Диаграмма Route Groups Architecture
+
+```mermaid
+flowchart TD
+    subgraph RouteTree["TanStack Router - Route Groups"]
+        Root["__root.tsx<br/>QueryClientProvider"]
+
+        subgraph AuthGroup["_auth.tsx - Public Layout"]
+            AuthCheck{"beforeLoad:<br/>accessToken?"}
+            AuthCheck -->|Yes| RedirectDashboard["redirect → /dashboard"]
+            AuthLogin["_auth.login.tsx<br/>/login"]
+            AuthRegister["_auth.register.tsx<br/>/register"]
+        end
+
+        subgraph ClientGroup["_client.tsx - Protected Layout"]
+            ClientCheck{"beforeLoad:<br/>accessToken?"}
+            ClientCheck -->|No| RedirectLogin["redirect → /login"]
+            ClientDashboard["_client.dashboard.tsx<br/>/dashboard"]
+            ClientSchedule["_client.schedule.tsx<br/>/schedule"]
+        end
+
+        Root --> AuthGroup
+        Root --> ClientGroup
+        AuthCheck --> AuthLogin
+        AuthCheck --> AuthRegister
+        ClientCheck --> ClientDashboard
+        ClientCheck --> ClientSchedule
+    end
+```
+
 ## Диаграмма Auth Flow
 
 ```mermaid
 flowchart TD
-    subgraph Login Flow
-        A[User visits /login] --> B{Has Access Token?}
-        B -->|Yes| C[Redirect to /dashboard]
-        B -->|No| D[Show Login Form]
-        D --> E[Submit credentials]
-        E --> F{API Response}
-        F -->|Success| G[Store tokens]
-        G --> H[Redirect to /dashboard]
-        F -->|Error| I[Show error message]
+    subgraph "Login Flow"
+        A[User visits /login] --> B{Route: _auth.tsx}
+        B --> C{beforeLoad: accessToken?}
+        C -->|Yes| D[redirect → /dashboard]
+        C -->|No| E[Render LoginPage]
+        E --> F[Submit credentials]
+        F --> G{API Response}
+        G -->|Success| H[Store tokens in Zustand]
+        H --> I[navigate → /dashboard]
+        G -->|Error| J[Show error message]
     end
 
-    subgraph Token Refresh Flow
-        J[API Request] --> K{Response 401?}
-        K -->|No| L[Return response]
-        K -->|Yes| M[Call refresh endpoint]
-        M --> N{Refresh Success?}
-        N -->|Yes| O[Update access token]
-        O --> P[Retry original request]
-        N -->|No| Q[Logout user]
-        Q --> R[Redirect to /login]
+    subgraph "Token Refresh Flow"
+        K[API Request] --> L{Response 401?}
+        L -->|No| M[Return response]
+        L -->|Yes| N[Call /auth/refresh]
+        N --> O{Refresh Success?}
+        O -->|Yes| P[Update accessToken]
+        P --> Q[Retry original request]
+        O -->|No| R[logout]
+        R --> S[redirect → /login]
     end
 
-    subgraph Protected Route
-        S[Access protected route] --> T{Has Access Token?}
-        T -->|No| U[Redirect to /login]
-        T -->|Yes| V{Loading?}
-        V -->|Yes| W[Show spinner]
-        V -->|No| X{Role check}
-        X -->|Pass| Y[Render content]
-        X -->|Fail| Z[Redirect to /unauthorized]
+    subgraph "Protected Route Flow"
+        T[User visits /dashboard] --> U{Route: _client.tsx}
+        U --> V{beforeLoad: accessToken?}
+        V -->|No| W[redirect → /login]
+        V -->|Yes| X[Render DashboardPage]
     end
 ```
 
