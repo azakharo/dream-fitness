@@ -102,19 +102,41 @@ This is a security vulnerability because:
 
 ### Phase 2: Frontend Changes
 
-#### 2.1 Update Auth API Client
+#### 2.1 Regenerate API Types
+
+After backend changes are deployed, regenerate the TypeScript types:
+
+```bash
+cd frontend
+npm run gen:types
+```
+
+This command runs:
+
+```
+openapi-typescript http://localhost:3000/api/docs-json -o src/types/api.generated.ts
+```
+
+**Note:** The backend API Gateway must be running for this command to work.
+
+#### 2.2 Update Auth API Client
 
 **File:** `frontend/src/api/auth.ts` (or similar)
 
 - Remove refresh token handling from response
 - Ensure cookies are sent with requests (`credentials: 'include'`)
 
-#### 2.2 Update Auth Store/Context
+#### 2.3 Update Auth Store/Context
 
 **File:** `frontend/src/store/authStore.ts` (or similar)
 
 - Remove refresh token from state
 - Update token refresh logic to use cookie-based refresh
+
+#### Минимальные проверки кода Frontend
+
+- [ ] `npm run ts` — без ошибок
+- [ ] `npm run lint` — без ошибок
 
 ---
 
