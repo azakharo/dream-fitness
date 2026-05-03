@@ -74,7 +74,70 @@ frontend/src/
 
 ## Задачи
 
-### 1. UI Components для форм
+### 1. Route Constants
+
+Создать файл [`lib/routes.ts`](../../src/lib/routes.ts) с константами для всех маршрутов приложения:
+
+```typescript
+/**
+ * Константы маршрутов приложения.
+ * Используются для типобезопасной навигации и избежания опечаток.
+ */
+
+// Публичные роуты (без авторизации)
+export const PUBLIC_ROUTES = {
+  LOGIN: '/login',
+  REGISTER: '/register',
+} as const;
+
+// Защищённые роуты клиента
+export const CLIENT_ROUTES = {
+  DASHBOARD: '/dashboard',
+  SCHEDULE: '/schedule',
+  BOOKING: '/booking',
+  PROFILE: '/profile',
+  HISTORY: '/history',
+  NOTIFICATIONS: '/notifications',
+} as const;
+
+// Роуты администратора
+export const ADMIN_ROUTES = {
+  ROOT: '/admin',
+  SCHEDULE: '/admin/schedule',
+  SCHEDULE_NEW: '/admin/schedule/new',
+  SCHEDULE_EDIT: '/admin/schedule',
+  USERS: '/admin/users',
+  REPORTS: '/admin/reports',
+} as const;
+
+// Вспомогательные роуты
+export const MISC_ROUTES = {
+  HOME: '/',
+  UNAUTHORIZED: '/unauthorized',
+} as const;
+
+/**
+ * Объект для удобного доступа ко всем роутам.
+ * Использование: ROUTES.DASHBOARD, ROUTES.LOGIN и т.д.
+ */
+export const ROUTES = {
+  ...PUBLIC_ROUTES,
+  ...CLIENT_ROUTES,
+  ...ADMIN_ROUTES,
+  ...MISC_ROUTES,
+} as const;
+```
+
+**Преимущества:**
+
+- Исключает опечатки в строковых литералах
+- Упрощает рефакторинг — меняете константу в одном месте
+- Обеспечивает автодополнение в IDE
+- `as const` обеспечивает строгую типизацию
+
+---
+
+### 2. UI Components для форм
 
 Добавить недостающие shadcn/ui компоненты:
 
@@ -95,7 +158,7 @@ npx shadcn add form
 
 ---
 
-### 2. Zod Schemas для валидации
+### 3. Zod Schemas для валидации
 
 Создать файл [`schemas/auth.schema.ts`](../../src/schemas/auth.schema.ts):
 
@@ -134,14 +197,14 @@ export type RegisterForm = z.infer<typeof registerSchema>;
 
 ---
 
-### 3. TanStack Router Setup
+### 4. TanStack Router Setup
 
 Используем **Route Groups** для организации маршрутов без дублирования кода:
 
 - `_auth.tsx` — layout route для публичных страниц (login, register)
 - `_client.tsx` — layout route для защищённых страниц (dashboard, schedule, etc.)
 
-#### 3.1. Создать [`routes/__root.tsx`](../../src/routes/__root.tsx)
+#### 4.1. Создать [`routes/__root.tsx`](../../src/routes/__root.tsx)
 
 Базовый layout с QueryClientProvider:
 
@@ -167,13 +230,14 @@ export const Route = createRootRoute({
 });
 ```
 
-#### 3.2. Создать [`routes/_auth.tsx`](../../src/routes/_auth.tsx)
+#### 4.2. Создать [`routes/_auth.tsx`](../../src/routes/_auth.tsx)
 
 Layout route для публичных страниц. Проверяет, что пользователь НЕ авторизован:
 
 ```typescript
 import { createFileRoute, redirect, Outlet } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
+import { ROUTES } from '@/lib/routes';
 
 /**
  * Layout route для публичных страниц (login, register).
@@ -184,14 +248,14 @@ export const Route = createFileRoute('/_auth')({
   beforeLoad: () => {
     const { accessToken } = useAuthStore.getState();
     if (accessToken) {
-      throw redirect({ to: '/dashboard' });
+      throw redirect({ to: ROUTES.DASHBOARD });
     }
   },
   component: () => <Outlet />,
 });
 ```
 
-#### 3.3. Создать [`routes/_auth.login.tsx`](../../src/routes/_auth.login.tsx)
+#### 4.3. Создать [`routes/_auth.login.tsx`](../../src/routes/_auth.login.tsx)
 
 Наследует проверку авторизации от `_auth.tsx`:
 
@@ -204,7 +268,7 @@ export const Route = createFileRoute('/_auth/login')({
 });
 ```
 
-#### 3.4. Создать [`routes/_auth.register.tsx`](../../src/routes/_auth.register.tsx)
+#### 4.4. Создать [`routes/_auth.register.tsx`](../../src/routes/_auth.register.tsx)
 
 Наследует проверку авторизации от `_auth.tsx`:
 
@@ -217,13 +281,14 @@ export const Route = createFileRoute('/_auth/register')({
 });
 ```
 
-#### 3.5. Создать [`routes/_client.tsx`](../../src/routes/_client.tsx)
+#### 4.5. Создать [`routes/_client.tsx`](../../src/routes/_client.tsx)
 
 Layout route для защищённых страниц. Проверяет, что пользователь авторизован:
 
 ```typescript
 import { createFileRoute, redirect, Outlet } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
+import { ROUTES } from '@/lib/routes';
 
 /**
  * Layout route для защищённых страниц клиента.
@@ -239,14 +304,14 @@ export const Route = createFileRoute('/_client')({
     }
 
     if (!accessToken) {
-      throw redirect({ to: '/login' });
+      throw redirect({ to: ROUTES.LOGIN });
     }
   },
   component: () => <Outlet />,
 });
 ```
 
-#### 3.6. Создать [`routes/_client.dashboard.tsx`](../../src/routes/_client.dashboard.tsx)
+#### 4.6. Создать [`routes/_client.dashboard.tsx`](../../src/routes/_client.dashboard.tsx)
 
 Пример защищённой страницы:
 
@@ -262,26 +327,27 @@ const DashboardPage = () => {
 };
 ```
 
-#### 3.7. Создать [`routes/index.tsx`](../../src/routes/index.tsx)
+#### 4.7. Создать [`routes/index.tsx`](../../src/routes/index.tsx)
 
 Редирект на dashboard или login:
 
 ```typescript
 import {createFileRoute, redirect} from '@tanstack/react-router';
 import {useAuthStore} from '@/stores/auth-store';
+import {ROUTES} from '@/lib/routes';
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {
     const {accessToken} = useAuthStore.getState();
     if (accessToken) {
-      throw redirect({to: '/dashboard'});
+      throw redirect({to: ROUTES.DASHBOARD});
     }
-    throw redirect({to: '/login'});
+    throw redirect({to: ROUTES.LOGIN});
   },
 });
 ```
 
-#### 3.8. Создать [`router.tsx`](../../src/router.tsx)
+#### 4.8. Создать [`router.tsx`](../../src/router.tsx)
 
 ```typescript
 import {createRouter} from '@tanstack/react-router';
@@ -310,7 +376,7 @@ declare module '@tanstack/react-router' {
 
 ---
 
-### 4. Auth Hooks
+### 5. Auth Hooks
 
 Создать [`hooks/use-auth.ts`](../../src/hooks/use-auth.ts):
 
@@ -319,6 +385,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useNavigate} from '@tanstack/react-router';
 import {useAuthStore} from '@/stores/auth-store';
 import {api} from '@/lib/api-client';
+import {ROUTES} from '@/lib/routes';
 import type {LoginDto, RegisterDto, UserProfileDto} from '@/types';
 
 export const useLogin = () => {
@@ -334,7 +401,7 @@ export const useLogin = () => {
     onSuccess: response => {
       setAccessToken(response.accessToken);
       setUser(response.user);
-      navigate({to: '/dashboard'});
+      navigate({to: ROUTES.DASHBOARD});
     },
   });
 };
@@ -345,7 +412,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: (data: RegisterDto) => api.post('/auth/register', data),
     onSuccess: () => {
-      navigate({to: '/login'});
+      navigate({to: ROUTES.LOGIN});
     },
   });
 };
@@ -360,7 +427,7 @@ export const useLogout = () => {
     onSuccess: () => {
       clearAuth();
       queryClient.clear();
-      navigate({to: '/login'});
+      navigate({to: ROUTES.LOGIN});
     },
   });
 };
@@ -378,9 +445,9 @@ export const useProfile = () => {
 
 ---
 
-### 5. Auth Components
+### 6. Auth Components
 
-#### 5.1. Создать [`components/auth/login-form.tsx`](../../src/components/auth/login-form.tsx)
+#### 6.1. Создать [`components/auth/login-form.tsx`](../../src/components/auth/login-form.tsx)
 
 ```typescript
 import { useForm } from 'react-hook-form';
@@ -479,7 +546,7 @@ export const LoginForm = () => {
 };
 ```
 
-#### 5.2. Создать [`components/auth/register-form.tsx`](../../src/components/auth/register-form.tsx)
+#### 6.2. Создать [`components/auth/register-form.tsx`](../../src/components/auth/register-form.tsx)
 
 ```typescript
 import { useForm } from 'react-hook-form';
@@ -508,6 +575,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { GENDER_OPTIONS } from '@/types/constants';
+import { ROUTES } from '@/lib/routes';
 
 export const RegisterForm = () => {
   const registerMutation = useRegister();
@@ -565,7 +633,7 @@ export const RegisterForm = () => {
 
             <p className="text-center text-sm">
               Уже есть аккаунт?{' '}
-              <Link to="/login" className="text-primary underline">
+              <Link to={ROUTES.LOGIN} className="text-primary underline">
                 Войти
               </Link>
             </p>
@@ -577,11 +645,12 @@ export const RegisterForm = () => {
 };
 ```
 
-#### 5.3. Создать [`components/auth/protected-route.tsx`](../../src/components/auth/protected-route.tsx)
+#### 6.3. Создать [`components/auth/protected-route.tsx`](../../src/components/auth/protected-route.tsx)
 
 ```typescript
 import { Navigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
+import { ROUTES } from '@/lib/routes';
 import type { UserRole } from '@/types';
 
 interface ProtectedRouteProps {
@@ -604,11 +673,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!accessToken) {
-    return <Navigate to="/login" />;
+    return <Navigate to={ROUTES.LOGIN} />;
   }
 
   if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/unauthorized" />;
+    return <Navigate to={ROUTES.UNAUTHORIZED} />;
   }
 
   return <>{children}</>;
@@ -617,13 +686,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
 ---
 
-### 6. Auth Pages
+### 7. Auth Pages
 
-#### 6.1. Создать [`pages/auth/login.tsx`](../../src/pages/auth/login.tsx)
+#### 7.1. Создать [`pages/auth/login.tsx`](../../src/pages/auth/login.tsx)
 
 ```typescript
 import { Link } from '@tanstack/react-router';
 import { LoginForm } from '@/components/auth/login-form';
+import { ROUTES } from '@/lib/routes';
 
 export const LoginPage = () => {
   return (
@@ -632,7 +702,7 @@ export const LoginPage = () => {
         <LoginForm />
         <p className="text-center text-sm">
           Нет аккаунта?{' '}
-          <Link to="/register" className="text-primary underline">
+          <Link to={ROUTES.REGISTER} className="text-primary underline">
             Зарегистрироваться
           </Link>
         </p>
@@ -642,7 +712,7 @@ export const LoginPage = () => {
 };
 ```
 
-#### 6.2. Создать [`pages/auth/register.tsx`](../../src/pages/auth/register.tsx)
+#### 7.2. Создать [`pages/auth/register.tsx`](../../src/pages/auth/register.tsx)
 
 ```typescript
 import { RegisterForm } from '@/components/auth/register-form';
@@ -658,7 +728,7 @@ export const RegisterPage = () => {
 
 ---
 
-### 7. Обновить main.tsx
+### 8. Обновить main.tsx
 
 ```typescript
 import { StrictMode } from 'react';
@@ -676,7 +746,7 @@ createRoot(document.getElementById('root')!).render(
 
 ---
 
-### 8. Инициализация Auth State
+### 9. Инициализация Auth State
 
 Добавить инициализацию в [`stores/auth-store.ts`](../../src/stores/auth-store.ts):
 
@@ -796,14 +866,15 @@ flowchart TD
 
 ## Порядок реализации
 
-1. Установить shadcn/ui компоненты (input, label, card, form)
-2. Создать Zod schemas для валидации
-3. Настроить TanStack Router с базовыми маршрутами
-4. Создать auth hooks (useLogin, useRegister, useLogout, useProfile)
-5. Создать LoginForm компонент
-6. Создать RegisterForm компонент
-7. Создать ProtectedRoute компонент
-8. Создать страницы Login и Register
-9. Обновить main.tsx для использования Router
-10. Добавить инициализацию auth state
-11. Протестировать все сценарии
+1. Создать файл [`lib/routes.ts`](../../src/lib/routes.ts) с константами роутов
+2. Установить shadcn/ui компоненты (input, label, card, form)
+3. Создать Zod schemas для валидации
+4. Настроить TanStack Router с базовыми маршрутами
+5. Создать auth hooks (useLogin, useRegister, useLogout, useProfile)
+6. Создать LoginForm компонент
+7. Создать RegisterForm компонент
+8. Создать ProtectedRoute компонент
+9. Создать страницы Login и Register
+10. Обновить main.tsx для использования Router
+11. Добавить инициализацию auth state
+12. Протестировать все сценарии
