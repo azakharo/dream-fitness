@@ -78,9 +78,7 @@ export class AuthService {
       email: user.email,
       name: user.name,
       phone: user.phone,
-      birthDate: user.birthDate
-        ? user.birthDate.toISOString().split('T')[0]
-        : null,
+      birthDate: user.birthDate ? user.birthDate.toISOString() : null,
       gender: user.gender,
       role: user.role,
       balance: user.balance,
