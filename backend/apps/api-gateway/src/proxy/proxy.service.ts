@@ -16,7 +16,34 @@ export class ProxyService {
     private readonly configService: ConfigService,
   ) {}
 
+  /**
+   * Proxies a request and returns only the response data.
+   * Use this for most proxy operations.
+   */
   async proxyRequest<T = unknown>(
+    req: Request,
+    body: unknown,
+    path: string,
+    method: string,
+    serviceUrlKey: string,
+    defaultUrl: string,
+  ): Promise<T> {
+    const proxyResponse = await this.proxyRequestWithHeaders<T>(
+      req,
+      body,
+      path,
+      method,
+      serviceUrlKey,
+      defaultUrl,
+    );
+    return proxyResponse.data;
+  }
+
+  /**
+   * Proxies a request and returns both data and headers.
+   * Use this when you need access to response headers (e.g., for cookie forwarding).
+   */
+  async proxyRequestWithHeaders<T = unknown>(
     req: Request,
     body: unknown,
     path: string,

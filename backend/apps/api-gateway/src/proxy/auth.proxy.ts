@@ -55,7 +55,7 @@ export class AuthProxyController {
     @Res({ passthrough: true }) res: Response,
     @Body() body: RegisterDto,
   ) {
-    const authResponse = await this.proxyService.proxyRequest<{
+    const authResponse = await this.proxyService.proxyRequestWithHeaders<{
       user: unknown;
       accessToken: string;
     }>(
@@ -88,7 +88,7 @@ export class AuthProxyController {
     @Res({ passthrough: true }) res: Response,
     @Body() body: LoginDto,
   ) {
-    const authResponse = await this.proxyService.proxyRequest<{
+    const authResponse = await this.proxyService.proxyRequestWithHeaders<{
       accessToken: string;
     }>(
       req,
@@ -121,7 +121,7 @@ export class AuthProxyController {
 
     const body = refreshToken ? { refreshToken } : {};
 
-    const authResponse = await this.proxyService.proxyRequest<{
+    const authResponse = await this.proxyService.proxyRequestWithHeaders<{
       accessToken: string;
     }>(
       req,
@@ -153,7 +153,7 @@ export class AuthProxyController {
     @Req() req: RequestWithUser,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const authResponse = await this.proxyService.proxyRequest<{
+    const authResponse = await this.proxyService.proxyRequestWithHeaders<{
       message: string;
     }>(
       req,
