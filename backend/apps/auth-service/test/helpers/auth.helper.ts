@@ -36,8 +36,22 @@ export class AuthHelper {
   ): Promise<TestResponse<LoginResponseBody>> {
     const response = await this.request
       .post('/auth/refresh')
-      .send({ refreshToken });
+      .set('Cookie', [`refreshToken=${refreshToken}`]);
     return response as unknown as TestResponse<LoginResponseBody>;
+  }
+
+  /**
+   * Extracts refresh token from set-cookie header
+   */
+  extractRefreshTokenFromCookies(
+    setCookieHeader: string | string[] | undefined,
+  ): string | undefined {
+    if (!setCookieHeader) return undefined;
+    const cookieString = Array.isArray(setCookieHeader)
+      ? setCookieHeader[0]
+      : setCookieHeader;
+    const match = cookieString.match(/refreshToken=([^;]+)/);
+    return match ? match[1] : undefined;
   }
 
   async registerAndLogin(userData: RegisterDto): Promise<{
@@ -55,11 +69,14 @@ export class AuthHelper {
   async registerAndLoginFlat(
     userData: RegisterDto,
   ): Promise<{ accessToken: string; refreshToken: string; userId: string }> {
-    const { registerResponse, loginResponse } =
-      await this.registerAndLogin(userData);
+    const registerResponse = await this.register(userData);
+    const loginResponse = await this.login(userData.email, userData.password);
+    const refreshToken = this.extractRefreshTokenFromCookies(
+      loginResponse.headers['set-cookie'],
+    );
     return {
       accessToken: loginResponse.body.accessToken,
-      refreshToken: loginResponse.body.refreshToken,
+      refreshToken: refreshToken!,
       userId: registerResponse.body.user.id,
     };
   }

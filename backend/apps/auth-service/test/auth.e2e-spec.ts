@@ -37,9 +37,10 @@ describe('AuthController (e2e)', () => {
       expect(response.body.user).toBeDefined();
       expect(response.body.user.email).toBe('newuser@example.com');
       expect(response.body.user.name).toBe('New User');
-      expect(response.body.tokens).toBeDefined();
-      expect(response.body.tokens.accessToken).toBeDefined();
-      expect(response.body.tokens.refreshToken).toBeDefined();
+      expect(response.body.accessToken).toBeDefined();
+      expect(response.body).not.toHaveProperty('refreshToken');
+      expect(response.headers['set-cookie']).toBeDefined();
+      expect(response.headers['set-cookie'][0]).toContain('refreshToken=');
     });
 
     it('should register a user with all fields', async () => {
@@ -58,7 +59,8 @@ describe('AuthController (e2e)', () => {
       expect(response.body.user.phone).toBe('+79001234567');
       expect(response.body.user.birthDate).toBe('1990-01-01T00:00:00.000Z');
       expect(response.body.user.gender).toBe(UserGender.MALE);
-      expect(response.body.tokens).toBeDefined();
+      expect(response.body.accessToken).toBeDefined();
+      expect(response.headers['set-cookie']).toBeDefined();
     });
 
     it('should throw 400 when email already exists', async () => {
@@ -166,7 +168,7 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('POST /auth/login', () => {
-    it('should login successfully and return tokens', async () => {
+    it('should login successfully and return tokens in cookie', async () => {
       const userData = createRegisterDto();
       await authHelper.register(userData);
 
@@ -177,7 +179,10 @@ describe('AuthController (e2e)', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.accessToken).toBeDefined();
-      expect(response.body.refreshToken).toBeDefined();
+      expect(response.body).not.toHaveProperty('refreshToken');
+      expect(response.headers['set-cookie']).toBeDefined();
+      expect(response.headers['set-cookie'][0]).toContain('refreshToken=');
+      expect(response.headers['set-cookie'][0]).toContain('HttpOnly');
     });
 
     it('should throw 401 when email does not exist', async () => {
@@ -218,17 +223,32 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('POST /auth/refresh', () => {
-    it('should refresh tokens successfully', async () => {
+    it('should refresh tokens successfully using cookie', async () => {
       const userData = createRegisterDto();
-      const regResp = await authHelper.register(userData);
-
-      const refreshResp = await authHelper.refresh(
-        regResp.body.tokens.refreshToken,
+      await authHelper.register(userData);
+      const loginResp = await authHelper.login(
+        userData.email,
+        userData.password,
       );
+
+      const refreshToken = authHelper.extractRefreshTokenFromCookies(
+        loginResp.headers['set-cookie'],
+      );
+
+      const refreshResp = await authHelper.refresh(refreshToken!);
 
       expect(refreshResp.status).toBe(200);
       expect(refreshResp.body.accessToken).toBeDefined();
-      expect(refreshResp.body.refreshToken).toBeDefined();
+      expect(refreshResp.body).not.toHaveProperty('refreshToken');
+    });
+
+    it('should throw 400 when no cookie is provided', async () => {
+      const response = await appHelper
+        .getRequest()
+        .post('/auth/refresh')
+        .send({});
+
+      expect(response.status).toBe(400);
     });
 
     it('should throw 400 when refresh token is invalid', async () => {
@@ -239,13 +259,20 @@ describe('AuthController (e2e)', () => {
 
     it('should throw 400 when refresh token is expired', async () => {
       const userData = createRegisterDto();
-      const regResp = await authHelper.register(userData);
+      await authHelper.register(userData);
+      const loginResp = await authHelper.login(
+        userData.email,
+        userData.password,
+      );
+
+      authHelper.extractRefreshTokenFromCookies(
+        loginResp.headers['set-cookie'],
+      );
 
       const expiredToken = jwt.sign(
         {
-          sub: regResp.body.user.id,
-          email: regResp.body.user.email,
-          role: regResp.body.user.role,
+          sub: 'test-user-id',
+          email: userData.email,
         },
         process.env.JWT_SECRET!,
         { expiresIn: '1ms' },
@@ -258,14 +285,6 @@ describe('AuthController (e2e)', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should throw 400 when request body is missing', async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const response = await authHelper.refresh();
-
-      expect(response.status).toBe(400);
-    });
-
     it('should throw 400 when refresh token is empty string', async () => {
       const response = await authHelper.refresh('');
 
@@ -274,7 +293,7 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('POST /auth/logout', () => {
-    it('should logout successfully with internal headers', async () => {
+    it('should logout successfully and clear cookie', async () => {
       const userData = createRegisterDto();
       const regResp = await authHelper.register(userData);
       const userId = regResp.body.user.id;
@@ -284,6 +303,9 @@ describe('AuthController (e2e)', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Logout successful');
+      expect(response.headers['set-cookie']).toBeDefined();
+      expect(response.headers['set-cookie'][0]).toContain('refreshToken=');
+      expect(response.headers['set-cookie'][0]).toContain('Max-Age=0');
     });
 
     it('should throw 400 when no internal headers are provided', async () => {
@@ -299,7 +321,7 @@ describe('AuthController (e2e)', () => {
       const userData = createRegisterDto();
       const regResp = await authHelper.register(userData);
 
-      const response = await authHelper.logout(regResp.body.tokens.accessToken);
+      const response = await authHelper.logout(regResp.body.accessToken);
 
       expect(response.status).toBe(400);
     });

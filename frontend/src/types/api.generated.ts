@@ -457,8 +457,6 @@ export interface components {
     LoginResponseBody: {
       /** @example jwt-access-token */
       accessToken: string;
-      /** @example jwt-refresh-token */
-      refreshToken: string;
     };
     RegisterResponseBody: {
       user: Record<string, never>;

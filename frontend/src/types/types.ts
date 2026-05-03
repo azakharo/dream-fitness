@@ -22,7 +22,6 @@ export type LoginDto = components['schemas']['LoginDto'];
 export type LoginResponseBody = components['schemas']['LoginResponseBody'];
 export type RegisterResponseBody =
   components['schemas']['RegisterResponseBody'];
-export type RefreshTokenDto = components['schemas']['RefreshTokenDto'];
 export type LogoutResponseBody = components['schemas']['LogoutResponseBody'];
 export type UserProfileDto = components['schemas']['UserProfileDto'];
 export type BalanceResponseDto = components['schemas']['BalanceResponseDto'];

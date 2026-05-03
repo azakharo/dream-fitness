@@ -5,10 +5,11 @@ import {
   Patch,
   Body,
   Req,
+  Res,
   UseGuards,
   All,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   ApiBearerAuth,
@@ -22,7 +23,6 @@ import { ProxyService } from './proxy.service';
 import {
   RegisterDto,
   LoginDto,
-  RefreshTokenDto,
   UpdateBalanceDto,
   RegisterResponseBody,
   LoginResponseBody,
@@ -50,8 +50,15 @@ export class AuthProxyController {
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 409, description: 'User already exists' })
-  register(@Req() req: Request, @Body() body: RegisterDto) {
-    return this.proxyService.proxyRequest(
+  async register(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: RegisterDto,
+  ) {
+    const authResponse = await this.proxyService.proxyRequest<{
+      user: unknown;
+      accessToken: string;
+    }>(
       req,
       body,
       '/auth/register',
@@ -59,6 +66,13 @@ export class AuthProxyController {
       AUTH_SERVICE_URL,
       AUTH_SERVICE_DEFAULT_URL,
     );
+
+    this.proxyService.forwardSetCookieHeader(authResponse, res);
+
+    return {
+      user: authResponse.data.user,
+      accessToken: authResponse.data.accessToken,
+    };
   }
 
   @Post('login')
@@ -69,8 +83,14 @@ export class AuthProxyController {
     type: LoginResponseBody,
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  login(@Req() req: Request, @Body() body: LoginDto) {
-    return this.proxyService.proxyRequest(
+  async login(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: LoginDto,
+  ) {
+    const authResponse = await this.proxyService.proxyRequest<{
+      accessToken: string;
+    }>(
       req,
       body,
       '/auth/login',
@@ -78,18 +98,32 @@ export class AuthProxyController {
       AUTH_SERVICE_URL,
       AUTH_SERVICE_DEFAULT_URL,
     );
+
+    this.proxyService.forwardSetCookieHeader(authResponse, res);
+
+    return {
+      accessToken: authResponse.data.accessToken,
+    };
   }
 
   @Post('refresh')
-  @ApiBody({ type: RefreshTokenDto })
   @ApiResponse({
     status: 201,
     description: 'Token refreshed successfully',
     type: LoginResponseBody,
   })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  refresh(@Req() req: Request, @Body() body: RefreshTokenDto) {
-    return this.proxyService.proxyRequest(
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = (req.cookies as Record<string, string>)?.refreshToken;
+
+    const body = refreshToken ? { refreshToken } : {};
+
+    const authResponse = await this.proxyService.proxyRequest<{
+      accessToken: string;
+    }>(
       req,
       body,
       '/auth/refresh',
@@ -97,6 +131,12 @@ export class AuthProxyController {
       AUTH_SERVICE_URL,
       AUTH_SERVICE_DEFAULT_URL,
     );
+
+    this.proxyService.forwardSetCookieHeader(authResponse, res);
+
+    return {
+      accessToken: authResponse.data.accessToken,
+    };
   }
 
   // Protected endpoints
@@ -109,8 +149,13 @@ export class AuthProxyController {
     type: LogoutResponseBody,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  logout(@Req() req: RequestWithUser) {
-    return this.proxyService.proxyRequest(
+  async logout(
+    @Req() req: RequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const authResponse = await this.proxyService.proxyRequest<{
+      message: string;
+    }>(
       req,
       null,
       '/auth/logout',
@@ -118,6 +163,12 @@ export class AuthProxyController {
       AUTH_SERVICE_URL,
       AUTH_SERVICE_DEFAULT_URL,
     );
+
+    this.proxyService.forwardSetCookieHeader(authResponse, res);
+
+    return {
+      message: authResponse.data.message,
+    };
   }
 
   @Get('me')
