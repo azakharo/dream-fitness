@@ -65,12 +65,12 @@ trainingTest.describe('Scenario 3: Waitlist Promotion', () => {
     expect(response.status()).toBe(201);
 
     const responseBody = (await response.json()) as RegisterResponseBody;
-    expect(responseBody).toHaveProperty('tokens');
+    expect(responseBody).toHaveProperty('accessToken');
     expect(responseBody).toHaveProperty('user');
     expect(responseBody.user).toHaveProperty('id');
 
     // Store user2 info
-    process.env.USER2_TOKEN = responseBody.tokens.accessToken;
+    process.env.USER2_TOKEN = responseBody.accessToken;
     process.env.USER2_ID = responseBody.user.id;
   });
 

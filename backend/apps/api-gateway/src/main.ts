@@ -7,22 +7,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Cookie parser middleware
   app.use(cookieParser());
 
-  // CORS configuration for credentials support
   app.enableCors({
     origin: true,
     credentials: true,
   });
 
-  // CORS configuration for credentials support
-  app.enableCors({
-    origin: true,
-    credentials: true,
-  });
-
-  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
