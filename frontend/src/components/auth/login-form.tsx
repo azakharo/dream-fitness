@@ -45,7 +45,7 @@ export const LoginForm: React.FC = () => {
         <CardDescription>Войдите в свой аккаунт DreamFitness</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
+        <Form form={form}>
           {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <FormField

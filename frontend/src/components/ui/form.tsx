@@ -64,12 +64,23 @@ export const FormMessage: React.FC<
 FormMessage.displayName = 'FormMessage';
 
 // Form wrapper
-interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+interface FormProps<
+  TFieldValues extends Record<string, unknown> = Record<string, unknown>,
+> extends Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> {
+  form: UseFormReturn<TFieldValues>;
   onSubmit?: React.FormEventHandler<HTMLFormElement>;
 }
 
-export const Form: React.FC<FormProps> = ({className, ...props}) => {
-  return <form data-slot="form" className={className} {...props} />;
-};
+export function Form<
+  TFieldValues extends Record<string, unknown> = Record<string, unknown>,
+>({form, className, children, ...props}: FormProps<TFieldValues>) {
+  return (
+    <RHFProvider {...form}>
+      <form data-slot="form" className={className} {...props}>
+        {children}
+      </form>
+    </RHFProvider>
+  );
+}
 
 Form.displayName = 'Form';
