@@ -57,133 +57,131 @@ export const RegisterForm: React.FC = () => {
         <CardDescription>Создайте аккаунт DreamFitness</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form form={form}>
-          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField
-              name="name"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Имя</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Иван Иванов" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="email"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="user@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="phone"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Телефон</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+79991234567" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="birthDate"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Дата рождения</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="gender"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Пол</FormLabel>
-                  <FormControl>
-                    <select
-                      className="
-                        flex h-10 w-full rounded-md border border-input
-                        bg-background px-3 py-2 text-sm ring-offset-background
-                        focus-visible:ring-2 focus-visible:ring-ring
-                        focus-visible:ring-offset-2 focus-visible:outline-none
-                      "
-                      {...field}
-                    >
-                      {GENDER_OPTIONS.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="password"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Пароль</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="confirmPassword"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Подтвердите пароль</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {registerMutation.isError && (
-              <p className="text-sm text-red-500">
-                Ошибка регистрации. Попробуйте снова.
-              </p>
+        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+        <Form form={form} onSubmit={handleSubmit} className="space-y-4">
+          <FormField
+            name="name"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Имя</FormLabel>
+                <FormControl>
+                  <Input placeholder="Иван Иванов" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={registerMutation.isPending}
-            >
-              {registerMutation.isPending
-                ? 'Регистрация...'
-                : 'Зарегистрироваться'}
-            </Button>
-
-            <p className="text-center text-sm">
-              Уже есть аккаунт?{' '}
-              <Link to={ROUTES.LOGIN} className="text-primary underline">
-                Войти
-              </Link>
+          />
+          <FormField
+            name="email"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="user@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="phone"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Телефон</FormLabel>
+                <FormControl>
+                  <Input placeholder="+79991234567" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="birthDate"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Дата рождения</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="gender"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Пол</FormLabel>
+                <FormControl>
+                  <select
+                    className="
+                      flex h-10 w-full rounded-md border border-input
+                      bg-background px-3 py-2 text-sm ring-offset-background
+                      focus-visible:ring-2 focus-visible:ring-ring
+                      focus-visible:ring-offset-2 focus-visible:outline-none
+                    "
+                    {...field}
+                  >
+                    {GENDER_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="password"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Пароль</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="confirmPassword"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Подтвердите пароль</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {registerMutation.isError && (
+            <p className="text-sm text-red-500">
+              Ошибка регистрации. Попробуйте снова.
             </p>
-          </form>
+          )}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={registerMutation.isPending}
+          >
+            {registerMutation.isPending
+              ? 'Регистрация...'
+              : 'Зарегистрироваться'}
+          </Button>
+
+          <p className="text-center text-sm">
+            Уже есть аккаунт?{' '}
+            <Link to={ROUTES.LOGIN} className="text-primary underline">
+              Войти
+            </Link>
+          </p>
         </Form>
       </CardContent>
     </Card>

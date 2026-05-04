@@ -45,48 +45,46 @@ export const LoginForm: React.FC = () => {
         <CardDescription>Войдите в свой аккаунт DreamFitness</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form form={form}>
-          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField
-              name="email"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="user@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="password"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Пароль</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {loginMutation.isError && (
-              <p className="text-sm text-red-500">Неверный email или пароль</p>
+        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+        <Form form={form} onSubmit={handleSubmit} className="space-y-4">
+          <FormField
+            name="email"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="user@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loginMutation.isPending}
-            >
-              {loginMutation.isPending ? 'Вход...' : 'Войти'}
-            </Button>
-          </form>
+          />
+          <FormField
+            name="password"
+            render={({field}) => (
+              <FormItem>
+                <FormLabel>Пароль</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {loginMutation.isError && (
+            <p className="text-sm text-red-500">Неверный email или пароль</p>
+          )}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loginMutation.isPending}
+          >
+            {loginMutation.isPending ? 'Вход...' : 'Войти'}
+          </Button>
         </Form>
       </CardContent>
     </Card>
