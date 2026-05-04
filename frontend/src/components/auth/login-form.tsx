@@ -36,7 +36,9 @@ export const LoginForm: React.FC = () => {
     loginMutation.mutate(data);
   };
 
-  const handleSubmit = form.handleSubmit(onSubmit);
+  const handleSubmit = () => {
+    void form.handleSubmit(onSubmit);
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -45,7 +47,6 @@ export const LoginForm: React.FC = () => {
         <CardDescription>Войдите в свой аккаунт DreamFitness</CardDescription>
       </CardHeader>
       <CardContent>
-        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
         <Form form={form} onSubmit={handleSubmit} className="space-y-4">
           <FormField
             name="email"

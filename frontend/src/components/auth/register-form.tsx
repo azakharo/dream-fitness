@@ -48,7 +48,9 @@ export const RegisterForm: React.FC = () => {
     registerMutation.mutate(data);
   };
 
-  const handleSubmit = form.handleSubmit(onSubmit);
+  const handleSubmit = () => {
+    void form.handleSubmit(onSubmit);
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -57,7 +59,6 @@ export const RegisterForm: React.FC = () => {
         <CardDescription>Создайте аккаунт DreamFitness</CardDescription>
       </CardHeader>
       <CardContent>
-        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
         <Form form={form} onSubmit={handleSubmit} className="space-y-4">
           <FormField
             name="name"
