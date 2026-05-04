@@ -77,3 +77,9 @@ export type UnreadCountResponseDto =
   components['schemas']['UnreadCountResponseDto'];
 export type NotificationDto = components['schemas']['NotificationDto'];
 export type NotificationType = NotificationDto['type'];
+
+// ===========================================
+// User Domain
+// ===========================================
+
+export type UserRole = 'client' | 'admin';
