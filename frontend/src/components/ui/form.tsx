@@ -4,6 +4,7 @@ import {
   FormProvider as RHFProvider,
   useFormContext,
 } from 'react-hook-form';
+import {cn} from '@/lib/utils';
 import type {
   ControllerProps,
   FieldPath,
@@ -121,16 +122,29 @@ FormLabel.displayName = 'FormLabel';
 // Form Control
 export const FormControl: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
+  children,
   ...props
 }) => {
   const {error, formDescriptionId, formMessageId} = useFormField();
+
+  // Clone child to pass aria-invalid attribute for Input styling
+  // eslint-disable-next-line react-x/no-children-only
+  const child = React.Children.only(children);
+  const childWithAriaInvalid = React.isValidElement(child)
+    ? // eslint-disable-next-line react-x/no-clone-element
+      React.cloneElement(
+        child as React.ReactElement<React.HTMLAttributes<HTMLElement>>,
+        {
+          'aria-invalid': !!error,
+        },
+      )
+    : children;
 
   return (
     <div
       data-slot="form-control"
       data-error={!!error}
       className={className}
-      aria-invalid={!!error}
       aria-describedby={
         !error
           ? `${formDescriptionId}`
@@ -138,7 +152,9 @@ export const FormControl: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
       }
       aria-errormessage={error ? formMessageId : undefined}
       {...props}
-    />
+    >
+      {childWithAriaInvalid}
+    </div>
   );
 };
 
@@ -177,7 +193,7 @@ export const FormMessage: React.FC<
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={className}
+      className={cn('text-sm text-destructive', className)}
       {...props}
     >
       {body}
