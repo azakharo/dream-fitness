@@ -28,6 +28,28 @@ export class ApiError extends Error {
 
 let refreshPromise: Promise<void> | null = null;
 
+/**
+ * Recursively transforms Date objects to ISO strings in the request body.
+ * This ensures the UI components can work with Date objects while the API
+ * receives properly formatted string dates.
+ */
+function transformDatesInBody(body: unknown): unknown {
+  if (body instanceof Date) {
+    return body.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+  }
+  if (Array.isArray(body)) {
+    return body.map(transformDatesInBody);
+  }
+  if (body !== null && typeof body === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(body)) {
+      result[key] = transformDatesInBody(value);
+    }
+    return result;
+  }
+  return body;
+}
+
 const beforeRequestHook: BeforeRequestHook = (state: BeforeRequestState) => {
   const token = useAuthStore.getState().accessToken;
   if (token) {
@@ -85,16 +107,17 @@ const kyInstance = ky.create({
 });
 
 /**
- * Convenience API methods with typed responses
+ * Convenience API methods with typed responses.
+ * Date objects in request bodies are automatically converted to ISO date strings.
  */
 export const api = {
   get: <T>(endpoint: string) => kyInstance.get(endpoint).json<T>(),
 
   post: <T>(endpoint: string, body?: unknown) =>
-    kyInstance.post(endpoint, {json: body}).json<T>(),
+    kyInstance.post(endpoint, {json: transformDatesInBody(body)}).json<T>(),
 
   put: <T>(endpoint: string, body?: unknown) =>
-    kyInstance.put(endpoint, {json: body}).json<T>(),
+    kyInstance.put(endpoint, {json: transformDatesInBody(body)}).json<T>(),
 
   delete: <T>(endpoint: string) => kyInstance.delete(endpoint).json<T>(),
 };

@@ -5,11 +5,11 @@ import {api} from '@/lib/api-client';
 import {ROUTES} from '@/lib/routes';
 import type {
   LoginDto,
-  RegisterDto,
   UserProfileDto,
   LoginResponseBody,
   RegisterResponseBody,
 } from '@/types';
+import type {RegisterFormData} from '@/schemas/auth.schema';
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -38,7 +38,8 @@ export const useRegister = () => {
   const {setAccessToken, setUser} = useAuthStore();
 
   return useMutation({
-    mutationFn: async (data: RegisterDto) => {
+    // RegisterFormData has Date for birthDate, api.post will convert it to string
+    mutationFn: async (data: RegisterFormData) => {
       // Backend returns { accessToken, user } and sets refreshToken cookie
       const response = await api.post<RegisterResponseBody>(
         '/auth/register',

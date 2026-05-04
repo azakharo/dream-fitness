@@ -38,7 +38,7 @@ export const RegisterForm: React.FC = () => {
       name: '',
       email: '',
       phone: '',
-      birthDate: '',
+      birthDate: undefined,
       gender: 'male',
       password: '',
       confirmPassword: '',
@@ -110,10 +110,7 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Дата рождения</FormLabel>
                 <FormControl>
-                  <DatePicker
-                    value={field.value as string | undefined}
-                    onChange={field.onChange}
-                  />
+                  <DatePicker value={field.value} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
