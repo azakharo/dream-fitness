@@ -11,11 +11,7 @@
 
 ## Технологический стек
 
-- [React](https://react.dev/) (v19)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Vite](https://vitejs.dev/)
-- Tailwind CSS
-- **UI Library:** [shadcn/ui](https://ui.shadcn.com/) with Radix UI — доступные UI компоненты на базе Radix примитивов
+- [Технологический стек](./README.md#tech-stack)
 
 ## Структура папок проекта
 
@@ -24,8 +20,12 @@
 ## Основные npm команды
 
 - Установка зависимостей: `npm install`
-- Разработка: `npm run dev`
+- Start development mode: `npm run dev`
 - Production build: `npm run build`
 - Проверка кода на наличие ошибок Typescript: `npm run ts`
 - Линтинг и автоформатирование кода: `npm run lint`
 - Авто-генерация типов данных, предоставляемых backend API, из OpenAPI spec: `npm run gen:types`
+
+## Правила по работе с кодом
+
+- Если во время выполнения задачи изменялись TypeScript или JavaScript файлы исходного кода, то после выполнения задачи (в самом конце), нужно проверить, нет ли ошибок TypeScript (`npm run ts`) и других принятых правил кодирования (`npm run lint`). Обнаруженные проблемы необходимо исправить.
