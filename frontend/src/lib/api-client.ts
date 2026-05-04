@@ -9,7 +9,7 @@ import type {
 } from 'ky';
 import {useAuthStore} from '@/stores/auth-store';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_ENABLED_API_PROXYING ?? '') + '/api';
 
 /**
  * Custom error class for API errors

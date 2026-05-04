@@ -36,10 +36,6 @@ export const LoginForm: React.FC = () => {
     loginMutation.mutate(data);
   };
 
-  const handleSubmit = () => {
-    void form.handleSubmit(onSubmit);
-  };
-
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -47,7 +43,14 @@ export const LoginForm: React.FC = () => {
         <CardDescription>Войдите в свой аккаунт DreamFitness</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form form={form} onSubmit={handleSubmit} className="space-y-4">
+        <Form
+          form={form}
+          onSubmit={event => {
+            event.preventDefault();
+            void form.handleSubmit(onSubmit)();
+          }}
+          className="space-y-4"
+        >
           <FormField
             name="email"
             render={({field}) => (

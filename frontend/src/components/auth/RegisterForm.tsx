@@ -48,10 +48,6 @@ export const RegisterForm: React.FC = () => {
     registerMutation.mutate(data);
   };
 
-  const handleSubmit = () => {
-    void form.handleSubmit(onSubmit);
-  };
-
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -59,7 +55,14 @@ export const RegisterForm: React.FC = () => {
         <CardDescription>Создайте аккаунт DreamFitness</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form form={form} onSubmit={handleSubmit} className="space-y-4">
+        <Form
+          form={form}
+          onSubmit={event => {
+            event.preventDefault();
+            void form.handleSubmit(onSubmit)();
+          }}
+          className="space-y-4"
+        >
           <FormField
             name="name"
             render={({field}) => (
