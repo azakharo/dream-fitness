@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_auth')({
   beforeLoad: () => {
     const {accessToken} = useAuthStore.getState();
     if (accessToken) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw redirect({to: ROUTES.DASHBOARD});
     }
   },

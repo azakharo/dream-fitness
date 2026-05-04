@@ -2,7 +2,8 @@ import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Link} from '@tanstack/react-router';
 import {useRegister} from '@/hooks/use-auth';
-import {registerSchema, type RegisterForm} from '@/schemas/auth.schema';
+import {registerSchema} from '@/schemas/auth.schema';
+import type {RegisterFormData} from '@/schemas/auth.schema';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {
@@ -30,7 +31,7 @@ const GENDER_OPTIONS = [
 export const RegisterForm: React.FC = () => {
   const registerMutation = useRegister();
 
-  const form = useForm<RegisterForm>({
+  const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
@@ -43,9 +44,11 @@ export const RegisterForm: React.FC = () => {
     },
   });
 
-  const onSubmit = (data: RegisterForm) => {
+  const onSubmit = (data: RegisterFormData) => {
     registerMutation.mutate(data);
   };
+
+  const handleSubmit = form.handleSubmit(onSubmit);
 
   return (
     <Card className="w-full max-w-md">
@@ -55,7 +58,8 @@ export const RegisterForm: React.FC = () => {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <FormField
               name="name"
               render={({field}) => (

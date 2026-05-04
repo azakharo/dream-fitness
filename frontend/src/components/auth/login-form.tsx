@@ -1,7 +1,8 @@
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useLogin} from '@/hooks/use-auth';
-import {loginSchema, type LoginForm} from '@/schemas/auth.schema';
+import {loginSchema} from '@/schemas/auth.schema';
+import type {LoginFormData} from '@/schemas/auth.schema';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {
@@ -23,7 +24,7 @@ import {
 export const LoginForm: React.FC = () => {
   const loginMutation = useLogin();
 
-  const form = useForm<LoginForm>({
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
@@ -31,9 +32,11 @@ export const LoginForm: React.FC = () => {
     },
   });
 
-  const onSubmit = (data: LoginForm) => {
+  const onSubmit = (data: LoginFormData) => {
     loginMutation.mutate(data);
   };
+
+  const handleSubmit = form.handleSubmit(onSubmit);
 
   return (
     <Card className="w-full max-w-md">
@@ -43,7 +46,8 @@ export const LoginForm: React.FC = () => {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <FormField
               name="email"
               render={({field}) => (

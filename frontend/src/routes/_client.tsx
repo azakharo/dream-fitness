@@ -16,6 +16,7 @@ export const Route = createFileRoute('/_client')({
     }
 
     if (!accessToken) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw redirect({to: ROUTES.LOGIN});
     }
   },
