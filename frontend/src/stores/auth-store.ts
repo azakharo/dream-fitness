@@ -1,6 +1,7 @@
 import {create} from 'zustand';
 import {persist, createJSONStorage} from 'zustand/middleware';
 import type {UserProfileDto, LoginResponseBody} from '@/types';
+import {api} from '@/lib/api-client';
 
 type User = UserProfileDto;
 interface AuthState {
@@ -58,3 +59,22 @@ export const useAuthStore = create<AuthState & AuthActions>()(
     },
   ),
 );
+
+export const initializeAuth = async () => {
+  const {accessToken, setLoading, setUser, logout} = useAuthStore.getState();
+
+  setLoading(true);
+
+  if (accessToken) {
+    try {
+      const user = await api.get<UserProfileDto>('/auth/me');
+      setUser(user);
+    } catch {
+      logout();
+    }
+  }
+
+  setLoading(false);
+};
+
+initializeAuth().catch(console.error);

@@ -1,19 +1,19 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from 'typescript-eslint';
+import {defineConfig, globalIgnores} from 'eslint/config';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-import reactCompiler from 'eslint-plugin-react-compiler'
-import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss'
+import reactX from 'eslint-plugin-react-x';
+import reactDom from 'eslint-plugin-react-dom';
+import reactCompiler from 'eslint-plugin-react-compiler';
+import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['./src/**/*.{ts,tsx}'],
+    files: ['./src/**/*.{ts,tsx}', './eslint.config.js', './vite.config.js'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommendedTypeChecked,
@@ -39,13 +39,13 @@ export default defineConfig([
       'react-compiler/react-compiler': 'warn',
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true },
+        {allowConstantExport: true},
       ],
     },
     settings: {
-      "better-tailwindcss": {
-        entryPoint: "src/index.css",
-      }
+      'better-tailwindcss': {
+        entryPoint: 'src/index.css',
+      },
     },
   },
-])
+]);
