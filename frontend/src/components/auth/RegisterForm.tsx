@@ -105,6 +105,7 @@ export const RegisterForm: React.FC = () => {
             )}
           />
           <FormField
+            control={form.control}
             name="birthDate"
             render={({field}) => (
               <FormItem>
