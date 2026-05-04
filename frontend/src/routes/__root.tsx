@@ -2,6 +2,8 @@ import {createRootRoute, Outlet} from '@tanstack/react-router';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {Agentation} from 'agentation';
 
+import {NotFoundPage} from '@/pages/NotFoundPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -18,4 +20,5 @@ export const Route = createRootRoute({
       <Agentation />
     </QueryClientProvider>
   ),
+  notFoundComponent: NotFoundPage,
 });
