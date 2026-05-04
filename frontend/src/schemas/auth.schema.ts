@@ -1,0 +1,30 @@
+import {z} from 'zod';
+
+export const loginSchema = z.object({
+  email: z.string().email('Некорректный email'),
+  password: z.string().min(1, 'Введите пароль'),
+});
+
+export const registerSchema = z
+  .object({
+    name: z.string().min(2, 'Минимум 2 символа'),
+    email: z.string().email('Некорректный email'),
+    phone: z.string().regex(/^\+7\d{10}$/, 'Формат: +79991234567'),
+    birthDate: z.string().refine(val => {
+      const date = new Date(val);
+      const now = new Date();
+      return date < now && date > new Date('1900-01-01');
+    }, 'Некорректная дата рождения'),
+    gender: z.enum(['male', 'female'], {
+      error: () => ({message: 'Выберите пол'}),
+    }),
+    password: z.string().min(8, 'Минимум 8 символов'),
+    confirmPassword: z.string(),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: 'Пароли не совпадают',
+    path: ['confirmPassword'],
+  });
+
+export type LoginForm = z.infer<typeof loginSchema>;
+export type RegisterForm = z.infer<typeof registerSchema>;
