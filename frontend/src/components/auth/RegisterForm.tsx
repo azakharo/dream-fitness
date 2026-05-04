@@ -6,6 +6,7 @@ import {registerSchema} from '@/schemas/auth.schema';
 import type {RegisterFormData} from '@/schemas/auth.schema';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
+import {DatePicker} from '@/components/ui/date-picker';
 import {
   Card,
   CardContent,
@@ -109,7 +110,10 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Дата рождения</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePicker
+                    value={field.value as string | undefined}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

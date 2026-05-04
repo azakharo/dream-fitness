@@ -1,4 +1,7 @@
 import {z} from 'zod';
+import {parse} from 'date-fns';
+
+const DATE_FORMAT = 'dd.MM.yyyy';
 
 export const loginSchema = z.object({
   email: z.string().email('Некорректный email'),
@@ -11,9 +14,13 @@ export const registerSchema = z
     email: z.string().email('Некорректный email'),
     phone: z.string().regex(/^\+7\d{10}$/, 'Формат: +79991234567'),
     birthDate: z.string().refine(val => {
-      const date = new Date(val);
-      const now = new Date();
-      return date < now && date > new Date('1900-01-01');
+      try {
+        const date = parse(val, DATE_FORMAT, new Date());
+        const now = new Date();
+        return date < now && date > new Date('1900-01-01');
+      } catch {
+        return false;
+      }
     }, 'Некорректная дата рождения'),
     gender: z.enum(['male', 'female'], {
       error: () => ({message: 'Выберите пол'}),
