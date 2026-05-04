@@ -25,6 +25,7 @@ const FormFieldContext = React.createContext<{
 const FormItemContext = React.createContext<{id: string}>({id: ''});
 
 // Hook to access field state from context
+// eslint-disable-next-line react-refresh/only-export-components
 export const useFormField = () => {
   const fieldContext = React.use(FormFieldContext);
   const itemContext = React.use(FormItemContext);
