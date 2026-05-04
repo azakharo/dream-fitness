@@ -18,6 +18,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
 } from 'lucide-react';
+import {ru} from 'date-fns/locale';
 
 // Top-level components to avoid nested component definitions
 type CalendarRootProps = React.ComponentProps<'div'> & {
@@ -88,6 +89,8 @@ function createCalendarDayButtonWithLocale(locale?: Partial<Locale>) {
   };
 }
 
+const DayButtonWithLocale = createCalendarDayButtonWithLocale(ru);
+
 function Calendar({
   className,
   classNames,
@@ -103,12 +106,6 @@ function Calendar({
 }) {
   const defaultClassNames = getDefaultClassNames();
 
-  // Create DayButton component with locale at the top level
-  const DayButtonWithLocale = React.useMemo(
-    () => createCalendarDayButtonWithLocale(locale),
-    [locale],
-  );
-
   // Memoize components object to avoid unnecessary re-renders
   const memoizedComponents = React.useMemo(
     () => ({
@@ -118,11 +115,13 @@ function Calendar({
       WeekNumber: CalendarWeekNumber,
       ...components,
     }),
-    [DayButtonWithLocale, components],
+    [components],
   );
 
   return (
     <DayPicker
+      locale={ru}
+      weekStartsOn={1}
       showOutsideDays={showOutsideDays}
       className={cn(
         `
@@ -136,7 +135,6 @@ function Calendar({
         className,
       )}
       captionLayout={captionLayout}
-      locale={locale}
       formatters={{
         formatMonthDropdown: date =>
           date.toLocaleString(locale?.code, {month: 'short'}),
