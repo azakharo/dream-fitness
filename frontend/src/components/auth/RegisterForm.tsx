@@ -111,7 +111,14 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Дата рождения</FormLabel>
                 <FormControl>
-                  <DatePicker value={field.value} onChange={field.onChange} />
+                  <DatePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    captionLayout="dropdown"
+                    // Обязательно указываем границы, чтобы сформировать список годов
+                    startMonth={new Date(1926, 0)}
+                    endMonth={new Date()}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
