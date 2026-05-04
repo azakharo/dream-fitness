@@ -1,5 +1,5 @@
 import {Link} from '@tanstack/react-router';
-import {LoginForm} from '@/components/auth/login-form';
+import {LoginForm} from '@/components/auth/LoginForm';
 import {ROUTES} from '@/lib/routes';
 
 export const LoginPage: React.FC = () => {
