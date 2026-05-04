@@ -91,19 +91,19 @@ function createCalendarDayButtonWithLocale(locale?: Partial<Locale>) {
 
 const DayButtonWithLocale = createCalendarDayButtonWithLocale(ru);
 
+type Props = DayPickerProps & {
+  buttonVariant?: React.ComponentProps<typeof Button>['variant'];
+};
+
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
   captionLayout = 'label',
   buttonVariant = 'ghost',
-  locale,
-  formatters,
   components,
   ...props
-}: DayPickerProps & {
-  buttonVariant?: React.ComponentProps<typeof Button>['variant'];
-}) {
+}: Props) {
   const defaultClassNames = getDefaultClassNames();
 
   // Memoize components object to avoid unnecessary re-renders
@@ -135,11 +135,6 @@ function Calendar({
         className,
       )}
       captionLayout={captionLayout}
-      formatters={{
-        formatMonthDropdown: date =>
-          date.toLocaleString(locale?.code, {month: 'short'}),
-        ...formatters,
-      }}
       classNames={{
         root: cn('w-fit', defaultClassNames.root),
         months: cn(
