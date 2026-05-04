@@ -1,31 +1,90 @@
 # AGENTS.md
 
-## Основные документы по проекту
+## Описание проекта
 
-- [PRD](../doc/PRD.md)
-- [Требования к UI](../doc/UI.md)
-- [Frontend ADR](../doc/Frontend-ADR.md)
-- [OpenAPI 3.0 спецификация API бекенда](../doc/openapi.json)
-- [Краткое описание API бекенда](../doc/API.md)
-- [Все типы данных, предоставляемые backend API](./src/types/types.ts)
+Frontend для системы управления фитнес-клубом DreamFitness. Веб-приложение на React 19 + TypeScript с Vite.
+
+Клиенты могут управлять абонементами, записываться на групповые и индивидуальные тренировки. Администраторы контролируют заполненность тренировок и состояние счетов пользователей.
+
+## Основные документы
+
+- [PRD](../doc/PRD.md) — требования к продукту
+- [Требования к UI](../doc/UI.md) — функциональные требования к интерфейсу
+- [Frontend ADR](../doc/Frontend-ADR.md) — архитектурные решения
+- [OpenAPI 3.0 спецификация](../doc/openapi.json) — полное описание API бекенда
+- [Краткое описание API](../doc/API.md) — основные эндпоинты
+- [Автогенерируемые типы](./src/types/types.ts) — типы данных из OpenAPI (НЕ РЕДАКТИРОВАТЬ ВРУЧНУЮ)
 
 ## Технологический стек
 
-- [Технологический стек](./README.md#tech-stack)
+| Категория     | Технология            | Версия |
+| ------------- | --------------------- | ------ |
+| Framework     | React                 | 19.2   |
+| Language      | TypeScript            | 5.9    |
+| Build Tool    | Vite                  | 7.2    |
+| Routing       | TanStack Router       | Latest |
+| Server State  | TanStack Query        | Latest |
+| Client State  | Zustand               | Latest |
+| HTTP Client   | ky                    | 1.7    |
+| UI Components | shadcn/ui + Radix     | Latest |
+| Styling       | Tailwind CSS          | 4.2    |
+| Forms         | React Hook Form + Zod | Latest |
+| Linting       | ESLint + Prettier     | Latest |
 
-## Структура папок проекта
+## Архитектурные особенности
 
-[Структура проекта](../doc/Frontend-ADR.md#7-структура-проекта)
+- **State Management**: Zustand для client state (UI), TanStack Query для server state (API data)
+- **Type Generation**: Типы генерируются из OpenAPI спецификации через `npm run gen:types`
+- **Auth**: Access token в Zustand + sessionStorage, Refresh token в HTTP-only cookie
+- **API Client**: ky с auto-refresh токена через hooks (beforeRequest, afterResponse)
+- **Routing**: TanStack Router с file-based routing и route loaders
+- **Forms**: React Hook Form с Zod schema валидацией
 
-## Основные npm команды
+## Структура проекта
 
-- Установка зависимостей: `npm install`
-- Start development mode: `npm run dev`
-- Production build: `npm run build`
-- Проверка кода на наличие ошибок Typescript: `npm run ts`
-- Линтинг и автоформатирование кода: `npm run lint`
-- Авто-генерация типов данных, предоставляемых backend API, из OpenAPI spec: `npm run gen:types`
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── ui/                    # shadcn/ui компоненты
+│   │   ├── layout/                 # Layout компоненты (ClientLayout, AdminLayout)
+│   │   ├── auth/                   # Auth компоненты (LoginForm, ProtectedRoute)
+│   │   └── common/                 # Общие компоненты (LoadingSpinner, EmptyState)
+│   ├── pages/                      # Страницы приложения
+│   │   ├── auth/                   # Login, Register
+│   │   ├── client/                 # Dashboard, Schedule, Booking, Profile, History
+│   │   └── admin/                  # Admin Dashboard, Schedule, Users, Reports
+│   ├── hooks/                      # Custom hooks (useTrainings, useBookings, etc.)
+│   ├── stores/                     # Zustand stores (auth-store, ui-store)
+│   ├── lib/                        # Utilities (api-client, utils, constants)
+│   ├── schemas/                    # Zod schemas для валидации форм
+│   ├── types/                      # TypeScript типы
+│   │   ├── api.generated.ts        # Автогенерируется (НЕ РЕДАКТИРОВАТЬ)
+│   │   ├── constants.ts            # Runtime values для UI (dropdowns, filters)
+│   │   └── index.ts                 # Re-export всех типов
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── router.tsx
+├── components.json                 # shadcn/ui конфигурация
+├── vite.config.ts
+├── tailwind.config.ts
+└── package.json
+```
+
+## npm команды
+
+| Команда             | Описание                                   |
+| ------------------- | ------------------------------------------ |
+| `npm install`       | Установка зависимостей                     |
+| `npm run dev`       | Запуск dev-сервера (http://localhost:5173) |
+| `npm run build`     | Production build (папка `dist/`)           |
+| `npm run preview`   | Предпросмотр production build              |
+| `npm run ts`        | Проверка TypeScript ошибок                 |
+| `npm run lint`      | Линтинг и автоформатирование кода          |
+| `npm run gen:types` | Генерация типов из OpenAPI спецификации    |
 
 ## Правила по работе с кодом
 
 - Если во время выполнения задачи изменялись TypeScript или JavaScript файлы исходного кода, то после выполнения задачи (в самом конце), нужно проверить, нет ли ошибок TypeScript (`npm run ts`) и других принятых правил кодирования (`npm run lint`). Обнаруженные проблемы необходимо исправить.
+- Если во время выполнения задачи изменился backend API, нужно напомнить пользователю выполнить авто-генерацию типов данных: `npm run gen:types`.
+- Файл `src/types/api.generated.ts` автогенерируется и НЕ должен редактироваться вручную.
