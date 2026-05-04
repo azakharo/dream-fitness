@@ -27,7 +27,8 @@ export const useLogin = () => {
     },
     onSuccess: ({user}) => {
       setUser(user);
-      void navigate({to: ROUTES.DASHBOARD as string});
+      // Type assertion needed due to Tanstack React Router strict typing
+      void navigate({to: ROUTES.DASHBOARD as '.' | '..', search: true});
     },
   });
 };
@@ -50,7 +51,7 @@ export const useRegister = () => {
       setAccessToken(accessToken);
       setUser(user as UserProfileDto);
       // Navigate directly to dashboard (no need to login again)
-      void navigate({to: ROUTES.DASHBOARD as string});
+      void navigate({to: ROUTES.DASHBOARD as '.' | '..', search: true});
     },
   });
 };
@@ -65,7 +66,7 @@ export const useLogout = () => {
     onSuccess: () => {
       clearAuth();
       queryClient.clear();
-      void navigate({to: ROUTES.LOGIN as string});
+      void navigate({to: ROUTES.LOGIN as '.' | '..', search: true});
     },
   });
 };
