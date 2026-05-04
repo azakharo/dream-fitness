@@ -3,15 +3,15 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useLogin} from '@/hooks/use-auth';
 import {loginSchema} from '@/schemas/auth.schema';
 import type {LoginFormData} from '@/schemas/auth.schema';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
+import {Button} from '@/components/ui';
+import {Input} from '@/components/ui';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui';
 import {
   Form,
   FormControl,
@@ -19,7 +19,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui';
 
 export const LoginForm: React.FC = () => {
   const loginMutation = useLogin();

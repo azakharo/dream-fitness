@@ -4,16 +4,16 @@ import {Link} from '@tanstack/react-router';
 import {useRegister} from '@/hooks/use-auth';
 import {registerSchema} from '@/schemas/auth.schema';
 import type {RegisterFormData} from '@/schemas/auth.schema';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
-import {DatePicker} from '@/components/ui/date-picker';
+import {Button} from '@/components/ui';
+import {Input} from '@/components/ui';
+import {DatePicker} from '@/components/ui';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui';
 import {
   Form,
   FormControl,
@@ -21,7 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui';
 import {ROUTES} from '@/lib/routes';
 
 const GENDER_OPTIONS = [
