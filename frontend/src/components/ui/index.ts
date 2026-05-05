@@ -1,6 +1,6 @@
 // UI Components
-export {Button} from './button';
-export {Calendar, CalendarDayButton} from './calendar';
+export {Button} from './Button';
+export {Calendar, CalendarDayButton} from './Calendar';
 export {
   Card,
   CardContent,
@@ -8,8 +8,8 @@ export {
   CardFooter,
   CardHeader,
   CardTitle,
-} from './card';
-export {DatePicker} from './date-picker';
+} from './Card';
+export {DatePicker} from './DatePicker';
 export {
   Form,
   FormControl,
@@ -18,10 +18,37 @@ export {
   FormItem,
   FormLabel,
   FormMessage,
-} from './form';
-export {Input} from './input';
-export {Label} from './label';
-export {Popover, PopoverContent, PopoverTrigger} from './popover';
+} from './Form';
+export {Input} from './Input';
+export {Label} from './Label';
+export {Popover, PopoverContent, PopoverTrigger} from './Popover';
+
+export {
+  DropdownMenu,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from './DropdownMenu';
+export {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+  AvatarBadge,
+} from './Avatar';
+export {Badge} from './Badge';
 
 // Variant helpers
 export {buttonVariants, type ButtonVariantProps} from './button-variants';

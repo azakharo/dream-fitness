@@ -89,3 +89,4 @@ frontend/
 - Если во время выполнения задачи изменился backend API, нужно напомнить пользователю выполнить авто-генерацию типов данных: `npm run gen:types`.
 - Файл `src/types/api.generated.ts` автогенерируется и НЕ должен редактироваться вручную.
 - The Date → string and similar conversions should happen in the API client layer, keeping backend-specific formatting out of UI components. This follows the principle that UI should work with native types while the API layer handles serialization.
+- Все файлы React компонентов (pages, components и т.д.) именуются в **PascalCase**, идентично названию экспортируемого компонента.

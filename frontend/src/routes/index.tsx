@@ -4,10 +4,13 @@ import {ROUTES} from '@/lib/routes';
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {
-    const {accessToken} = useAuthStore.getState();
+    const {accessToken, user} = useAuthStore.getState();
     if (accessToken) {
+      // Redirect based on user role - admins go to admin dashboard
+      const destination =
+        user?.role === 'admin' ? ROUTES.ROOT : ROUTES.DASHBOARD;
       // eslint-disable-next-line @typescript-eslint/only-throw-error
-      throw redirect({to: ROUTES.DASHBOARD});
+      throw redirect({to: destination});
     }
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw redirect({to: ROUTES.LOGIN});
