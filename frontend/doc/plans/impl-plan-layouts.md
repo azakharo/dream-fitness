@@ -245,17 +245,31 @@ export const NotificationsBell: React.FC = () => {
 **Требования из UI.md:**
 
 - Logo
+- **TopNav для desktop** (навигация внутри header)
 - Bell icon (notifications)
 - Avatar с dropdown меню
 
+```
+Desktop Header:
+┌─────────┬───────────────────────┬──────────────┐
+│  Logo   │ Nav: Dashboard, ...   │ Bell, Avatar │
+└─────────┴───────────────────────┴──────────────┘
+
+Mobile Header:
+┌─────────┬──────────────┐
+│  Logo   │ Bell, Avatar │
+└─────────┴──────────────┘
+```
+
 ```typescript
 import { Link } from '@tanstack/react-router';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useLogout } from '@/hooks/use-auth';
 import { NotificationsBell } from './NotificationsBell';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { TopNav } from './TopNav';
+import { Button } from '@/components/ui/Button';
+import { Avatar, AvatarFallback } from '@/components/ui/Avatar';
 import { ROUTES } from '@/lib/routes';
 
 export const Header: React.FC = () => {
@@ -275,6 +289,11 @@ export const Header: React.FC = () => {
         <Link to={ROUTES.DASHBOARD} className="flex items-center space-x-2">
           <span className="text-xl font-bold text-primary">DreamFitness</span>
         </Link>
+
+        {/* Desktop Navigation - показывается только на desktop */}
+        <div className="hidden md:flex flex-1 justify-center">
+          <TopNav />
+        </div>
 
         {/* Right side */}
         <div className="flex items-center space-x-4">
@@ -355,7 +374,7 @@ export const TopNav: React.FC = () => {
   const location = useLocation();
 
   return (
-    <nav className="hidden md:flex items-center space-x-6">
+    <nav className="flex items-center space-x-6">
       {NAV_ITEMS.map((item) => {
         const isActive = location.pathname === item.href;
         return (
@@ -445,19 +464,22 @@ export const BottomNav: React.FC = () => {
 
 **Требования из UI.md:**
 
-- Desktop: Top navigation bar
+- Desktop: Top navigation bar **внутри** Header
 - Mobile: Bottom navigation
-- Header с logo, bell icon, avatar
+- Header с logo, навигацией, bell icon, avatar
 
 ```
 Desktop Layout:
-┌─────────────────────────────────────┐
-│  Header (Logo, Bell icon, Avatar)   │
-├─────────────────────────────────────┤
-│                                     │
-│         Main Content                │
-│                                     │
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  Header                                         │
+│  ┌─────────┬───────────────────────┬──────────┐ │
+│  │  Logo   │ Nav: Dashboard, ...   │ Bell, Av │ │
+│  └─────────┴───────────────────────┴──────────┘ │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│              Main Content                       │
+│                                                 │
+└─────────────────────────────────────────────────┘
 
 Mobile Layout:
 ┌─────────────────────────────────────┐
@@ -474,20 +496,13 @@ Mobile Layout:
 ```typescript
 import { Outlet } from '@tanstack/react-router';
 import { Header } from './Header';
-import { TopNav } from './TopNav';
 import { BottomNav } from './BottomNav';
 
 export const ClientLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
+      {/* Header включает в себя TopNav для desktop */}
       <Header />
-
-      {/* Desktop navigation - shown in header area */}
-      <div className="hidden md:block border-b">
-        <div className="container flex h-12 items-center">
-          <TopNav />
-        </div>
-      </div>
 
       {/* Main content area */}
       <main className="container py-6 pb-20 md:pb-6">
@@ -788,6 +803,8 @@ npx shadcn add popover
 npx shadcn add badge
 ```
 
+> **Учитывай соглашение по наименованию:** Все файлы React компонентов именуются в **PascalCase**, идентично названию экспортируемого компонента.
+
 ---
 
 ### 12. Установить Lucide Icons
@@ -838,16 +855,14 @@ flowchart TD
 ```mermaid
 flowchart TB
     subgraph Desktop["Desktop - >= 768px"]
-        DesktopHeader["Header<br/>Logo + Bell + Avatar"]
-        DesktopTopNav["TopNav<br/>Dashboard | Schedule | History | Profile"]
+        DesktopHeader["Header<br/>Logo | TopNav | Bell + Avatar"]
         DesktopContent["Main Content"]
 
-        DesktopHeader --> DesktopTopNav
-        DesktopTopNav --> DesktopContent
+        DesktopHeader --> DesktopContent
     end
 
     subgraph Mobile["Mobile - < 768px"]
-        MobileHeader["Header<br/>Logo + Bell + Avatar"]
+        MobileHeader["Header<br/>Logo | Bell + Avatar"]
         MobileContent["Main Content<br/>pb-20 for bottom nav"]
         MobileBottomNav["BottomNav<br/>4 icon buttons"]
 
