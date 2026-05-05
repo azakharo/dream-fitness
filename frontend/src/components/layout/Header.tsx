@@ -18,6 +18,7 @@ import {ROUTES} from '@/lib/routes';
 
 export const Header: React.FC = () => {
   const {user} = useAuthStore();
+  const role = user?.role ?? 'admin';
   const logoutMutation = useLogout();
 
   const initials =
@@ -29,26 +30,31 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className="
-        sticky top-0 z-50 flex h-14 w-full items-center justify-between border-b
-        bg-background/95 px-4 backdrop-blur-sm
+      className={`
+        sticky top-0 z-50 flex h-14 w-full items-center
+        ${role === 'admin' ? 'justify-end' : 'justify-between'}
+        border-b bg-background/95 px-4 backdrop-blur-sm
         supports-backdrop-filter:bg-background/60
-      "
+      `}
     >
       {/* Logo */}
-      <Link to={ROUTES.DASHBOARD} className="flex items-center space-x-2">
-        <span className="text-xl font-bold text-primary">DreamFitness</span>
-      </Link>
+      {role === 'client' && (
+        <Link to={ROUTES.DASHBOARD} className="flex items-center space-x-2">
+          <span className="text-xl font-bold text-primary">DreamFitness</span>
+        </Link>
+      )}
 
       {/* Desktop Navigation - shown only on desktop */}
-      <div
-        className="
-          hidden flex-1 justify-center
-          md:flex
-        "
-      >
-        <TopNav />
-      </div>
+      {role === 'client' && (
+        <div
+          className="
+            hidden flex-1 justify-center
+            md:flex
+          "
+        >
+          <TopNav />
+        </div>
+      )}
 
       {/* Right side */}
       <div className="flex items-center space-x-4">
