@@ -21,6 +21,8 @@ import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as ClientDashboardRouteImport } from './routes/_client.dashboard'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
+import { Route as AdminScheduleIdRouteImport } from './routes/admin.schedule.$id'
+import { Route as ClientBookingIdRouteImport } from './routes/_client.booking.$id'
 
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
   id: '/unauthorized',
@@ -80,6 +82,16 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AdminScheduleIdRoute = AdminScheduleIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminScheduleRoute,
+} as any)
+const ClientBookingIdRoute = ClientBookingIdRouteImport.update({
+  id: '/booking/$id',
+  path: '/booking/$id',
+  getParentRoute: () => ClientRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,9 +101,11 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ClientDashboardRoute
   '/admin/reports': typeof AdminReportsRoute
-  '/admin/schedule': typeof AdminScheduleRoute
+  '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/booking/$id': typeof ClientBookingIdRoute
+  '/admin/schedule/$id': typeof AdminScheduleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -100,9 +114,11 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ClientDashboardRoute
   '/admin/reports': typeof AdminReportsRoute
-  '/admin/schedule': typeof AdminScheduleRoute
+  '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
+  '/booking/$id': typeof ClientBookingIdRoute
+  '/admin/schedule/$id': typeof AdminScheduleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,9 +131,11 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_client/dashboard': typeof ClientDashboardRoute
   '/admin/reports': typeof AdminReportsRoute
-  '/admin/schedule': typeof AdminScheduleRoute
+  '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
+  '/_client/booking/$id': typeof ClientBookingIdRoute
+  '/admin/schedule/$id': typeof AdminScheduleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,6 +150,8 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/users'
     | '/admin/'
+    | '/booking/$id'
+    | '/admin/schedule/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -143,6 +163,8 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/users'
     | '/admin'
+    | '/booking/$id'
+    | '/admin/schedule/$id'
   id:
     | '__root__'
     | '/'
@@ -157,6 +179,8 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/users'
     | '/admin/'
+    | '/_client/booking/$id'
+    | '/admin/schedule/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -253,6 +277,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/admin/schedule/$id': {
+      id: '/admin/schedule/$id'
+      path: '/$id'
+      fullPath: '/admin/schedule/$id'
+      preLoaderRoute: typeof AdminScheduleIdRouteImport
+      parentRoute: typeof AdminScheduleRoute
+    }
+    '/_client/booking/$id': {
+      id: '/_client/booking/$id'
+      path: '/booking/$id'
+      fullPath: '/booking/$id'
+      preLoaderRoute: typeof ClientBookingIdRouteImport
+      parentRoute: typeof ClientRoute
+    }
   }
 }
 
@@ -270,25 +308,39 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ClientRouteChildren {
   ClientDashboardRoute: typeof ClientDashboardRoute
+  ClientBookingIdRoute: typeof ClientBookingIdRoute
 }
 
 const ClientRouteChildren: ClientRouteChildren = {
   ClientDashboardRoute: ClientDashboardRoute,
+  ClientBookingIdRoute: ClientBookingIdRoute,
 }
 
 const ClientRouteWithChildren =
   ClientRoute._addFileChildren(ClientRouteChildren)
 
+interface AdminScheduleRouteChildren {
+  AdminScheduleIdRoute: typeof AdminScheduleIdRoute
+}
+
+const AdminScheduleRouteChildren: AdminScheduleRouteChildren = {
+  AdminScheduleIdRoute: AdminScheduleIdRoute,
+}
+
+const AdminScheduleRouteWithChildren = AdminScheduleRoute._addFileChildren(
+  AdminScheduleRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
-  AdminScheduleRoute: typeof AdminScheduleRoute
+  AdminScheduleRoute: typeof AdminScheduleRouteWithChildren
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
-  AdminScheduleRoute: AdminScheduleRoute,
+  AdminScheduleRoute: AdminScheduleRouteWithChildren,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

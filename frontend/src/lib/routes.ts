@@ -13,7 +13,7 @@ export const PUBLIC_ROUTES = {
 export const CLIENT_ROUTES = {
   DASHBOARD: '/dashboard',
   SCHEDULE: '/schedule',
-  BOOKING: '/booking',
+  BOOKING: '/booking/$id',
   PROFILE: '/profile',
   HISTORY: '/history',
   NOTIFICATIONS: '/notifications',
@@ -24,7 +24,7 @@ export const ADMIN_ROUTES = {
   ROOT: '/admin',
   ADMIN_SCHEDULE: '/admin/schedule',
   ADMIN_SCHEDULE_NEW: '/admin/schedule/new',
-  ADMIN_SCHEDULE_EDIT: '/admin/schedule',
+  ADMIN_SCHEDULE_EDIT: '/admin/schedule/$id',
   USERS: '/admin/users',
   REPORTS: '/admin/reports',
 } as const;
