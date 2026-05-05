@@ -126,15 +126,15 @@ For that edit `.env.production` file.
 - docker:prod:build - build or rebuild the images (add ' -- --no-cache' for full rebuild)
 - docker:prod:down - stop all
 - docker:prod:logs - view logs
-- docker:migrate:auto - run migration and create test users
-- docker:migrate:manual - run migration manually depending on the value of RUN_MIGRATIONS environment variable.
-- docker:seed:manual - create the test users depending on the value of RUN_SEED environment variables
-- docker:migrate:revert - revert migrations.
+- docker:prod:migrate:auto - run migration and create test users
+- docker:prod:migrate:manual - run migration manually depending on the value of RUN_MIGRATIONS environment variable.
+- docker:prod:seed:manual - create the test users depending on the value of RUN_SEED environment variables
+- docker:prod:migrate:revert - revert migrations.
 
 ### Run migrations and create admin and test users
 
 ```bash
-$ npm run docker:migrate:auto
+$ npm run docker:prod:migrate:auto
 ```
 
 ### Start services
@@ -178,13 +178,13 @@ Test the whole system making requests to the api gateway from the outside.
 ### Run migrations and create admin and test users
 
 ```bash
-$ npm run docker:migrate:auto
+$ npm run docker:test:migrate:auto
 ```
 
 ### Start services
 
 ```bash
-$ npm run docker:prod
+$ npm run docker:test
 ```
 
 ### Run tests
@@ -196,13 +196,13 @@ $ npm run test:api-gateway
 ### Stop services
 
 ```bash
-$ npm run docker:prod:down
+$ npm run docker:test:down
 ```
 
 If you want to clear the DB data, then run instead:
 
 ```bash
-$ npm run docker:prod:down -- -v
+$ npm run docker:test:down -- -v
 ```
 
 ---

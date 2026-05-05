@@ -126,10 +126,10 @@ services:
 ```json
 {
   "scripts": {
-    "docker:migrate:auto": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner",
-    "docker:migrate:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate",
-    "docker:seed:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:seed",
-    "docker:migrate:revert": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert"
+    "docker:prod:migrate:auto": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner",
+    "docker:prod:migrate:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate",
+    "docker:prod:seed:manual": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:seed",
+    "docker:prod:migrate:revert": "docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert"
   }
 }
 ```
@@ -138,13 +138,13 @@ services:
 
 ## Usage Scenarios
 
-| Scenario             | RUN_MIGRATIONS | RUN_SEED | Command                         |
-| -------------------- | -------------- | -------- | ------------------------------- |
-| Auto: migrate + seed | true           | true     | `npm run docker:migrate:auto`   |
-| Auto: migrate only   | true           | false    | Set env vars and run container  |
-| Manual: migrate      | false          | false    | `npm run docker:migrate:manual` |
-| Manual: seed         | false          | false    | `npm run docker:seed:manual`    |
-| Manual: revert       | false          | false    | `npm run docker:migrate:revert` |
+| Scenario             | RUN_MIGRATIONS | RUN_SEED | Command                              |
+| -------------------- | -------------- | -------- | ------------------------------------ |
+| Auto: migrate + seed | true           | true     | `npm run docker:prod:migrate:auto`   |
+| Auto: migrate only   | true           | false    | Set env vars and run container       |
+| Manual: migrate      | false          | false    | `npm run docker:prod:migrate:manual` |
+| Manual: seed         | false          | false    | `npm run docker:prod:seed:manual`    |
+| Manual: revert       | false          | false    | `npm run docker:prod:migrate:revert` |
 
 ---
 
@@ -172,10 +172,10 @@ Run migrations manually with explicit control:
 
 ```bash
 # Step 1: Run migrations manually
-npm run docker:migrate:manual
+npm run docker:prod:migrate:manual
 
 # Step 2: Run seed manually (optional)
-npm run docker:seed:manual
+npm run docker:prod:seed:manual
 
 # Step 3: Start services
 docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.prod.yml up -d
@@ -185,7 +185,7 @@ docker-compose --env-file .env --env-file .env.production -f docker-compose.base
 
 ```bash
 # Revert last migration
-npm run docker:migrate:revert
+npm run docker:prod:migrate:revert
 ```
 
 ### Option D: CI/CD Pipeline
@@ -239,7 +239,7 @@ docker-compose --env-file .env --env-file .env.production -f docker-compose.base
 
 ```bash
 # Run migrations automatically
-npm run docker:migrate:auto
+npm run docker:prod:migrate:auto
 
 # Start services
 docker-compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.prod.yml up -d
