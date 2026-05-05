@@ -25,6 +25,8 @@ describe('Waitlist API (e2e)', () => {
   });
 
   afterAll(async () => {
+    await dbHelper.truncateTables();
+    jest.resetAllMocks();
     await appHelper.cleanup();
   });
 

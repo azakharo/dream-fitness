@@ -30,6 +30,8 @@ describe('ScheduleController (e2e)', () => {
   });
 
   afterAll(async () => {
+    jest.resetAllMocks();
+    await dbHelper.truncateTables();
     await appHelper.cleanup();
   });
 

@@ -20,6 +20,7 @@ describe('UsersController (e2e)', () => {
   });
 
   afterAll(async () => {
+    await dbHelper.truncateTables();
     await appHelper.cleanup();
   });
 

@@ -32,6 +32,7 @@ describe('Bookings API (e2e)', () => {
   });
 
   afterAll(async () => {
+    await dbHelper.truncateTables();
     await appHelper.cleanup();
   });
 

@@ -14,7 +14,7 @@ import { HealthModule } from './health/health.module';
     ProxyModule,
     ThrottlerModule.forRoot({
       skipIf: () => {
-        return process.env.THROTTLING_DISABLED === 'true';
+        return process.env.NODE_ENV !== 'production';
       },
       throttlers: [
         {

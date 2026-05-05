@@ -9,12 +9,12 @@ services:
       dockerfile: Dockerfile.migrations
     container_name: dreamfitness-migration-runner
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV:-production}
       - RUN_MIGRATIONS=${RUN_MIGRATIONS:-false}
       - RUN_SEED=${RUN_SEED:-false}
     env_file:
       - .env
-      - .env.production
+      - .env.${NODE_ENV:-production}
       - .env.docker
     depends_on:
       postgres:
