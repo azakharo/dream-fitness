@@ -7,7 +7,7 @@ import {AdminLayout} from '@/components/layout/AdminLayout';
  * Layout route for administrative pages.
  * Checks that user is authenticated and has admin role.
  */
-export const Route = createFileRoute('/_admin')({
+export const Route = createFileRoute('/admin')({
   beforeLoad: () => {
     const {accessToken, user, isLoading} = useAuthStore.getState();
 
