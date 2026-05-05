@@ -39,20 +39,21 @@ export const NotificationsBell: React.FC = () => {
           )}
         </div>
         <div className="max-h-64 overflow-y-auto">
-          {notifications?.map(notification => (
-            <div
-              key={notification.id}
-              className="
-                border-b py-2
-                last:border-b-0
-              "
-            >
-              <p className="text-sm font-medium">{notification.title}</p>
-              <p className="text-xs text-muted-foreground">
-                {notification.content}
-              </p>
-            </div>
-          ))}
+          {Array.isArray(notifications) &&
+            notifications?.map(notification => (
+              <div
+                key={notification.id}
+                className="
+                  border-b py-2
+                  last:border-b-0
+                "
+              >
+                <p className="text-sm font-medium">{notification.title}</p>
+                <p className="text-xs text-muted-foreground">
+                  {notification.content}
+                </p>
+              </div>
+            ))}
           {(!notifications || notifications.length === 0) && (
             <p className="py-4 text-center text-sm text-muted-foreground">
               Нет уведомлений
