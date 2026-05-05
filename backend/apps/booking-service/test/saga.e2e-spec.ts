@@ -36,6 +36,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
   });
 
   afterAll(async () => {
+    await dbHelper.truncateTables();
+    jest.resetAllMocks();
     await appHelper.cleanup();
   });
 
