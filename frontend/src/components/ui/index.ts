@@ -48,7 +48,7 @@ export {
   AvatarGroupCount,
   AvatarBadge,
 } from './Avatar';
-export {Badge, badgeVariants} from './Badge';
+export {Badge} from './Badge';
 
 // Variant helpers
 export {buttonVariants, type ButtonVariantProps} from './button-variants';
