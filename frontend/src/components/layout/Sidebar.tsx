@@ -27,8 +27,8 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
     label: 'Расписание',
     icon: Calendar,
     children: [
-      {label: 'Список тренировок', href: ROUTES.SCHEDULE},
-      {label: 'Создать тренировку', href: ROUTES.SCHEDULE_NEW},
+      {label: 'Список тренировок', href: ROUTES.ADMIN_SCHEDULE},
+      {label: 'Создать тренировку', href: ROUTES.ADMIN_SCHEDULE_NEW},
     ],
   },
   {label: 'Пользователи', href: ROUTES.USERS, icon: Users},
