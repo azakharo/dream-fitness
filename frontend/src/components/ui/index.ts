@@ -23,5 +23,32 @@ export {Input} from './Input';
 export {Label} from './Label';
 export {Popover, PopoverContent, PopoverTrigger} from './Popover';
 
+export {
+  DropdownMenu,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from './DropdownMenu';
+export {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+  AvatarBadge,
+} from './Avatar';
+export {Badge, badgeVariants} from './Badge';
+
 // Variant helpers
 export {buttonVariants, type ButtonVariantProps} from './button-variants';
