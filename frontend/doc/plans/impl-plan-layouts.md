@@ -31,19 +31,30 @@
 
 ## Структура файлов
 
+> **Соглашение по наименованию:** Все файлы React компонентов именуются в **PascalCase**, идентично названию экспортируемого компонента.
+
 ```
 frontend/src/
 ├── components/
 │   ├── layout/
-│   │   ├── client-layout.tsx      # Layout для клиента (top/bottom nav)
-│   │   ├── admin-layout.tsx       # Layout для админа (sidebar)
-│   │   ├── header.tsx             # Header компонент
-│   │   ├── sidebar.tsx            # Sidebar для админа
-│   │   ├── bottom-nav.tsx         # Bottom navigation для mobile клиента
-│   │   ├── top-nav.tsx            # Top navigation для desktop клиента
-│   │   └── notifications-bell.tsx # Bell icon с badge и dropdown
+│   │   ├── ClientLayout.tsx       # Layout для клиента (top/bottom nav)
+│   │   ├── AdminLayout.tsx        # Layout для админа (sidebar)
+│   │   ├── Header.tsx             # Header компонент
+│   │   ├── Sidebar.tsx            # Sidebar для админа
+│   │   ├── BottomNav.tsx          # Bottom navigation для mobile клиента
+│   │   ├── TopNav.tsx             # Top navigation для desktop клиента
+│   │   └── NotificationsBell.tsx  # Bell icon с badge и dropdown
 │   └── ui/
-│       └── ...existing components
+│       ├── Button.tsx             # Переименовать из button.tsx
+│       ├── Calendar.tsx           # Переименовать из calendar.tsx
+│       ├── Card.tsx               # Переименовать из card.tsx
+│       ├── DatePicker.tsx         # Переименовать из date-picker.tsx
+│       ├── Form.tsx               # Переименовать из form.tsx
+│       ├── Input.tsx              # Переименовать из input.tsx
+│       ├── Label.tsx              # Переименовать из label.tsx
+│       ├── Popover.tsx            # Переименовать из popover.tsx
+│       ├── button-variants.ts     # Оставить как есть (не компонент)
+│       └── index.ts               # Обновить импорты
 ├── stores/
 │   ├── auth-store.ts              # Существует
 │   └── ui-store.ts                # Новый: sidebarOpen, toasts
@@ -58,6 +69,35 @@ frontend/src/
 ---
 
 ## Задачи
+
+### 0. Переименование существующих UI файлов
+
+> **Приоритет:** Высокий — должно быть выполнено первым для соответствия соглашениям проекта.
+
+Переименовать файлы в `src/components/ui/` в PascalCase:
+
+| Текущее название  | Новое название   |
+| ----------------- | ---------------- |
+| `button.tsx`      | `Button.tsx`     |
+| `calendar.tsx`    | `Calendar.tsx`   |
+| `card.tsx`        | `Card.tsx`       |
+| `date-picker.tsx` | `DatePicker.tsx` |
+| `form.tsx`        | `Form.tsx`       |
+| `input.tsx`       | `Input.tsx`      |
+| `label.tsx`       | `Label.tsx`      |
+| `popover.tsx`     | `Popover.tsx`    |
+
+**Важно:** После переименования нужно обновить все импорты в файлах, которые используют эти компоненты.
+
+**Файлы для обновления импортов:**
+
+- [`components/ui/index.ts`](../../src/components/ui/index.ts)
+- [`components/auth/LoginForm.tsx`](../../src/components/auth/LoginForm.tsx)
+- [`components/auth/RegisterForm.tsx`](../../src/components/auth/RegisterForm.tsx)
+- [`components/ui/DatePicker.tsx`](../../src/components/ui/date-picker.tsx) — использует Calendar, Popover
+- [`pages/auth/LoginPage.tsx`](../../src/pages/auth/LoginPage.tsx)
+
+---
 
 ### 1. UI Store
 
@@ -130,7 +170,7 @@ export const useUnreadCount = () => {
 
 ### 3. Notifications Bell Component
 
-Создать [`components/layout/notifications-bell.tsx`](../../src/components/layout/notifications-bell.tsx):
+Создать [`components/layout/NotificationsBell.tsx`](../../src/components/layout/NotificationsBell.tsx):
 
 **Требования из UI.md:**
 
@@ -200,7 +240,7 @@ export const NotificationsBell: React.FC = () => {
 
 ### 4. Header Component
 
-Создать [`components/layout/header.tsx`](../../src/components/layout/header.tsx):
+Создать [`components/layout/Header.tsx`](../../src/components/layout/Header.tsx):
 
 **Требования из UI.md:**
 
@@ -213,7 +253,7 @@ import { Link } from '@tanstack/react-router';
 import { User, LogOut, Settings } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useLogout } from '@/hooks/use-auth';
-import { NotificationsBell } from './notifications-bell';
+import { NotificationsBell } from './NotificationsBell';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ROUTES } from '@/lib/routes';
@@ -285,7 +325,7 @@ export const Header: React.FC = () => {
 
 ### 5. Top Navigation (Desktop Client)
 
-Создать [`components/layout/top-nav.tsx`](../../src/components/layout/top-nav.tsx):
+Создать [`components/layout/TopNav.tsx`](../../src/components/layout/TopNav.tsx):
 
 **Требования из UI.md:**
 
@@ -341,7 +381,7 @@ export const TopNav: React.FC = () => {
 
 ### 6. Bottom Navigation (Mobile Client)
 
-Создать [`components/layout/bottom-nav.tsx`](../../src/components/layout/bottom-nav.tsx):
+Создать [`components/layout/BottomNav.tsx`](../../src/components/layout/BottomNav.tsx):
 
 **Требования из UI.md:**
 
@@ -401,7 +441,7 @@ export const BottomNav: React.FC = () => {
 
 ### 7. Client Layout
 
-Создать [`components/layout/client-layout.tsx`](../../src/components/layout/client-layout.tsx):
+Создать [`components/layout/ClientLayout.tsx`](../../src/components/layout/ClientLayout.tsx):
 
 **Требования из UI.md:**
 
@@ -433,9 +473,9 @@ Mobile Layout:
 
 ```typescript
 import { Outlet } from '@tanstack/react-router';
-import { Header } from './header';
-import { TopNav } from './top-nav';
-import { BottomNav } from './bottom-nav';
+import { Header } from './Header';
+import { TopNav } from './TopNav';
+import { BottomNav } from './BottomNav';
 
 export const ClientLayout: React.FC = () => {
   return (
@@ -465,7 +505,7 @@ export const ClientLayout: React.FC = () => {
 
 ### 8. Sidebar Component (Admin)
 
-Создать [`components/layout/sidebar.tsx`](../../src/components/layout/sidebar.tsx):
+Создать [`components/layout/Sidebar.tsx`](../../src/components/layout/Sidebar.tsx):
 
 **Требования из UI.md:**
 
@@ -630,7 +670,7 @@ export const Sidebar: React.FC = () => {
 
 ### 9. Admin Layout
 
-Создать [`components/layout/admin-layout.tsx`](../../src/components/layout/admin-layout.tsx):
+Создать [`components/layout/AdminLayout.tsx`](../../src/components/layout/AdminLayout.tsx):
 
 **Требования из UI.md:**
 
@@ -650,8 +690,8 @@ Admin Layout:
 
 ```typescript
 import { Outlet } from '@tanstack/react-router';
-import { Sidebar } from './sidebar';
-import { Header } from './header';
+import { Sidebar } from './Sidebar';
+import { Header } from './Header';
 
 export const AdminLayout: React.FC = () => {
   return (
@@ -681,7 +721,7 @@ export const AdminLayout: React.FC = () => {
 import {createFileRoute, redirect} from '@tanstack/react-router';
 import {useAuthStore} from '@/stores/auth-store';
 import {ROUTES} from '@/lib/routes';
-import {ClientLayout} from '@/components/layout/client-layout';
+import {ClientLayout} from '@/components/layout/ClientLayout';
 
 export const Route = createFileRoute('/_client')({
   beforeLoad: () => {
@@ -708,7 +748,7 @@ Layout route для административных страниц:
 import {createFileRoute, redirect} from '@tanstack/react-router';
 import {useAuthStore} from '@/stores/auth-store';
 import {ROUTES} from '@/lib/routes';
-import {AdminLayout} from '@/components/layout/admin-layout';
+import {AdminLayout} from '@/components/layout/AdminLayout';
 
 /**
  * Layout route для административных страниц.
@@ -862,17 +902,18 @@ flowchart TB
 
 ## Порядок реализации
 
-1. Установить lucide-react иконки
-2. Установить недостающие shadcn/ui компоненты (avatar, dropdown-menu, popover, badge)
-3. Создать UI store (`stores/ui-store.ts`)
-4. Создать notifications hook (`hooks/use-notifications.ts`)
-5. Создать NotificationsBell компонент
-6. Создать Header компонент
-7. Создать TopNav компонент
-8. Создать BottomNav компонент
-9. Создать ClientLayout компонент
-10. Создать Sidebar компонент
-11. Создать AdminLayout компонент
-12. Обновить `_client.tsx` route
-13. Создать `_admin.tsx` route
-14. Протестировать все layout сценарии
+1. **Переименовать UI файлы** в PascalCase и обновить импорты
+2. Установить lucide-react иконки
+3. Установить недостающие shadcn/ui компоненты (avatar, dropdown-menu, popover, badge)
+4. Создать UI store (`stores/ui-store.ts`)
+5. Создать notifications hook (`hooks/use-notifications.ts`)
+6. Создать NotificationsBell компонент
+7. Создать Header компонент
+8. Создать TopNav компонент
+9. Создать BottomNav компонент
+10. Создать ClientLayout компонент
+11. Создать Sidebar компонент
+12. Создать AdminLayout компонент
+13. Обновить `_client.tsx` route
+14. Создать `_admin.tsx` route
+15. Протестировать все layout сценарии
