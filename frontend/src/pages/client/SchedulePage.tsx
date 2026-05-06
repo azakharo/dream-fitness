@@ -9,7 +9,7 @@ import {
 } from '@/hooks/use-trainings';
 
 export const SchedulePage: React.FC = () => {
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const [selectedDate, setSelectedDate] = React.useState(() => new Date());
   const [filters, setFilters] = React.useState<TrainingFilters>({});
 
   const {data: trainersData} = useTrainers();
@@ -21,8 +21,10 @@ export const SchedulePage: React.FC = () => {
 
   const selectedDayTrainings = React.useMemo(() => {
     const dateStr = selectedDate.toISOString().split('T')[0];
-    return trainings.filter(t => t.scheduledAt.startsWith(dateStr));
-  }, [trainings, selectedDate]);
+    return (trainingsData?.items ?? []).filter(t =>
+      t.scheduledAt.startsWith(dateStr),
+    );
+  }, [trainingsData, selectedDate]);
 
   return (
     <div className="flex flex-col gap-6">
