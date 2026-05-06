@@ -9,8 +9,9 @@ import {ROUTES} from '@/lib/routes';
 
 export const NotificationsBell: React.FC = () => {
   const {data: unreadData} = useUnreadCount();
-  const {data: notifications} = useNotifications(5);
+  const {data: notificationData} = useNotifications(5);
   const {notificationsOpen, setNotificationsOpen} = useUIStore();
+  const notifications = notificationData?.items ?? [];
 
   const unreadCount = unreadData?.count ?? 0;
 
