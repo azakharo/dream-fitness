@@ -11,7 +11,7 @@ export const ClientLayout: React.FC = () => {
       {/* Main content area */}
       <main
         className="
-          container py-6 pb-20
+          container px-4 py-6 pb-20
           md:pb-6
         "
       >
