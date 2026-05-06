@@ -2,6 +2,7 @@ import {useMemo} from 'react';
 import type {BookingResponseDto, TrainingResponseDto} from '@/types';
 import {useBookings, type BookingFilters} from './use-bookings';
 import {useTrainingsByIds} from './use-trainings-by-ids';
+import {isDateAfter, isDateBefore, parseApiDate} from '@/lib/date-utils';
 
 export interface EnrichedBooking extends BookingResponseDto {
   trainingTitle: string;
@@ -17,8 +18,7 @@ export interface EnrichedBooking extends BookingResponseDto {
 }
 
 export const useEnrichedBookings = (filters?: BookingFilters) => {
-  const {data: bookingsData, isLoading: isBookingsLoading} =
-    useBookings(filters);
+  const {data: bookingsData, isLoading: isBookingsLoading} = useBookings();
 
   const trainingIds = useMemo(() => {
     if (!bookingsData?.items) return [];
@@ -48,9 +48,41 @@ export const useEnrichedBookings = (filters?: BookingFilters) => {
     });
   }, [bookingsData, trainingsMap]);
 
+  const filteredBookings = useMemo(() => {
+    if (!enrichedBookings) return [];
+    if (!filters) return enrichedBookings;
+
+    const now = new Date();
+
+    return enrichedBookings.filter(booking => {
+      // Filter by status
+      if (filters.status && booking.status !== filters.status) {
+        return false;
+      }
+
+      // Filter by upcoming (training scheduled in the future)
+      if (filters.upcoming) {
+        const scheduledAt = parseApiDate(booking.scheduledAt);
+        if (!isDateAfter(scheduledAt, now)) {
+          return false;
+        }
+      }
+
+      // Filter by past (training already completed)
+      if (filters.past) {
+        const scheduledAt = parseApiDate(booking.scheduledAt);
+        if (!isDateBefore(scheduledAt, now)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [enrichedBookings, filters]);
+
   return {
-    data: enrichedBookings,
-    total: bookingsData?.total || 0,
+    data: filteredBookings,
+    total: filteredBookings.length,
     isLoading: isBookingsLoading || isTrainingsLoading,
   };
 };

@@ -12,19 +12,15 @@ export interface BookingFilters {
   past?: boolean;
 }
 
-export const useBookings = (filters?: BookingFilters) => {
+/**
+ * Fetch all bookings for the current user.
+ * Note: Backend doesn't support filtering.
+ * For client-side filtering, use useEnrichedBookings which handles all filters.
+ */
+export const useBookings = () => {
   return useQuery({
-    queryKey: ['bookings', filters],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters?.status) params.set('status', filters.status);
-      if (filters?.upcoming) params.set('upcoming', 'true');
-      if (filters?.past) params.set('past', 'true');
-
-      const queryString = params.toString();
-      const endpoint = queryString ? `/bookings?${queryString}` : '/bookings';
-      return api.get<BookingListResponseDto>(endpoint);
-    },
+    queryKey: ['bookings'],
+    queryFn: () => api.get<BookingListResponseDto>('/bookings'),
   });
 };
 

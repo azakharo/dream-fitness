@@ -4,28 +4,27 @@ import {BalanceCard} from '@/components/client/dashboard/BalanceCard';
 import {QuickActions} from '@/components/client/dashboard/QuickActions';
 import {UpcomingTrainings} from '@/components/client/dashboard/UpcomingTrainings';
 import {useBalance} from '@/hooks/use-balance';
-import {useBookings} from '@/hooks/use-bookings';
 import {useTrainings} from '@/hooks/use-trainings';
 import type {TrainingResponseDto} from '@/types';
 import {isDateAfter, compareDatesAsc} from '@/lib/date-utils';
+import {useEnrichedBookings} from '@/hooks';
 
 export const DashboardPage: React.FC = () => {
   const {data: balanceData, isLoading: isBalanceLoading} = useBalance();
-  const {data: bookingsData, isLoading: isBookingsLoading} = useBookings({
-    upcoming: true,
-  });
+  const {data: bookingsData, isLoading: isBookingsLoading} =
+    useEnrichedBookings({
+      upcoming: true,
+    });
 
   const {data: trainingsData, isLoading: isTrainingsLoading} = useTrainings();
 
   const upcomingTrainings: TrainingResponseDto[] = React.useMemo(() => {
-    if (!trainingsData?.items || !bookingsData?.items) return [];
+    if (!trainingsData?.items || !bookingsData) return [];
 
     const now = new Date();
     return trainingsData.items
       .filter(training => {
-        const booking = bookingsData.items.find(
-          b => b.trainingId === training.id,
-        );
+        const booking = bookingsData.find(b => b.trainingId === training.id);
         const hasActiveBooking = booking && booking.status === 'confirmed';
         const isFuture = isDateAfter(training.scheduledAt, now);
         return hasActiveBooking && isFuture;
