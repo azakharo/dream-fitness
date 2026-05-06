@@ -11,6 +11,7 @@ import {
   isDateToday,
   formatMonthYear,
   formatTime,
+  formatDateKey,
 } from '@/lib/date-utils';
 
 interface WeeklyCalendarProps {
@@ -48,19 +49,22 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
 
   const trainingsByDay = useMemo(() => {
     const map = new Map<string, TrainingResponseDto[]>();
+
+    // Initialize map with all days of the week using local date keys
     weekDays.forEach(day => {
-      const dateStr = day.toISOString().split('T')[0];
-      map.set(dateStr, []);
+      map.set(formatDateKey(day), []);
     });
 
+    // Group trainings by their scheduled date
     trainings.forEach(training => {
-      const dateStr = training.scheduledAt.split('T')[0];
-      const existing = map.get(dateStr);
+      const dateKey = formatDateKey(training.scheduledAt);
+      const existing = map.get(dateKey);
       if (existing) {
         existing.push(training);
       }
     });
 
+    // Sort trainings within each day by start time
     map.forEach(dayTrainings => {
       dayTrainings.sort(
         (a, b) =>
@@ -70,8 +74,6 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
 
     return map;
   }, [trainings, weekDays]);
-
-  console.log({trainings, weekDays, trainingsByDay});
 
   const goToPreviousWeek = () => {
     setCurrentWeekStart(prev => addWeeksToDate(prev, -1));
@@ -178,8 +180,8 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
       {/* Training slots */}
       <div className="grid max-h-125 grid-cols-7 divide-x overflow-y-auto">
         {weekDays.map((day, dayIndex) => {
-          const dateStr = day.toISOString().split('T')[0];
-          const dayTrainings = trainingsByDay.get(dateStr) || [];
+          const dateKey = formatDateKey(day);
+          const dayTrainings = trainingsByDay.get(dateKey) || [];
           const isExpanded = expandedDays.has(dayIndex);
           const visibleTrainings = isExpanded
             ? dayTrainings

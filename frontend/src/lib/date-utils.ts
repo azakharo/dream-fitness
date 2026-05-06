@@ -23,6 +23,12 @@ import {ru} from 'date-fns/locale';
 
 import {DATE_FORMAT, TIME_FORMAT, DATETIME_FORMAT} from './constants';
 
+/**
+ * Date key format used for grouping trainings by day.
+ * Format: "yyyy-MM-dd" in local timezone.
+ */
+export const DATE_KEY_FORMAT = 'yyyy-MM-dd';
+
 // --- Parsing ---
 
 /**
@@ -105,6 +111,19 @@ export const formatDuration = (minutes: number): string => {
 export const formatRelativeTime = (date: Date | string): string => {
   const d = typeof date === 'string' ? parseApiDate(date) : date;
   return formatDistanceToNow(d, {addSuffix: true, locale: ru});
+};
+
+/**
+ * Format date as a key string for grouping by day.
+ * Uses local timezone to avoid UTC conversion issues.
+ * Format: "yyyy-MM-dd" (e.g., "2024-06-20")
+ *
+ * IMPORTANT: Use this instead of date.toISOString().split('T')[0]
+ * to avoid timezone-related date shifts.
+ */
+export const formatDateKey = (date: Date | string): string => {
+  const d = typeof date === 'string' ? parseApiDate(date) : date;
+  return format(d, DATE_KEY_FORMAT, {locale: ru});
 };
 
 // --- Date Manipulation ---
