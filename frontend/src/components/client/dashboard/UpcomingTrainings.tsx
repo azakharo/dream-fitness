@@ -1,8 +1,10 @@
 import * as React from 'react';
+import {Link} from '@tanstack/react-router';
 import type {TrainingResponseDto} from '@/types';
 
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
 import {Button, Skeleton} from '@/components/ui';
+import {ROUTES} from '@/lib/routes';
 
 interface UpcomingTrainingsProps {
   trainings: TrainingResponseDto[];
@@ -56,11 +58,11 @@ export const UpcomingTrainings: React.FC<UpcomingTrainingsProps> = ({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-muted-foreground">Нет предстоящих тренировок</p>
-          <a href="/schedule">
+          <Link to={ROUTES.SCHEDULE}>
             <Button variant="outline" size="sm">
               Найти тренировку
             </Button>
-          </a>
+          </Link>
         </CardContent>
       </Card>
     );
@@ -73,9 +75,10 @@ export const UpcomingTrainings: React.FC<UpcomingTrainingsProps> = ({
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {displayTrainings.map(training => (
-          <a
+          <Link
             key={training.id}
-            href={`/booking/${training.id}`}
+            to={ROUTES.BOOKING}
+            params={{id: training.id}}
             className="
               block rounded-lg border p-3 transition-colors
               hover:border-primary/50 hover:bg-muted/50
@@ -99,7 +102,7 @@ export const UpcomingTrainings: React.FC<UpcomingTrainingsProps> = ({
                 Тренер: {training.trainerName}
               </p>
             )}
-          </a>
+          </Link>
         ))}
       </CardContent>
     </Card>

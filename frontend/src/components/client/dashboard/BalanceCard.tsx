@@ -1,7 +1,9 @@
 import * as React from 'react';
+import {Link} from '@tanstack/react-router';
 
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
 import {Button, Skeleton} from '@/components/ui';
+import {ROUTES} from '@/lib/routes';
 
 interface BalanceCardProps {
   balance: number;
@@ -29,11 +31,11 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
             {formatBalance(balance)} баллов
           </div>
         )}
-        <a href="/profile">
+        <Link to={ROUTES.PROFILE}>
           <Button variant="default" size="sm">
             Пополнить
           </Button>
-        </a>
+        </Link>
       </CardContent>
     </Card>
   );
