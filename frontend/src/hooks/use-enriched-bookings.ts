@@ -23,7 +23,7 @@ export const useEnrichedBookings = (filters?: BookingFilters) => {
   const trainingIds = useMemo(() => {
     if (!bookingsData?.items) return [];
     return bookingsData.items.map(b => b.trainingId);
-  }, [bookingsData?.items]);
+  }, [bookingsData]);
 
   const {data: trainingsMap, isLoading: isTrainingsLoading} =
     useTrainingsByIds(trainingIds);
@@ -46,7 +46,7 @@ export const useEnrichedBookings = (filters?: BookingFilters) => {
         availableSlots: training?.availableSlots || 0,
       } as EnrichedBooking;
     });
-  }, [bookingsData?.items, trainingsMap]);
+  }, [bookingsData, trainingsMap]);
 
   return {
     data: enrichedBookings,

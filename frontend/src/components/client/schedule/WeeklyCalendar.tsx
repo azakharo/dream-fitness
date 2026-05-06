@@ -32,7 +32,9 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     getWeekStart(selectedDate),
   );
-  const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set());
+  const [expandedDays, setExpandedDays] = useState<Set<number>>(
+    () => new Set(),
+  );
 
   const weekDays = useMemo(() => {
     const days: Date[] = [];
@@ -96,6 +98,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   };
 
   if (isLoading) {
+    /* eslint-disable react-x/no-array-index-key */
     return (
       <div className="rounded-lg border bg-card">
         <div className="border-b p-4">
@@ -116,6 +119,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
         </div>
       </div>
     );
+    /* eslint-enable react-x/no-array-index-key */
   }
 
   return (
@@ -142,7 +146,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
       <div className="grid grid-cols-7 border-b bg-muted/50">
         {weekDays.map((day, index) => (
           <div
-            key={index}
+            key={day.toISOString()}
             className={`
               p-2 text-center
               ${isDateToday(day) ? 'bg-primary/10' : ''}
@@ -170,7 +174,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
       </div>
 
       {/* Training slots */}
-      <div className="grid max-h-[500px] grid-cols-7 divide-x overflow-y-auto">
+      <div className="grid max-h-125 grid-cols-7 divide-x overflow-y-auto">
         {weekDays.map((day, dayIndex) => {
           const dateStr = day.toISOString().split('T')[0];
           const dayTrainings = trainingsByDay.get(dateStr) || [];
@@ -182,9 +186,9 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
 
           return (
             <div
-              key={dayIndex}
+              key={day.toISOString()}
               className={`
-                min-h-[120px] p-2
+                min-h-30 p-2
                 ${isSameDayAs(day, selectedDate) ? `bg-accent/50` : ''}
               `}
             >
@@ -234,6 +238,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                         )}
                         {isFull && (
                           <div
+                            // eslint-disable-next-line better-tailwindcss/enforce-consistent-line-wrapping
                             className="
                             text-[10px] font-medium text-destructive
                           "
