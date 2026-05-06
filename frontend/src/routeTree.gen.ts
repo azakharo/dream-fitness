@@ -19,6 +19,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as ClientScheduleRouteImport } from './routes/_client.schedule'
+import { Route as ClientProfileRouteImport } from './routes/_client.profile'
 import { Route as ClientDashboardRouteImport } from './routes/_client.dashboard'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
@@ -73,6 +74,11 @@ const ClientScheduleRoute = ClientScheduleRouteImport.update({
   path: '/schedule',
   getParentRoute: () => ClientRoute,
 } as any)
+const ClientProfileRoute = ClientProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ClientRoute,
+} as any)
 const ClientDashboardRoute = ClientDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ClientDashboardRoute
+  '/profile': typeof ClientProfileRoute
   '/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ClientDashboardRoute
+  '/profile': typeof ClientProfileRoute
   '/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_client/dashboard': typeof ClientDashboardRoute
+  '/_client/profile': typeof ClientProfileRoute
   '/_client/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/profile'
     | '/schedule'
     | '/admin/reports'
     | '/admin/schedule'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/profile'
     | '/schedule'
     | '/admin/reports'
     | '/admin/schedule'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_client/dashboard'
+    | '/_client/profile'
     | '/_client/schedule'
     | '/admin/reports'
     | '/admin/schedule'
@@ -275,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientScheduleRouteImport
       parentRoute: typeof ClientRoute
     }
+    '/_client/profile': {
+      id: '/_client/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ClientProfileRouteImport
+      parentRoute: typeof ClientRoute
+    }
     '/_client/dashboard': {
       id: '/_client/dashboard'
       path: '/dashboard'
@@ -327,12 +346,14 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ClientRouteChildren {
   ClientDashboardRoute: typeof ClientDashboardRoute
+  ClientProfileRoute: typeof ClientProfileRoute
   ClientScheduleRoute: typeof ClientScheduleRoute
   ClientBookingIdRoute: typeof ClientBookingIdRoute
 }
 
 const ClientRouteChildren: ClientRouteChildren = {
   ClientDashboardRoute: ClientDashboardRoute,
+  ClientProfileRoute: ClientProfileRoute,
   ClientScheduleRoute: ClientScheduleRoute,
   ClientBookingIdRoute: ClientBookingIdRoute,
 }

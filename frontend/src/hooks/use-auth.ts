@@ -10,6 +10,7 @@ import type {
   RegisterResponseBody,
 } from '@/types';
 import type {RegisterFormData} from '@/schemas/auth.schema';
+import type {EditProfileFormData} from '@/schemas/user.schema';
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -71,6 +72,20 @@ export const useLogout = () => {
       clearAuth();
       queryClient.clear();
       void navigate({to: ROUTES.LOGIN, search: true});
+    },
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  const {setUser} = useAuthStore();
+
+  return useMutation({
+    mutationFn: (data: EditProfileFormData) =>
+      api.patch<UserProfileDto>('/auth/me', data),
+    onSuccess: updatedUser => {
+      setUser(updatedUser);
+      void queryClient.invalidateQueries({queryKey: ['profile']});
     },
   });
 };
