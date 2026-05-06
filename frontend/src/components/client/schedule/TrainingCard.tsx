@@ -4,6 +4,7 @@ import {Link} from '@tanstack/react-router';
 import {Card, CardContent} from '@/components/ui/Card';
 import {Badge} from '@/components/ui/Badge';
 import type {TrainingResponseDto} from '@/types';
+import {formatTime, getEndTime, parseApiDate} from '@/lib/date-utils';
 
 interface TrainingCardProps {
   training: TrainingResponseDto;
@@ -14,17 +15,8 @@ export const TrainingCard: React.FC<TrainingCardProps> = ({
   training,
   onClick,
 }) => {
-  const startTime = new Date(training.scheduledAt);
-  const endTime = new Date(
-    startTime.getTime() + training.durationMinutes * 60000,
-  );
-
-  const formatTime = (date: Date): string => {
-    return date.toLocaleTimeString('ru-RU', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const startTime = parseApiDate(training.scheduledAt);
+  const endTime = getEndTime(training.scheduledAt, training.durationMinutes);
 
   const formatPrice = (price: number): string => {
     return `${price} баллов`;

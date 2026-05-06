@@ -4,6 +4,7 @@ import {toast} from 'sonner';
 import {Button, Skeleton} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
 import {useCancelBooking, useEnrichedBookings} from '@/hooks';
+import {formatDateShort, formatTime} from '@/lib/date-utils';
 
 interface BookingItemProps {
   id: string;
@@ -13,20 +14,6 @@ interface BookingItemProps {
   onCancel: (id: string) => Promise<void>;
   isCancelling: boolean;
 }
-
-const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-  });
-};
-
-const formatTime = (date: string): string => {
-  return new Date(date).toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
 
 const BookingItem: React.FC<BookingItemProps> = ({
   id,
@@ -49,7 +36,7 @@ const BookingItem: React.FC<BookingItemProps> = ({
           <span className="font-medium">{trainingTitle}</span>
           <span className="text-muted-foreground">
             {' • '}
-            {formatDate(scheduledAt)}
+            {formatDateShort(scheduledAt)}
             {', '}
             {formatTime(scheduledAt)}
           </span>

@@ -5,25 +5,12 @@ import type {TrainingResponseDto} from '@/types';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
 import {Button, Skeleton} from '@/components/ui';
 import {ROUTES} from '@/lib/routes';
+import {formatDateShort, formatTime} from '@/lib/date-utils';
 
 interface UpcomingTrainingsProps {
   trainings: TrainingResponseDto[];
   isLoading?: boolean;
 }
-
-const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-  });
-};
-
-const formatTime = (date: string): string => {
-  return new Date(date).toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
 
 const capitalizeFirstLetter = (str: string): string => {
   if (!str) return '';
@@ -91,7 +78,7 @@ export const UpcomingTrainings: React.FC<UpcomingTrainingsProps> = ({
                 </span>
                 <span className="text-muted-foreground">
                   {' • '}
-                  {formatDate(training.scheduledAt)}
+                  {formatDateShort(training.scheduledAt)}
                   {', '}
                   {formatTime(training.scheduledAt)}
                 </span>

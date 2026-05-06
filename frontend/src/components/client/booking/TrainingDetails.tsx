@@ -2,33 +2,17 @@ import type {TrainerResponseDto, TrainingResponseDto} from '@/types';
 import {Badge} from '@/components/ui/Badge';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
 import {Skeleton} from '@/components/ui/Skeleton';
+import {
+  formatDateLong,
+  formatTime,
+  formatDuration,
+  getEndTime,
+} from '@/lib/date-utils';
 
 interface TrainingDetailsProps {
   training: TrainingResponseDto;
   trainer?: TrainerResponseDto;
 }
-
-const formatDate = (date: string) =>
-  new Date(date).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-
-const formatTime = (date: string) =>
-  new Date(date).toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-const formatDuration = (minutes: number) => {
-  if (minutes >= 60) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return mins > 0 ? `${hours} ч ${mins} мин` : `${hours} ч`;
-  }
-  return `${minutes} мин`;
-};
 
 const getTrainingTypeBadgeVariant = (
   type: TrainingResponseDto['type'],
@@ -75,10 +59,7 @@ export const TrainingDetails: React.FC<TrainingDetailsProps> = ({
 }) => {
   const startTime = formatTime(training.scheduledAt);
   const endTime = formatTime(
-    new Date(
-      new Date(training.scheduledAt).getTime() +
-        training.durationMinutes * 60 * 1000,
-    ).toISOString(),
+    getEndTime(training.scheduledAt, training.durationMinutes),
   );
 
   return (
@@ -95,7 +76,7 @@ export const TrainingDetails: React.FC<TrainingDetailsProps> = ({
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <span>📅</span>
-            <span>{formatDate(training.scheduledAt)}</span>
+            <span>{formatDateLong(training.scheduledAt)}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <span>🕐</span>

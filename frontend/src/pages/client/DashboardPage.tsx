@@ -7,6 +7,7 @@ import {useBalance} from '@/hooks/use-balance';
 import {useBookings} from '@/hooks/use-bookings';
 import {useTrainings} from '@/hooks/use-trainings';
 import type {TrainingResponseDto} from '@/types';
+import {isDateAfter, compareDatesAsc} from '@/lib/date-utils';
 
 export const DashboardPage: React.FC = () => {
   const {data: balanceData, isLoading: isBalanceLoading} = useBalance();
@@ -26,14 +27,10 @@ export const DashboardPage: React.FC = () => {
           b => b.trainingId === training.id,
         );
         const hasActiveBooking = booking && booking.status === 'confirmed';
-        const isFuture = new Date(training.scheduledAt) > now;
+        const isFuture = isDateAfter(training.scheduledAt, now);
         return hasActiveBooking && isFuture;
       })
-      .sort((a, b) => {
-        return (
-          new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
-        );
-      });
+      .sort((a, b) => compareDatesAsc(a.scheduledAt, b.scheduledAt));
   }, [trainingsData, bookingsData]);
 
   const isLoading = isBalanceLoading || isBookingsLoading || isTrainingsLoading;

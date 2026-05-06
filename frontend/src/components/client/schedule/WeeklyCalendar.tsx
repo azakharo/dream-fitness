@@ -4,6 +4,14 @@ import {Link} from '@tanstack/react-router';
 import {Button} from '@/components/ui/Button';
 import {Skeleton} from '@/components/ui/Skeleton';
 import type {TrainingResponseDto} from '@/types';
+import {
+  getWeekStart,
+  addWeeksToDate,
+  isSameDayAs,
+  isDateToday,
+  formatMonthYear,
+  formatTime,
+} from '@/lib/date-utils';
 
 interface WeeklyCalendarProps {
   trainings: TrainingResponseDto[];
@@ -14,35 +22,6 @@ interface WeeklyCalendarProps {
 
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 const MAX_VISIBLE_TRAININGS = 3;
-
-const getWeekStart = (date: Date): Date => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
-
-const formatMonthYear = (date: Date): string => {
-  return date.toLocaleDateString('ru-RU', {month: 'long', year: 'numeric'});
-};
-
-const formatTime = (date: Date): string => {
-  return date.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
-};
-
-const isSameDay = (d1: Date, d2: Date): boolean => {
-  return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
-  );
-};
-
-const isToday = (date: Date): boolean => {
-  return isSameDay(date, new Date());
-};
 
 export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   trainings,
@@ -91,15 +70,11 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   }, [trainings, weekDays]);
 
   const goToPreviousWeek = () => {
-    const newStart = new Date(currentWeekStart);
-    newStart.setDate(newStart.getDate() - 7);
-    setCurrentWeekStart(newStart);
+    setCurrentWeekStart(prev => addWeeksToDate(prev, -1));
   };
 
   const goToNextWeek = () => {
-    const newStart = new Date(currentWeekStart);
-    newStart.setDate(newStart.getDate() + 7);
-    setCurrentWeekStart(newStart);
+    setCurrentWeekStart(prev => addWeeksToDate(prev, 1));
   };
 
   const goToToday = () => {
@@ -170,7 +145,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
             key={index}
             className={`
               p-2 text-center
-              ${isToday(day) ? 'bg-primary/10' : ''}
+              ${isDateToday(day) ? 'bg-primary/10' : ''}
             `}
           >
             <div className="text-xs font-medium text-muted-foreground">
@@ -180,8 +155,12 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
               className={`
                 mt-1 inline-flex size-8 items-center justify-center rounded-full
                 text-sm
-                ${isToday(day) ? 'bg-primary text-primary-foreground' : ''}
-                ${isSameDay(day, selectedDate) && !isToday(day) ? 'bg-secondary' : ''}
+                ${isDateToday(day) ? 'bg-primary text-primary-foreground' : ''}
+                ${
+                  isSameDayAs(day, selectedDate) && !isDateToday(day)
+                    ? `bg-secondary`
+                    : ''
+                }
               `}
             >
               {day.getDate()}
@@ -206,7 +185,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
               key={dayIndex}
               className={`
                 min-h-[120px] p-2
-                ${isSameDay(day, selectedDate) ? `bg-accent/50` : ''}
+                ${isSameDayAs(day, selectedDate) ? `bg-accent/50` : ''}
               `}
             >
               {visibleTrainings.length === 0 ? (
@@ -254,11 +233,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                           </div>
                         )}
                         {isFull && (
-                          <div
-                            className="
-                            text-[10px] font-medium text-destructive
-                          "
-                          >
+                          <div className="text-[10px] font-medium text-destructive">
                             Мест нет
                           </div>
                         )}

@@ -3,20 +3,7 @@ import * as React from 'react';
 import {Badge, Skeleton} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
 import {useEnrichedBookings} from '@/hooks';
-
-const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-  });
-};
-
-const formatTime = (date: string): string => {
-  return new Date(date).toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
+import {formatDateShort, formatTime} from '@/lib/date-utils';
 
 interface TrainingItemProps {
   trainingTitle: string;
@@ -55,7 +42,7 @@ const TrainingItem: React.FC<TrainingItemProps> = ({
           <span className="font-medium">{trainingTitle}</span>
           <span className="text-muted-foreground">
             {' • '}
-            {formatDate(scheduledAt)}
+            {formatDateShort(scheduledAt)}
             {', '}
             {formatTime(scheduledAt)}
           </span>

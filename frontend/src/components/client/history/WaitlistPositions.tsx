@@ -4,20 +4,7 @@ import {toast} from 'sonner';
 import {Button, Skeleton} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
 import {useEnrichedWaitlist, useLeaveWaitlist} from '@/hooks';
-
-const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-  });
-};
-
-const formatTime = (date: string): string => {
-  return new Date(date).toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
+import {formatDateShort, formatTime} from '@/lib/date-utils';
 
 interface WaitlistItemProps {
   id: string;
@@ -52,7 +39,7 @@ const WaitlistItem: React.FC<WaitlistItemProps> = ({
           <span className="font-medium">{trainingTitle}</span>
           <span className="text-muted-foreground">
             {' • '}
-            {formatDate(scheduledAt)}
+            {formatDateShort(scheduledAt)}
             {', '}
             {formatTime(scheduledAt)}
           </span>

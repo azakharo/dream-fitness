@@ -3,6 +3,7 @@ import type {NotificationResponseDto, NotificationType} from '@/types';
 import {Card, CardContent} from '@/components/ui/Card';
 import {Button} from '@/components/ui/Button';
 import {Badge} from '@/components/ui/Badge';
+import {formatRelativeTime} from '@/lib/date-utils';
 
 interface NotificationItemProps {
   notification: NotificationResponseDto;
@@ -25,22 +26,6 @@ const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   training_reminder: 'Напоминание',
   waitlist_joined: 'Лист ожидания',
   waitlist_promoted: 'Лист ожидания',
-};
-
-const getRelativeTime = (date: string): string => {
-  const now = new Date();
-  const then = new Date(date);
-  const diffMs = now.getTime() - then.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) return 'только что';
-  if (diffMins < 60) return `${diffMins} мин. назад`;
-  if (diffHours < 24) return `${diffHours} ч. назад`;
-  if (diffDays === 1) return 'вчера';
-  if (diffDays < 7) return `${diffDays} дн. назад`;
-  return then.toLocaleDateString('ru-RU');
 };
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({
@@ -98,7 +83,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
               </Badge>
 
               <span className="text-xs text-gray-500">
-                {getRelativeTime(notification.createdAt)}
+                {formatRelativeTime(notification.createdAt)}
               </span>
 
               {!notification.isRead && onMarkAsRead && (

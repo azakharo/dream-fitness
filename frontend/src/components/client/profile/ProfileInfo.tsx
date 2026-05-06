@@ -2,6 +2,7 @@ import type {UserProfileDto} from '@/types';
 import {Button} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {Skeleton} from '@/components/ui';
+import {formatDate} from '@/lib/date-utils';
 
 interface ProfileInfoProps {
   user: UserProfileDto;
@@ -13,16 +14,6 @@ interface ProfileInfoProps {
 const GENDER_LABELS: Record<string, string> = {
   male: 'Мужской',
   female: 'Женский',
-};
-
-const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return 'Не указана';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
 };
 
 export const ProfileInfo: React.FC<ProfileInfoProps> = ({
@@ -66,7 +57,9 @@ export const ProfileInfo: React.FC<ProfileInfoProps> = ({
           </p>
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">Дата рождения:</span>{' '}
-            {formatDate(user.birthDate as unknown as string | undefined)}
+            {user.birthDate
+              ? formatDate(user.birthDate as unknown as string)
+              : 'Не указана'}
           </p>
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">Пол:</span>{' '}
