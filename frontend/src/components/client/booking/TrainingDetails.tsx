@@ -98,16 +98,6 @@ export const TrainingDetails: React.FC<TrainingDetailsProps> = ({
             </div>
           )}
         </div>
-
-        {training.description && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Описание</h4>
-            <p className="text-sm text-muted-foreground">
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {training.description as any as string}
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
