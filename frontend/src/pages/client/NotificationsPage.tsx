@@ -14,10 +14,10 @@ export const NotificationsPage: React.FC = () => {
   >(undefined);
   const {data, isLoading} = useNotifications();
 
-  const notifications: NotificationResponseDto[] = React.useMemo(() => {
+  const notifications = React.useMemo<NotificationResponseDto[]>(() => {
     if (!data) return [];
-    if (!selectedType) return data;
-    return data.filter(n => n.type === selectedType);
+    if (!selectedType) return data.items;
+    return data.items.filter(n => n.type === selectedType);
   }, [data, selectedType]);
 
   const handleMarkAsRead = (notificationId: string) => {

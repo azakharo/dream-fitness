@@ -1,9 +1,7 @@
 import {useQuery} from '@tanstack/react-query';
 import {useAuthStore} from '@/stores/auth-store';
 import {api} from '@/lib/api-client';
-import type {components} from '@/types/api.generated';
-
-type NotificationResponse = components['schemas']['NotificationResponseDto'];
+import type {NotificationListResponseDto} from '@/types';
 
 export const useNotifications = (limit?: number) => {
   const {accessToken} = useAuthStore();
@@ -14,7 +12,7 @@ export const useNotifications = (limit?: number) => {
       const endpoint = limit
         ? `/notifications?limit=${limit}`
         : '/notifications';
-      return api.get<NotificationResponse[]>(endpoint);
+      return api.get<NotificationListResponseDto>(endpoint);
     },
     enabled: !!accessToken,
   });
