@@ -4,10 +4,10 @@
 
 ## Контекст
 
-- **Frontend ADR:** [`/doc/Frontend-ADR.md`](../../../../doc/Frontend-ADR.md)
-- **UI Requirements:** [`/doc/UI.md`](../../../../doc/UI.md)
-- **API Documentation:** [`/doc/API.md`](../../../../doc/API.md)
-- **Top-level Plan:** [`/doc/plans/impl-plan-top-level.md`](../../../../doc/plans/impl-plan-top-level.md)
+- **Frontend ADR:** [`/doc/Frontend-ADR.md`](../../../doc/Frontend-ADR.md)
+- **UI Requirements:** [`/doc/UI.md`](../../../doc/UI.md)
+- **API Documentation:** [`/doc/API.md`](../../../doc/API.md)
+- **Top-level Plan:** [`/doc/plans/impl-plan-top-level.md`](../../../doc/plans/impl-plan-top-level.md)
 
 ---
 
