@@ -85,7 +85,7 @@ frontend/
 
 ## Правила по работе с кодом
 
-- Если во время выполнения задачи изменялись TypeScript или JavaScript файлы исходного кода, то после выполнения задачи (в самом конце), нужно проверить, нет ли ошибок TypeScript (`npm run ts`) и других принятых правил кодирования (`npm run lint`). Обнаруженные проблемы необходимо исправить.
+- Если во время выполнения задачи изменялись TypeScript или JavaScript файлы исходного кода, то после выполнения задачи (в самом конце), нужно проверить, нет ли ошибок TypeScript (`npm run ts`) или нарушения других принятых правил кодирования (`npm run lint`). Обнаруженные проблемы необходимо исправить.
 - Если во время выполнения задачи изменился backend API, нужно напомнить пользователю выполнить авто-генерацию типов данных: `npm run gen:types`.
 - Файл `src/types/api.generated.ts` автогенерируется и НЕ должен редактироваться вручную.
 - The Date → string and similar conversions should happen in the API client layer, keeping backend-specific formatting out of UI components. This follows the principle that UI should work with native types while the API layer handles serialization.
