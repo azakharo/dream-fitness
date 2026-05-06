@@ -68,7 +68,12 @@ export const AvailabilityStatus: React.FC<AvailabilityStatusProps> = ({
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Статус баланса:</span>
             {hasEnoughBalance ? (
-              <span className="flex items-center gap-1 font-medium text-green-600">
+              <span
+                // eslint-disable-next-line better-tailwindcss/enforce-consistent-line-wrapping
+                className="
+                flex items-center gap-1 font-medium text-green-600
+              "
+              >
                 ✓ Достаточно
               </span>
             ) : (

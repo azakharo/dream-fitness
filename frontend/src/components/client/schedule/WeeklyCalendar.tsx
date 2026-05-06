@@ -233,7 +233,11 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                           </div>
                         )}
                         {isFull && (
-                          <div className="text-[10px] font-medium text-destructive">
+                          <div
+                            className="
+                            text-[10px] font-medium text-destructive
+                          "
+                          >
                             Мест нет
                           </div>
                         )}
