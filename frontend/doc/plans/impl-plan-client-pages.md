@@ -236,8 +236,8 @@ export const useTrainers = () => {
 };
 
 // useSchedule — расписание
-export const useSchedule = (date?: string) => {
-  // queryKey: ['schedule', date]
+export const useSchedule = (date?: Date) => {
+  // queryKey: ['schedule', date.toIsoString()]
   // queryFn: GET /api/schedule/:date или GET /api/schedule
 };
 ```
@@ -248,8 +248,8 @@ export const useSchedule = (date?: string) => {
 interface TrainingFilters {
   type?: TrainingType;
   trainerId?: string;
-  dateFrom?: string;
-  dateTo?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
   status?: TrainingStatus;
 }
 ```
