@@ -71,6 +71,8 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
     return map;
   }, [trainings, weekDays]);
 
+  console.log({trainings, weekDays, trainingsByDay});
+
   const goToPreviousWeek = () => {
     setCurrentWeekStart(prev => addWeeksToDate(prev, -1));
   };
