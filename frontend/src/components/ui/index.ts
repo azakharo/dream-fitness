@@ -1,6 +1,7 @@
 // UI Components
 export {Button} from './Button';
-export {Calendar, CalendarDayButton} from './Calendar';
+export {Skeleton} from './Skeleton';
+export {Calendar, CalendarDayButton} from './calendar';
 export {
   Card,
   CardContent,
