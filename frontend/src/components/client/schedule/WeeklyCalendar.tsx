@@ -4,6 +4,8 @@ import {Link} from '@tanstack/react-router';
 import {Button} from '@/components/ui/Button';
 import {Skeleton} from '@/components/ui/Skeleton';
 import type {TrainingResponseDto} from '@/types';
+import {useBookings} from '@/hooks/use-bookings';
+import {useWaitlist} from '@/hooks/use-waitlist';
 import {
   getWeekStart,
   addWeeksToDate,
@@ -32,6 +34,29 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   const [expandedDays, setExpandedDays] = useState<Set<number>>(
     () => new Set(),
   );
+
+  const {data: bookingsData} = useBookings();
+  const {data: waitlistData} = useWaitlist();
+
+  const userBookedTrainingIds = useMemo(() => {
+    const bookedIds = new Set<string>();
+    const bookings = bookingsData?.items ?? [];
+    for (const booking of bookings) {
+      if (booking.status === 'confirmed') {
+        bookedIds.add(booking.trainingId);
+      }
+    }
+    return bookedIds;
+  }, [bookingsData]);
+
+  const userWaitlistPositions = useMemo(() => {
+    const positions = new Map<string, number>();
+    const waitlist = waitlistData ?? [];
+    for (const entry of waitlist) {
+      positions.set(entry.trainingId, entry.position);
+    }
+    return positions;
+  }, [waitlistData]);
 
   const weekDays = useMemo(() => {
     const days: Date[] = [];
@@ -182,6 +207,10 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                   {visibleTrainings.map(training => {
                     const startTime = new Date(training.scheduledAt);
                     const isFull = training.availableSlots === 0;
+                    const isBooked = userBookedTrainingIds.has(training.id);
+                    const waitlistPosition = userWaitlistPositions.get(
+                      training.id,
+                    );
 
                     return (
                       <Link
@@ -216,12 +245,30 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                             {training.trainerName}
                           </div>
                         )}
-                        {isFull && (
-                          // eslint-disable-next-line prettier/prettier
+                        {isBooked && (
+                          <div className="text-[10px] font-medium text-primary">
+                            Вы записаны
+                          </div>
+                        )}
+                        {!isBooked && waitlistPosition !== undefined && (
+                          <div className="text-[10px] font-medium text-orange-600">
+                            {`Лист ожидания: позиция ${waitlistPosition}`}
+                          </div>
+                        )}
+                        {!isBooked && waitlistPosition === undefined && (
                           <div
-                            className="text-[10px] font-medium text-destructive"
+                            className={`
+                              text-[10px]
+                              ${
+                                isFull
+                                  ? 'font-medium text-destructive'
+                                  : `text-muted-foreground`
+                              }
+                            `}
                           >
-                            Мест нет
+                            {isFull
+                              ? 'Мест нет'
+                              : `Свободно: ${training.availableSlots} мест`}
                           </div>
                         )}
                       </Link>
