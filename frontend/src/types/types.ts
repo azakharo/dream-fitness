@@ -38,8 +38,6 @@ export type TransactionType = TransactionResponseDto['type'];
 // ===========================================
 
 export type TrainerResponseDto = components['schemas']['TrainerResponseDto'];
-export type TrainerListResponseDto =
-  components['schemas']['TrainerListResponseDto'];
 export type CreateTrainerDto = components['schemas']['CreateTrainerDto'];
 export type UpdateTrainerDto = components['schemas']['UpdateTrainerDto'];
 export type TrainingResponseDto = components['schemas']['TrainingResponseDto'];

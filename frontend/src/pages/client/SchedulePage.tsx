@@ -28,7 +28,7 @@ export const SchedulePage: React.FC = () => {
   };
 
   const {data: trainersData} = useTrainers();
-  const trainers = trainersData?.items || [];
+  const trainers = trainersData ?? [];
 
   const {data: trainingsData, isLoading: isTrainingsLoading} =
     useTrainings(filters);

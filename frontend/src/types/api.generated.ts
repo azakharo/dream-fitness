@@ -260,14 +260,14 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/schedule/{date}': {
+  '/api/schedule/trainer/{id}': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get: operations['TrainingProxyController_getScheduleByDate'];
+    get: operations['TrainingProxyController_getTrainerSchedule'];
     put?: never;
     post?: never;
     delete?: never;
@@ -318,7 +318,7 @@ export interface paths {
     get: operations['BookingProxyController_getWaitlist'];
     put?: never;
     post: operations['BookingProxyController_joinWaitlist'];
-    delete?: never;
+    delete: operations['BookingProxyController_leaveWaitlist'];
     options?: never;
     head?: never;
     patch?: never;
@@ -334,7 +334,7 @@ export interface paths {
     get: operations['BookingProxyController_getWaitlistPosition'];
     put?: never;
     post?: never;
-    delete: operations['BookingProxyController_leaveWaitlist'];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -372,22 +372,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/notifications/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: operations['NotificationProxyController_getNotificationById'];
-    put?: never;
-    post?: never;
-    delete: operations['NotificationProxyController_deleteNotification'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/notifications/{id}/read': {
     parameters: {
       query?: never;
@@ -418,6 +402,22 @@ export interface paths {
     options?: never;
     head?: never;
     patch: operations['NotificationProxyController_markAllAsRead'];
+    trace?: never;
+  };
+  '/api/notifications/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations['NotificationProxyController_deleteNotification'];
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   '/health': {
@@ -542,11 +542,6 @@ export interface components {
       createdAt: string;
       updatedAt: string;
     };
-    TrainerListResponseDto: {
-      items: components['schemas']['TrainerResponseDto'][];
-      /** @example 10 */
-      count: number;
-    };
     CreateTrainerDto: {
       /** @example John Smith */
       name: string;
@@ -649,6 +644,26 @@ export interface components {
       price?: number;
       /** @enum {string} */
       status?: 'scheduled' | 'cancelled' | 'completed';
+    };
+    ScheduleTrainingDto: {
+      id: string;
+      title: string;
+      type: string;
+      scheduledAt: string;
+      durationMinutes: number;
+    };
+    WeekScheduleDayDto: {
+      date: string;
+      trainings: components['schemas']['ScheduleTrainingDto'][];
+    };
+    WeekScheduleResponseDto: {
+      weekStart: string;
+      weekEnd: string;
+      days: components['schemas']['WeekScheduleDayDto'][];
+    };
+    TrainerScheduleResponseDto: {
+      trainer: Record<string, never>;
+      trainings: components['schemas']['ScheduleTrainingDto'][];
     };
     BookingResponseDto: {
       /** @example f47ac10b-58cc-4372-a567-0e02b2c3d479 */
@@ -1033,7 +1048,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['BalanceResponseDto'];
+          'application/json': components['schemas']['TransactionResponseDto'];
         };
       };
       /** @description Invalid input data */
@@ -1071,7 +1086,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['BalanceResponseDto'];
+          'application/json': components['schemas']['TransactionResponseDto'];
         };
       };
       /** @description Invalid input data */
@@ -1116,7 +1131,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['BalanceResponseDto'];
+          'application/json': components['schemas']['TransactionResponseDto'];
         };
       };
       /** @description Invalid input data */
@@ -1154,7 +1169,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['BalanceResponseDto'];
+          'application/json': components['schemas']['TransactionResponseDto'];
         };
       };
       /** @description Invalid input data */
@@ -1215,7 +1230,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['TrainerListResponseDto'];
+          'application/json': components['schemas']['TrainerResponseDto'][];
         };
       };
       /** @description Unauthorized */
@@ -1319,16 +1334,12 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Trainer deleted */
+      /** @description Trainer deactivated */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          'application/json': {
-            deleted?: boolean;
-          };
-        };
+        content?: never;
       };
       /** @description Unauthorized */
       401: {
@@ -1526,16 +1537,12 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Training deleted */
+      /** @description Training cancelled */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          'application/json': {
-            deleted?: boolean;
-          };
-        };
+        content?: never;
       };
       /** @description Unauthorized */
       401: {
@@ -1623,13 +1630,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Schedule retrieved */
+      /** @description Weekly schedule retrieved */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['TrainingListResponseDto'];
+          'application/json': components['schemas']['WeekScheduleResponseDto'];
         };
       };
       /** @description Unauthorized */
@@ -1641,24 +1648,24 @@ export interface operations {
       };
     };
   };
-  TrainingProxyController_getScheduleByDate: {
+  TrainingProxyController_getTrainerSchedule: {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        date: string;
+        id: string;
       };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Schedule for date retrieved */
+      /** @description Trainer schedule retrieved */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['TrainingListResponseDto'];
+          'application/json': components['schemas']['TrainerScheduleResponseDto'];
         };
       };
       /** @description Unauthorized */
@@ -1911,24 +1918,27 @@ export interface operations {
       };
     };
   };
-  BookingProxyController_getWaitlistPosition: {
+  BookingProxyController_leaveWaitlist: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
+      query: {
         trainingId: string;
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Waitlist position retrieved */
+      /** @description Left waitlist */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['WaitlistDto'];
+          'application/json': {
+            /** @example Removed from waitlist */
+            message?: string;
+          };
         };
       };
       /** @description Unauthorized */
@@ -1947,7 +1957,7 @@ export interface operations {
       };
     };
   };
-  BookingProxyController_leaveWaitlist: {
+  BookingProxyController_getWaitlistPosition: {
     parameters: {
       query?: never;
       header?: never;
@@ -1958,15 +1968,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Left waitlist */
+      /** @description Waitlist position retrieved */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            deleted?: boolean;
-          };
+          'application/json': components['schemas']['WaitlistDto'];
         };
       };
       /** @description Unauthorized */
@@ -2068,80 +2076,6 @@ export interface operations {
       };
     };
   };
-  NotificationProxyController_getNotificationById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Notification retrieved */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['NotificationDto'];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Notification not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  NotificationProxyController_deleteNotification: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Notification deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': {
-            deleted?: boolean;
-          };
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Notification not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
   NotificationProxyController_markAsRead: {
     parameters: {
       query?: never;
@@ -2200,6 +2134,44 @@ export interface operations {
       };
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  NotificationProxyController_deleteNotification: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Notification deleted */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            deleted?: boolean;
+          };
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Notification not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };

@@ -1,9 +1,9 @@
 import {useQuery} from '@tanstack/react-query';
 import {api} from '@/lib/api-client';
 import type {
+  TrainerResponseDto,
   TrainingListResponseDto,
   TrainingResponseDto,
-  TrainerListResponseDto,
 } from '@/types';
 
 export interface TrainingFilters {
@@ -45,7 +45,7 @@ export const useTraining = (id: string) => {
 export const useTrainers = () => {
   return useQuery({
     queryKey: ['trainers'],
-    queryFn: () => api.get<TrainerListResponseDto>('/trainers'),
+    queryFn: () => api.get<TrainerResponseDto[]>('/trainers'),
   });
 };
 
