@@ -15,8 +15,8 @@
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\" \"test/**/*.ts\"",
     "start:dev:infra": "docker-compose --env-file .env --env-file .env.development -f docker-compose.base.yml up -d --build",
     "stop:dev:infra": "docker-compose --env-file .env --env-file .env.development -f docker-compose.base.yml down",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
+    "dev": "npm run start:dev:infra && wait-on -t 120000 tcp:5432 tcp:5672 && concurrently --names api-gateway,auth-service,training-service,booking-service,notification-service --prefix-colors blue,green,yellow,magenta,cyan \"npm run start:dev:api-gateway\" \"npm run start:dev:auth-service\" \"npm run start:dev:training-service\" \"npm run start:dev:booking-service\" \"npm run start:dev:notification-service\"",
+    "dev:stop": "npm run stop:dev:infra",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/api-gateway/main",
     "start:dev:api-gateway": "nest start api-gateway --watch",
@@ -132,6 +132,7 @@
     "@types/passport-jwt": "4.0.1",
     "@types/pg": "8.20.0",
     "@types/supertest": "6.0.3",
+    "concurrently": "9.2.1",
     "copy-webpack-plugin": "14.0.0",
     "cross-env": "10.1.0",
     "dotenv-cli": "11.0.0",
@@ -148,7 +149,8 @@
     "ts-node": "10.9.2",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.0"
+    "typescript-eslint": "8.57.0",
+    "wait-on": "9.0.5"
   },
   "jest": {
     "moduleFileExtensions": [
