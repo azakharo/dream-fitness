@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {ScheduleFilters} from '@/components/client/schedule/ScheduleFilters';
 import {WeeklyCalendar} from '@/components/client/schedule/WeeklyCalendar';
-import {TrainingCard} from '@/components/client/schedule/TrainingCard';
 import {
   useTrainings,
   useTrainers,
@@ -18,13 +17,6 @@ export const SchedulePage: React.FC = () => {
   const {data: trainingsData, isLoading: isTrainingsLoading} =
     useTrainings(filters);
   const trainings = trainingsData?.items || [];
-
-  const selectedDayTrainings = React.useMemo(() => {
-    const dateStr = selectedDate.toISOString().split('T')[0];
-    return (trainingsData?.items ?? []).filter(t =>
-      t.scheduledAt.startsWith(dateStr),
-    );
-  }, [trainingsData, selectedDate]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -45,36 +37,6 @@ export const SchedulePage: React.FC = () => {
         onDateSelect={setSelectedDate}
         isLoading={isTrainingsLoading}
       />
-
-      {selectedDayTrainings.length > 0 && (
-        <div className="mt-6">
-          <h2 className="mb-4 text-lg font-medium">
-            Тренировки на{' '}
-            {selectedDate.toLocaleDateString('ru-RU', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-            })}
-          </h2>
-          <div
-            className="
-              grid gap-4
-              sm:grid-cols-2
-              lg:grid-cols-3
-            "
-          >
-            {selectedDayTrainings.map(training => (
-              <TrainingCard key={training.id} training={training} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {!isTrainingsLoading && selectedDayTrainings.length === 0 && (
-        <div className="py-12 text-center text-muted-foreground">
-          <p>На выбранный день нет тренировок</p>
-        </div>
-      )}
     </div>
   );
 };
