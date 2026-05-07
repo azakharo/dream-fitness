@@ -7,7 +7,6 @@ import type {TrainingResponseDto} from '@/types';
 import {
   getWeekStart,
   addWeeksToDate,
-  isSameDayAs,
   isDateToday,
   formatMonthYear,
   formatTime,
@@ -16,8 +15,8 @@ import {
 
 interface WeeklyCalendarProps {
   trainings: TrainingResponseDto[];
-  selectedDate: Date;
-  onDateSelect: (date: Date) => void;
+  currentWeekStart: Date;
+  onWeekChange: (newWeekStart: Date) => void;
   isLoading?: boolean;
 }
 
@@ -26,13 +25,10 @@ const MAX_VISIBLE_TRAININGS = 3;
 
 export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   trainings,
-  selectedDate,
-  onDateSelect,
+  currentWeekStart,
+  onWeekChange,
   isLoading = false,
 }) => {
-  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
-    getWeekStart(selectedDate),
-  );
   const [expandedDays, setExpandedDays] = useState<Set<number>>(
     () => new Set(),
   );
@@ -76,17 +72,15 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   }, [trainings, weekDays]);
 
   const goToPreviousWeek = () => {
-    setCurrentWeekStart(prev => addWeeksToDate(prev, -1));
+    onWeekChange(addWeeksToDate(currentWeekStart, -1));
   };
 
   const goToNextWeek = () => {
-    setCurrentWeekStart(prev => addWeeksToDate(prev, 1));
+    onWeekChange(addWeeksToDate(currentWeekStart, 1));
   };
 
   const goToToday = () => {
-    const today = new Date();
-    setCurrentWeekStart(getWeekStart(today));
-    onDateSelect(today);
+    onWeekChange(getWeekStart(new Date()));
   };
 
   const toggleExpanded = (dayIndex: number) => {
@@ -164,11 +158,6 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                 mt-1 inline-flex size-8 items-center justify-center rounded-full
                 text-sm
                 ${isDateToday(day) ? 'bg-primary text-primary-foreground' : ''}
-                ${
-                  isSameDayAs(day, selectedDate) && !isDateToday(day)
-                    ? `bg-secondary`
-                    : ''
-                }
               `}
             >
               {day.getDate()}
@@ -193,7 +182,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
               key={day.toISOString()}
               className={`
                 min-h-30 p-2
-                ${isSameDayAs(day, selectedDate) ? `bg-accent/50` : ''}
+                ${isDateToday(day) ? 'bg-accent/30' : ''}
               `}
             >
               {visibleTrainings.length === 0 ? (
@@ -211,7 +200,6 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                         key={training.id}
                         to="/booking/$id"
                         params={{id: training.id}}
-                        onClick={() => onDateSelect(day)}
                         className={`
                           block rounded-md p-2 text-xs transition-all
                           hover:ring-2 hover:ring-primary/20
@@ -241,11 +229,9 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                           </div>
                         )}
                         {isFull && (
+                          // eslint-disable-next-line prettier/prettier
                           <div
-                            // eslint-disable-next-line better-tailwindcss/enforce-consistent-line-wrapping
-                            className="
-                            text-[10px] font-medium text-destructive
-                          "
+                            className="text-[10px] font-medium text-destructive"
                           >
                             Мест нет
                           </div>
