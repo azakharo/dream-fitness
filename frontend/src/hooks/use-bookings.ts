@@ -49,8 +49,10 @@ export const useCancelBooking = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({id}: {id: string; reason?: string}) =>
-      api.delete<BookingResponseDto>(`/bookings/${id}`),
+    mutationFn: ({id, reason}: {id: string; reason?: string}) =>
+      api.post<BookingResponseDto>(`/bookings/${id}/cancel`, {
+        reason: reason ?? '',
+      }),
     onSuccess: () => {
       void queryClient.invalidateQueries({queryKey: ['bookings']});
       void queryClient.invalidateQueries({queryKey: ['trainings']});

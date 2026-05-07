@@ -302,7 +302,23 @@ export interface paths {
     get: operations['BookingProxyController_getBookingById'];
     put?: never;
     post?: never;
-    delete: operations['BookingProxyController_cancelBooking'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/bookings/{id}/cancel': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['BookingProxyController_cancelBooking'];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;

@@ -108,7 +108,7 @@ export class BookingProxyController {
     );
   }
 
-  @Delete('bookings/:id')
+  @Post('bookings/:id/cancel')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiBody({ type: CancelBookingDto })
@@ -131,8 +131,8 @@ export class BookingProxyController {
     return this.proxyService.proxyRequest(
       req,
       body,
-      `/bookings/${id}`,
-      'DELETE',
+      `/bookings/${id}/cancel`,
+      'POST',
       BOOKING_SERVICE_URL,
       BOOKING_SERVICE_DEFAULT_URL,
     );

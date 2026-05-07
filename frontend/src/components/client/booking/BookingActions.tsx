@@ -1,11 +1,25 @@
+import {useState} from 'react';
 import {useCancelBooking, useCreateBooking} from '@/hooks/use-bookings';
 import {useJoinWaitlist, useLeaveWaitlist} from '@/hooks/use-waitlist';
 import {Button} from '@/components/ui/Button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/AlertDialog';
+import {Input} from '@/components/ui/Input';
 import {toast} from 'sonner';
 
 interface BookingActionsProps {
   trainingId: string;
+  bookingId?: string;
   hasAvailableSpots: boolean;
   userBalance: number;
   price: number;
@@ -18,6 +32,7 @@ const formatNumber = (num: number) => num.toLocaleString('ru-RU');
 
 export const BookingActions: React.FC<BookingActionsProps> = ({
   trainingId,
+  bookingId,
   hasAvailableSpots,
   userBalance,
   price,
@@ -25,6 +40,9 @@ export const BookingActions: React.FC<BookingActionsProps> = ({
   waitlistPosition,
   isInWaitlist,
 }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+
   const createBooking = useCreateBooking();
   const cancelBooking = useCancelBooking();
   const joinWaitlist = useJoinWaitlist();
@@ -53,11 +71,18 @@ export const BookingActions: React.FC<BookingActionsProps> = ({
     })();
   };
 
-  const handleCancel = () => {
+  const handleConfirmCancel = () => {
+    if (!bookingId) {
+      toast.error('ID бронирования не найден');
+      return;
+    }
+
     void (async () => {
       try {
-        await cancelBooking.mutateAsync({id: trainingId});
+        await cancelBooking.mutateAsync({id: bookingId, reason: cancelReason});
         toast.success('Запись на тренировку отменена');
+        setIsDialogOpen(false);
+        setCancelReason('');
       } catch {
         toast.error('Не удалось отменить запись');
       }
@@ -97,14 +122,37 @@ export const BookingActions: React.FC<BookingActionsProps> = ({
             <span className="text-xl">✓</span>
             <span className="font-medium">Вы записаны на эту тренировку</span>
           </div>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleCancel}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Отмена...' : 'Отменить запись'}
-          </Button>
+          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Отмена...' : 'Отменить запись'}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Отмена записи</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Вы уверены, что хотите отменить тренировку? Укажите,
+                  пожалуйста, причину отмены.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="py-4">
+                <Input
+                  placeholder="Причина отмены (необязательно)"
+                  value={cancelReason}
+                  onChange={e => setCancelReason(e.target.value)}
+                />
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setCancelReason('')}>
+                  Отмена
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmCancel}>
+                  Подтвердить
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     );

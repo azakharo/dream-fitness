@@ -20,10 +20,10 @@ export const BookingPage: React.FC = () => {
   const {data: waitlistData, isLoading: isWaitlistLoading} =
     useWaitlistPosition(id);
 
-  const isAlreadyBooked =
-    bookingsData?.items.some(
-      booking => booking.trainingId === id && booking.status === 'confirmed',
-    ) ?? false;
+  const confirmedBooking = bookingsData?.items.find(
+    booking => booking.trainingId === id && booking.status === 'confirmed',
+  );
+  const isAlreadyBooked = confirmedBooking != null;
 
   const isInWaitlist = waitlistData != null;
   const waitlistPosition = waitlistData?.position;
@@ -81,6 +81,7 @@ export const BookingPage: React.FC = () => {
           />
           <BookingActions
             trainingId={id}
+            bookingId={confirmedBooking?.id}
             hasAvailableSpots={hasAvailableSpots}
             userBalance={userBalance}
             price={training.price}
