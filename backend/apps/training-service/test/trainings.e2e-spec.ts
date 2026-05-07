@@ -260,8 +260,8 @@ describe('TrainingsController (e2e)', () => {
       const response = await trainingsHelper.findAll(headers);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toEqual([]);
-      expect(response.body.total).toBe(0);
+      expect(response.body.items).toEqual([]);
+      expect(response.body.count).toBe(0);
     });
 
     it('should filter by type', async () => {
@@ -300,9 +300,9 @@ describe('TrainingsController (e2e)', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.length).toBe(2);
+      expect(response.body.items.length).toBe(2);
       expect(
-        response.body.data.every((t) => t.type === TrainingType.YOGA),
+        response.body.items.every((t) => t.type === TrainingType.YOGA),
       ).toBe(true);
     });
 
@@ -337,9 +337,9 @@ describe('TrainingsController (e2e)', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.length).toBe(2);
+      expect(response.body.items.length).toBe(2);
       expect(
-        response.body.data.every((t) => t.trainerId === trainerRes1.body.id),
+        response.body.items.every((t) => t.trainerId === trainerRes1.body.id),
       ).toBe(true);
     });
 
@@ -381,8 +381,8 @@ describe('TrainingsController (e2e)', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.length).toBe(1);
-      expect(response.body.data[0].title).toBe('Training 1');
+      expect(response.body.items.length).toBe(1);
+      expect(response.body.items[0].title).toBe('Training 1');
     });
 
     it('should respect pagination (page, limit)', async () => {
@@ -407,8 +407,8 @@ describe('TrainingsController (e2e)', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.length).toBe(2);
-      expect(response.body.total).toBe(5);
+      expect(response.body.items.length).toBe(2);
+      expect(response.body.count).toBe(5);
     });
 
     it('should return 400 when no auth headers', async () => {
