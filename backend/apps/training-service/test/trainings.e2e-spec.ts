@@ -250,8 +250,8 @@ describe('TrainingsController (e2e)', () => {
       const response = await trainingsHelper.findAll(headers);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body.data)).toBe(true);
-      expect(response.body.total).toBe(3);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.count).toBe(3);
     });
 
     it('should return empty list when no trainings exist', async () => {
