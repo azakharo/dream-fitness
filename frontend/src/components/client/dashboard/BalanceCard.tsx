@@ -21,15 +21,13 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ваш баланс</CardTitle>
+        <CardTitle>Ваш баланс в баллах</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {isLoading ? (
           <Skeleton className="h-8 w-32" />
         ) : (
-          <div className="text-2xl font-semibold">
-            {formatBalance(balance)} баллов
-          </div>
+          <div className="text-2xl font-semibold">{formatBalance(balance)}</div>
         )}
         <Link to={ROUTES.PROFILE}>
           <Button variant="default" size="sm">
