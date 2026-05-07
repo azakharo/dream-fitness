@@ -3,7 +3,7 @@ import { DeepPartial } from 'typeorm';
 import { TrainingRepository } from './repositories/training.repository';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UpdateTrainingDto } from './dto/update-training.dto';
-import { TrainingResponseDto } from '@app/contracts';
+import { TrainingListResponseDto, TrainingResponseDto } from '@app/contracts';
 import { Training } from './entities/training.entity';
 import { TrainersService } from '../trainers/trainers.service';
 import { TrainerNotFoundException } from '../common/exceptions/trainer-not-found.exception';
@@ -187,14 +187,14 @@ export class TrainingsService {
     dateTo?: string;
     page?: number;
     limit?: number;
-  }): Promise<{ data: TrainingResponseDto[]; total: number }> {
+  }): Promise<TrainingListResponseDto> {
     const { data, total } =
       await this.trainingRepository.findWithFilters(filterDto);
     return {
-      data: await Promise.all(
+      items: await Promise.all(
         data.map((training) => this.toResponseDto(training)),
       ),
-      total,
+      count: total,
     };
   }
 
