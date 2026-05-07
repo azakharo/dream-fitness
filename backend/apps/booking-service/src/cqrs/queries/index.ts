@@ -6,3 +6,5 @@ export { GetWaitlistPositionQuery } from './get-waitlist-position.query';
 export { GetWaitlistPositionHandler } from './get-waitlist-position.handler';
 export { GetTrainingAvailabilityQuery } from './get-training-availability.query';
 export { GetTrainingAvailabilityHandler } from './get-training-availability.handler';
+export { GetUserWaitlistQuery } from './get-user-waitlist.query';
+export { GetUserWaitlistHandler } from './get-user-waitlist.handler';

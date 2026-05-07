@@ -21,11 +21,16 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   BookingResponseDto,
   BookingListResponseDto,
+  WaitlistResponseDto,
 } from '@app/contracts/booking';
 import { BookingFilterDto } from './dto/booking-filter.dto';
 import { CreateBookingDto, CancelBookingDto } from '@app/contracts/booking';
 import { BookTrainingCommand, CancelBookingCommand } from '../cqrs/commands';
-import { GetUserBookingsQuery, GetBookingByIdQuery } from '../cqrs/queries';
+import {
+  GetUserBookingsQuery,
+  GetBookingByIdQuery,
+  GetUserWaitlistQuery,
+} from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
 import { Booking } from './entities/booking.entity';
 
@@ -81,6 +86,17 @@ export class BookingsController {
       page: result.page,
       limit: result.limit,
     };
+  }
+
+  @Get('waitlist')
+  @ApiOperation({ summary: 'Get user waitlist entries' })
+  @ApiOkResponse({ type: WaitlistResponseDto, isArray: true })
+  async getWaitlist(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<WaitlistResponseDto[]> {
+    return this.queryBus.execute<GetUserWaitlistQuery, WaitlistResponseDto[]>(
+      new GetUserWaitlistQuery(user.id),
+    );
   }
 
   @Get(':id')
