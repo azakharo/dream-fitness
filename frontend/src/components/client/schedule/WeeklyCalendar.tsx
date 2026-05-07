@@ -250,11 +250,13 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                             Вы записаны
                           </div>
                         )}
-                        {!isBooked && waitlistPosition !== undefined && (
-                          <div className="text-[10px] font-medium text-orange-600">
+                        {!isBooked && waitlistPosition !== undefined &&
+                          // prettier-ignore
+                          <div
+                            className="text-[10px] font-medium text-orange-600"
+                          >
                             {`Лист ожидания: позиция ${waitlistPosition}`}
-                          </div>
-                        )}
+                          </div>}
                         {!isBooked && waitlistPosition === undefined && (
                           <div
                             className={`
@@ -268,7 +270,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                           >
                             {isFull
                               ? 'Мест нет'
-                              : `Свободно: ${training.availableSlots} мест`}
+                              : `Свободно мест: ${training.availableSlots}`}
                           </div>
                         )}
                       </Link>
