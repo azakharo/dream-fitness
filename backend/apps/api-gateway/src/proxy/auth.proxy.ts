@@ -30,6 +30,7 @@ import {
   UserProfileDto,
   BalanceResponseDto,
   TransactionListResponseDto,
+  TransactionResponseDto,
 } from '@app/contracts/auth';
 
 const AUTH_SERVICE_URL = 'AUTH_SERVICE_URL';
@@ -242,7 +243,7 @@ export class AuthProxyController {
   @ApiResponse({
     status: 201,
     description: 'Deposit successful',
-    type: BalanceResponseDto,
+    type: TransactionResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -264,7 +265,7 @@ export class AuthProxyController {
   @ApiResponse({
     status: 201,
     description: 'Funds reserved successfully',
-    type: BalanceResponseDto,
+    type: TransactionResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -287,7 +288,7 @@ export class AuthProxyController {
   @ApiResponse({
     status: 201,
     description: 'Funds released successfully',
-    type: BalanceResponseDto,
+    type: TransactionResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -309,7 +310,7 @@ export class AuthProxyController {
   @ApiResponse({
     status: 201,
     description: 'Refund processed successfully',
-    type: BalanceResponseDto,
+    type: TransactionResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

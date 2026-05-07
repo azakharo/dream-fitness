@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
   All,
+  Query,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -210,24 +211,29 @@ export class BookingProxyController {
     );
   }
 
-  @Delete('waitlist/:trainingId')
+  @Delete('waitlist')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
     description: 'Left waitlist',
-    schema: { type: 'object', properties: { deleted: { type: 'boolean' } } },
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Removed from waitlist' },
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Not on waitlist' })
   leaveWaitlist(
     @Req() req: RequestWithUser,
-    @Param('trainingId') trainingId: string,
+    @Query('trainingId') trainingId: string,
   ) {
     return this.proxyService.proxyRequest(
       req,
       null,
-      `/waitlist/${trainingId}`,
+      `/waitlist?trainingId=${trainingId}`,
       'DELETE',
       BOOKING_SERVICE_URL,
       BOOKING_SERVICE_DEFAULT_URL,
