@@ -1,4 +1,4 @@
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useAuthStore} from '@/stores/auth-store';
 import {api} from '@/lib/api-client';
 import type {NotificationListResponseDto} from '@/types';
@@ -26,5 +26,17 @@ export const useUnreadCount = () => {
     queryFn: () => api.get<{count: number}>('/notifications/unread-count'),
     enabled: !!accessToken,
     refetchInterval: 60000, // Refetch every minute
+  });
+};
+
+export const useMarkAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (notificationId: string) =>
+      api.patch<void>(`/notifications/${notificationId}/read`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({queryKey: ['notifications']});
+    },
   });
 };

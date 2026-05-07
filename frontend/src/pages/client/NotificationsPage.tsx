@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {Bell, Inbox} from 'lucide-react';
-import {useNotifications} from '@/hooks/use-notifications';
+import {useMarkAsRead, useNotifications} from '@/hooks/use-notifications';
 import {NotificationItem} from '@/components/client/notifications/NotificationItem';
 import {NotificationFilters} from '@/components/client/notifications/NotificationFilters';
 import {Card, CardContent} from '@/components/ui/Card';
@@ -13,6 +13,7 @@ export const NotificationsPage: React.FC = () => {
     NotificationType | undefined
   >(undefined);
   const {data, isLoading} = useNotifications();
+  const markAsReadMutation = useMarkAsRead();
 
   const notifications = React.useMemo<NotificationResponseDto[]>(() => {
     if (!data) return [];
@@ -21,8 +22,7 @@ export const NotificationsPage: React.FC = () => {
   }, [data, selectedType]);
 
   const handleMarkAsRead = (notificationId: string) => {
-    // TODO: Implement mark as read mutation
-    console.log('Mark as read:', notificationId);
+    markAsReadMutation.mutate(notificationId);
   };
 
   return (
