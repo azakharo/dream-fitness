@@ -4,7 +4,6 @@ import type {
   TrainingListResponseDto,
   TrainingResponseDto,
   TrainerListResponseDto,
-  RealTrainingListResponseDto,
 } from '@/types';
 
 export interface TrainingFilters {
@@ -30,11 +29,7 @@ export const useTrainings = (filters?: TrainingFilters) => {
 
       const queryString = params.toString();
       const endpoint = queryString ? `/trainings?${queryString}` : '/trainings';
-      const realData = await api.get<RealTrainingListResponseDto>(endpoint);
-      return {
-        items: realData.data,
-        count: realData.count,
-      };
+      return api.get<TrainingListResponseDto>(endpoint);
     },
   });
 };

@@ -45,11 +45,6 @@ export type UpdateTrainerDto = components['schemas']['UpdateTrainerDto'];
 export type TrainingResponseDto = components['schemas']['TrainingResponseDto'];
 export type TrainingListResponseDto =
   components['schemas']['TrainingListResponseDto'];
-// TODO remove when backend API fixed
-export type RealTrainingListResponseDto = {
-  data: TrainingResponseDto[];
-  count: number;
-};
 export type CreateTrainingDto = components['schemas']['CreateTrainingDto'];
 export type UpdateTrainingDto = components['schemas']['UpdateTrainingDto'];
 export type TrainingType = TrainingResponseDto['type'];
