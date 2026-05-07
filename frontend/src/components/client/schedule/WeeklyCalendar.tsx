@@ -136,20 +136,14 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
           {formatMonthYear(currentWeekStart)}
         </h2>
         <Button variant="ghost" size="sm" onClick={goToToday}>
-          Сегодня
+          На сегодня
         </Button>
       </div>
 
       {/* Week days header */}
       <div className="grid grid-cols-7 border-b bg-muted/50">
         {weekDays.map((day, index) => (
-          <div
-            key={day.toISOString()}
-            className={`
-              p-2 text-center
-              ${isDateToday(day) ? 'bg-primary/10' : ''}
-            `}
-          >
+          <div key={day.toISOString()} className="p-2 text-center">
             <div className="text-xs font-medium text-muted-foreground">
               {WEEKDAYS[index]}
             </div>
@@ -178,13 +172,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
           const hiddenCount = dayTrainings.length - MAX_VISIBLE_TRAININGS;
 
           return (
-            <div
-              key={day.toISOString()}
-              className={`
-                min-h-30 p-2
-                ${isDateToday(day) ? 'bg-accent/30' : ''}
-              `}
-            >
+            <div key={day.toISOString()} className="min-h-30 p-2">
               {visibleTrainings.length === 0 ? (
                 <div className="py-4 text-center text-xs text-muted-foreground">
                   Нет тренировок
