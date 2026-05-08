@@ -1,6 +1,10 @@
 import {Link} from '@tanstack/react-router';
-import {Bell} from 'lucide-react';
-import {useNotifications, useUnreadCount} from '@/hooks/use-notifications';
+import {Bell, Check} from 'lucide-react';
+import {
+  useNotifications,
+  useUnreadCount,
+  useMarkAsRead,
+} from '@/hooks/use-notifications';
 import {useUIStore} from '@/stores/ui-store';
 import {Button} from '@/components/ui/Button';
 import {Badge} from '@/components/ui/Badge';
@@ -12,6 +16,7 @@ export const NotificationsBell: React.FC = () => {
   const {data: notificationData} = useNotifications(5);
   const {notificationsOpen, setNotificationsOpen} = useUIStore();
   const notifications = notificationData?.items ?? [];
+  const {mutate: markAsRead} = useMarkAsRead();
 
   const unreadCount = unreadData?.count ?? 0;
 
@@ -56,12 +61,22 @@ export const NotificationsBell: React.FC = () => {
                   )}
                   <p
                     className={`
-                      text-sm
+                      flex-1 text-sm
                       ${!notification.isRead ? 'font-semibold' : 'font-medium'}
                     `}
                   >
                     {notification.title}
                   </p>
+                  {!notification.isRead && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => markAsRead(notification.id)}
+                      className="size-8 shrink-0 rounded-full"
+                    >
+                      <Check className="size-4" />
+                    </Button>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {notification.content}
