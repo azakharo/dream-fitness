@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
 import { UserRepository } from './repositories/user.repository';
 import { RegisterDto } from '@app/contracts';
+import { UserResponseDto } from '@app/contracts';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserResponseDto } from './dto/user-response.dto';
 import { User } from './entities/user.entity';
 import { UserAlreadyExistsException } from '../common/exceptions/user-already-exists.exception';
 
