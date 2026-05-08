@@ -1,5 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
 import {api} from '@/lib/api-client';
+import {scheduleKeys, trainersKeys, trainingsKeys} from '@/lib/query-keys';
 import type {
   TrainerResponseDto,
   TrainingListResponseDto,
@@ -16,7 +17,7 @@ export interface TrainingFilters {
 
 export const useTrainings = (filters?: TrainingFilters) => {
   return useQuery({
-    queryKey: ['trainings', filters],
+    queryKey: trainingsKeys.list(filters),
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filters?.type) params.set('type', filters.type);
@@ -36,7 +37,7 @@ export const useTrainings = (filters?: TrainingFilters) => {
 
 export const useTraining = (id: string) => {
   return useQuery({
-    queryKey: ['trainings', id],
+    queryKey: trainingsKeys.detail(id),
     queryFn: () => api.get<TrainingResponseDto>(`/trainings/${id}`),
     enabled: !!id,
   });
@@ -44,14 +45,14 @@ export const useTraining = (id: string) => {
 
 export const useTrainers = () => {
   return useQuery({
-    queryKey: ['trainers'],
+    queryKey: trainersKeys.list(),
     queryFn: () => api.get<TrainerResponseDto[]>('/trainers'),
   });
 };
 
 export const useSchedule = (date?: Date) => {
   return useQuery({
-    queryKey: ['schedule', date?.toISOString()],
+    queryKey: scheduleKeys.byDate(date),
     queryFn: () => {
       if (date) {
         const dateStr = date.toISOString().split('T')[0];

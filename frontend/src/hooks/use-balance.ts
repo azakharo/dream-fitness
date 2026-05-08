@@ -1,5 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {api} from '@/lib/api-client';
+import {balanceKeys, transactionsKeys} from '@/lib/query-keys';
 import type {
   BalanceResponseDto,
   TransactionListResponseDto,
@@ -14,14 +15,14 @@ export interface TransactionFilters {
 
 export const useBalance = () => {
   return useQuery({
-    queryKey: ['balance'],
+    queryKey: balanceKeys.all(),
     queryFn: () => api.get<BalanceResponseDto>('/auth/balance'),
   });
 };
 
 export const useTransactions = (filters?: TransactionFilters) => {
   return useQuery({
-    queryKey: ['transactions', filters],
+    queryKey: transactionsKeys.list(filters),
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filters?.type) params.set('type', filters.type);
@@ -46,8 +47,8 @@ export const useDeposit = () => {
     mutationFn: (data: UpdateBalanceDto) =>
       api.post<BalanceResponseDto>('/auth/balance/deposit', data),
     onSuccess: () => {
-      void queryClient.invalidateQueries({queryKey: ['balance']});
-      void queryClient.invalidateQueries({queryKey: ['transactions']});
+      void queryClient.invalidateQueries({queryKey: balanceKeys.all()});
+      void queryClient.invalidateQueries({queryKey: transactionsKeys.all()});
     },
   });
 };

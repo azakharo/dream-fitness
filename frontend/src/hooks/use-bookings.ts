@@ -1,5 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {api} from '@/lib/api-client';
+import {bookingsKeys, trainingsKeys} from '@/lib/query-keys';
 import type {
   BookingListResponseDto,
   BookingResponseDto,
@@ -19,14 +20,14 @@ export interface BookingFilters {
  */
 export const useBookings = () => {
   return useQuery({
-    queryKey: ['bookings'],
+    queryKey: bookingsKeys.list(),
     queryFn: () => api.get<BookingListResponseDto>('/bookings'),
   });
 };
 
 export const useBooking = (id: string) => {
   return useQuery({
-    queryKey: ['bookings', id],
+    queryKey: bookingsKeys.detail(id),
     queryFn: () => api.get<BookingResponseDto>(`/bookings/${id}`),
     enabled: !!id,
   });
@@ -39,8 +40,8 @@ export const useCreateBooking = () => {
     mutationFn: (data: CreateBookingDto) =>
       api.post<BookingResponseDto>('/bookings', data),
     onSuccess: () => {
-      void queryClient.invalidateQueries({queryKey: ['bookings']});
-      void queryClient.invalidateQueries({queryKey: ['trainings']});
+      void queryClient.invalidateQueries({queryKey: bookingsKeys.all()});
+      void queryClient.invalidateQueries({queryKey: trainingsKeys.all()});
     },
   });
 };
@@ -54,8 +55,8 @@ export const useCancelBooking = () => {
         reason: reason ?? '',
       }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({queryKey: ['bookings']});
-      void queryClient.invalidateQueries({queryKey: ['trainings']});
+      void queryClient.invalidateQueries({queryKey: bookingsKeys.all()});
+      void queryClient.invalidateQueries({queryKey: trainingsKeys.all()});
     },
   });
 };

@@ -1,10 +1,11 @@
 import {useQueries, useQuery} from '@tanstack/react-query';
 import {api} from '@/lib/api-client';
+import {trainingsKeys} from '@/lib/query-keys';
 import type {TrainingResponseDto} from '@/types';
 
 export const useTraining = (id: string) => {
   return useQuery({
-    queryKey: ['trainings', id],
+    queryKey: trainingsKeys.detail(id),
     queryFn: () => api.get<TrainingResponseDto>(`/trainings/${id}`),
     enabled: !!id,
   });
@@ -15,7 +16,7 @@ export const useTrainingsByIds = (ids: string[]) => {
 
   const results = useQueries({
     queries: uniqueIds.map(id => ({
-      queryKey: ['trainings', id],
+      queryKey: trainingsKeys.detail(id),
       queryFn: () => api.get<TrainingResponseDto>(`/trainings/${id}`),
       enabled: !!id,
       staleTime: 5 * 60 * 1000,

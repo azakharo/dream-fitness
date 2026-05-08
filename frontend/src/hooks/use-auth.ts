@@ -3,6 +3,7 @@ import {useNavigate} from '@tanstack/react-router';
 import {useAuthStore} from '@/stores/auth-store';
 import {api} from '@/lib/api-client';
 import {ROUTES} from '@/lib/routes';
+import {profileKeys} from '@/lib/query-keys';
 import type {
   LoginDto,
   UserProfileDto,
@@ -85,7 +86,7 @@ export const useUpdateProfile = () => {
       api.patch<UserProfileDto>('/auth/me', data),
     onSuccess: updatedUser => {
       setUser(updatedUser);
-      void queryClient.invalidateQueries({queryKey: ['profile']});
+      void queryClient.invalidateQueries({queryKey: profileKeys.all()});
     },
   });
 };
@@ -94,7 +95,7 @@ export const useProfile = () => {
   const {accessToken} = useAuthStore();
 
   return useQuery({
-    queryKey: ['profile'],
+    queryKey: profileKeys.all(),
     queryFn: () => api.get<UserProfileDto>('/auth/me'),
     enabled: !!accessToken,
   });
