@@ -492,7 +492,14 @@ OpenAPI спецификация из backend уже лежит здесь: `fro
 - [ ] Stats widgets
 - [ ] Recent activity
 
-**Schedule Management:**
+**Trainers Management (CRUD):**
+
+- [ ] Trainers table
+- [ ] Create form
+- [ ] Edit form
+- [ ] Delete trainer dialog (confirmation)
+
+**Trainings Management (CRUD):**
 
 - [ ] Trainings table
 - [ ] Create training form
