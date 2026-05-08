@@ -8,3 +8,5 @@ export { GetTrainingAvailabilityQuery } from './get-training-availability.query'
 export { GetTrainingAvailabilityHandler } from './get-training-availability.handler';
 export { GetUserWaitlistQuery } from './get-user-waitlist.query';
 export { GetUserWaitlistHandler } from './get-user-waitlist.handler';
+export { GetTrainingBookingCountQuery } from './get-training-booking-count.query';
+export { GetTrainingBookingCountHandler } from './get-training-booking-count.handler';

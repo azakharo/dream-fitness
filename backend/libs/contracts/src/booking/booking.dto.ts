@@ -153,5 +153,13 @@ export class BookingListResponseDto {
   limit: number;
 }
 
+export class TrainingBookingCountDto {
+  @ApiProperty({ example: 5 })
+  confirmedCount: number;
+
+  @ApiProperty({ example: 2 })
+  waitlistCount: number;
+}
+
 // Re-export WaitlistResponseDto from waitlist.dto.ts for backward compatibility
 export { WaitlistResponseDto } from './waitlist.dto';

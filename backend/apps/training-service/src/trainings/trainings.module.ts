@@ -6,9 +6,15 @@ import { TrainingsService } from './trainings.service';
 import { TrainingsController } from './trainings.controller';
 import { TrainersModule } from '../trainers/trainers.module';
 import { EventsModule } from '../events/events.module';
+import { ClientsModule } from '../clients/clients.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Training]), TrainersModule, EventsModule],
+  imports: [
+    TypeOrmModule.forFeature([Training]),
+    TrainersModule,
+    EventsModule,
+    ClientsModule,
+  ],
   providers: [TrainingsService, TrainingRepository],
   controllers: [TrainingsController],
   exports: [TrainingsService, TrainingRepository],

@@ -29,6 +29,7 @@ import {
   BookingDto,
   WaitlistResponseDto,
   WaitlistDto,
+  TrainingBookingCountDto,
 } from '@app/contracts/booking';
 
 const BOOKING_SERVICE_URL = 'BOOKING_SERVICE_URL';
@@ -178,6 +179,29 @@ export class BookingProxyController {
       req,
       null,
       `/waitlist/position?trainingId=${trainingId}`,
+      'GET',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
+  }
+
+  @Get('bookings/training/:trainingId/count')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Booking count for training retrieved',
+    type: TrainingBookingCountDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getTrainingBookingCount(
+    @Req() req: RequestWithUser,
+    @Param('trainingId') trainingId: string,
+  ) {
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/bookings/training/${trainingId}/count`,
       'GET',
       BOOKING_SERVICE_URL,
       BOOKING_SERVICE_DEFAULT_URL,

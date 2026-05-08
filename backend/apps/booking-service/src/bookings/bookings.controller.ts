@@ -22,6 +22,7 @@ import {
   BookingResponseDto,
   BookingListResponseDto,
   WaitlistResponseDto,
+  TrainingBookingCountDto,
 } from '@app/contracts/booking';
 import { BookingFilterDto } from './dto/booking-filter.dto';
 import { CreateBookingDto, CancelBookingDto } from '@app/contracts/booking';
@@ -30,6 +31,7 @@ import {
   GetUserBookingsQuery,
   GetBookingByIdQuery,
   GetUserWaitlistQuery,
+  GetTrainingBookingCountQuery,
 } from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
 import { Booking } from './entities/booking.entity';
@@ -97,6 +99,26 @@ export class BookingsController {
     return this.queryBus.execute<GetUserWaitlistQuery, WaitlistResponseDto[]>(
       new GetUserWaitlistQuery(user.id),
     );
+  }
+
+  @Get('training/:trainingId/count')
+  @ApiOperation({ summary: 'Get booking count for a training' })
+  @ApiOkResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        confirmedCount: { type: 'number' },
+        waitlistCount: { type: 'number' },
+      },
+    },
+  })
+  async getTrainingBookingCount(
+    @Param('trainingId') trainingId: string,
+  ): Promise<TrainingBookingCountDto> {
+    return this.queryBus.execute<
+      GetTrainingBookingCountQuery,
+      TrainingBookingCountDto
+    >(new GetTrainingBookingCountQuery(trainingId));
   }
 
   @Get(':id')
