@@ -340,7 +340,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/waitlist/{trainingId}': {
+  '/api/waitlist/position': {
     parameters: {
       query?: never;
       header?: never;
@@ -348,6 +348,22 @@ export interface paths {
       cookie?: never;
     };
     get: operations['BookingProxyController_getWaitlistPosition'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/bookings/training/{trainingId}/count': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['BookingProxyController_getTrainingBookingCount'];
     put?: never;
     post?: never;
     delete?: never;
@@ -744,6 +760,12 @@ export interface components {
       position: number;
       /** Format: date-time */
       joinedAt: string;
+    };
+    TrainingBookingCountDto: {
+      /** @example 5 */
+      confirmedCount: number;
+      /** @example 2 */
+      waitlistCount: number;
     };
     JoinWaitlistDto: {
       /** @example 550e8400-e29b-41d4-a716-446655440000 */
@@ -1936,9 +1958,7 @@ export interface operations {
   };
   BookingProxyController_leaveWaitlist: {
     parameters: {
-      query: {
-        trainingId: string;
-      };
+      query?: never;
       header?: never;
       path?: never;
       cookie?: never;
@@ -1977,14 +1997,12 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        trainingId: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Waitlist position retrieved */
+      /** @description Waitlist position retrieved. Position -1 indicates user is not on the waitlist. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -2000,8 +2018,30 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not on waitlist */
-      404: {
+    };
+  };
+  BookingProxyController_getTrainingBookingCount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        trainingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Booking count for training retrieved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TrainingBookingCountDto'];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
         headers: {
           [name: string]: unknown;
         };

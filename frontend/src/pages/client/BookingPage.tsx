@@ -25,7 +25,7 @@ export const BookingPage: React.FC = () => {
   );
   const isAlreadyBooked = confirmedBooking != null;
 
-  const isInWaitlist = waitlistData != null;
+  const isInWaitlist = waitlistData != null && waitlistData.position !== -1;
   const waitlistPosition = waitlistData?.position;
 
   const userBalance = balanceData?.balance ?? 0;

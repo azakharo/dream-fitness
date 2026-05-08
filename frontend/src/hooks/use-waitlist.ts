@@ -13,7 +13,10 @@ export const useWaitlist = () => {
 export const useWaitlistPosition = (trainingId: string) => {
   return useQuery({
     queryKey: waitlistKeys.detail(trainingId),
-    queryFn: () => api.get<WaitlistResponseDto>(`/waitlist/${trainingId}`),
+    queryFn: () =>
+      api.get<WaitlistResponseDto>(
+        `/waitlist/position?trainingId=${trainingId}`,
+      ),
     enabled: !!trainingId,
   });
 };
@@ -35,7 +38,7 @@ export const useLeaveWaitlist = () => {
 
   return useMutation({
     mutationFn: (trainingId: string) =>
-      api.delete<WaitlistResponseDto>(`/waitlist/${trainingId}`),
+      api.delete<WaitlistResponseDto>(`/waitlist?trainingId=${trainingId}`),
     onSuccess: () => {
       void queryClient.invalidateQueries({queryKey: waitlistKeys.all()});
     },

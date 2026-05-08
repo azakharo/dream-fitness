@@ -94,7 +94,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         headers2,
       );
 
-      expect(waitlistPosition.status).toBe(404);
+      expect(waitlistPosition.status).toBe(200);
+      expect(waitlistPosition.body.position).toBe(-1);
     });
 
     it('should promote multiple users from waitlist when booking is cancelled', async () => {
@@ -132,7 +133,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         headers2,
       );
 
-      expect(waitlistPosition2.status).toBe(404);
+      expect(waitlistPosition2.status).toBe(200);
+      expect(waitlistPosition2.body.position).toBe(-1);
 
       const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
@@ -184,21 +186,24 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         headers1,
       );
 
-      expect(waitlistPosition1.status).toBe(404);
+      expect(waitlistPosition1.status).toBe(200);
+      expect(waitlistPosition1.body.position).toBe(-1);
 
       const waitlistPosition2 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
         headers2,
       );
 
-      expect(waitlistPosition2.status).toBe(404);
+      expect(waitlistPosition2.status).toBe(200);
+      expect(waitlistPosition2.body.position).toBe(-1);
 
       const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
         headers3,
       );
 
-      expect(waitlistPosition3.status).toBe(404);
+      expect(waitlistPosition3.status).toBe(200);
+      expect(waitlistPosition3.body.position).toBe(-1);
 
       const waitlistPosition4 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,
@@ -245,7 +250,8 @@ describe('Waitlist Promotion Saga (e2e)', () => {
         headers2,
       );
 
-      expect(waitlistPosition2.status).toBe(404);
+      expect(waitlistPosition2.status).toBe(200);
+      expect(waitlistPosition2.body.position).toBe(-1);
 
       const waitlistPosition3 = await waitlistHelper.getWaitlistPosition(
         TEST_TRAINING.id,

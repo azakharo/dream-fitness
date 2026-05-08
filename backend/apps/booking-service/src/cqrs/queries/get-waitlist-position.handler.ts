@@ -2,7 +2,6 @@ import { QueryHandler } from '@nestjs/cqrs';
 import { IQueryHandler } from '@nestjs/cqrs';
 import { WaitlistRepository } from '../../waitlist/repositories/waitlist.repository';
 import { GetWaitlistPositionQuery } from './get-waitlist-position.query';
-import { NotOnWaitlistException } from '../../common/exceptions';
 import { WaitlistPositionResponseDto } from '../../waitlist/dto/waitlist-position-response.dto';
 
 @QueryHandler(GetWaitlistPositionQuery)
@@ -19,11 +18,15 @@ export class GetWaitlistPositionHandler implements IQueryHandler<GetWaitlistPosi
       trainingId,
     );
 
+    const response = new WaitlistPositionResponseDto();
+
     if (!positionResult) {
-      throw new NotOnWaitlistException(userId, trainingId);
+      response.position = -1;
+      response.totalInQueue = 0;
+      response.waitlistId = '';
+      return response;
     }
 
-    const response = new WaitlistPositionResponseDto();
     response.position = positionResult.position;
     response.totalInQueue = positionResult.totalInQueue;
     response.waitlistId = positionResult.waitlistId;

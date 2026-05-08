@@ -168,11 +168,11 @@ export class BookingProxyController {
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
-    description: 'Waitlist position retrieved',
+    description:
+      'Waitlist position retrieved. Position -1 indicates user is not on the waitlist.',
     type: WaitlistDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Not on waitlist' })
   getWaitlistPosition(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,

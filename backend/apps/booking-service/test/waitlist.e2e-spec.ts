@@ -111,7 +111,7 @@ describe('Waitlist API (e2e)', () => {
       expect(response.body.position).toBeGreaterThanOrEqual(1);
     });
 
-    it('should return 404 when not on waitlist', async () => {
+    it('should return position -1 when not on waitlist', async () => {
       const headers = authHelper.getUserHeaders(TEST_USERS.user1.id);
 
       const response = await waitlistHelper.getWaitlistPosition(
@@ -119,7 +119,10 @@ describe('Waitlist API (e2e)', () => {
         headers,
       );
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(200);
+      expect(response.body.position).toBe(-1);
+      expect(response.body.totalInQueue).toBe(0);
+      expect(response.body.waitlistId).toBe('');
     });
   });
 
