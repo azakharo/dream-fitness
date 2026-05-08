@@ -25,6 +25,10 @@ export class BookingClientService {
 
       const response = await firstValueFrom(
         this.httpService.get<TrainingBookingCountDto>(url, {
+          headers: {
+            'X-User-Id': '00000000-0000-4000-8000-000000000001',
+            'X-User-Role': 'system',
+          },
           timeout: 5000,
         }),
       );
