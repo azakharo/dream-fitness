@@ -4,6 +4,8 @@ import {api} from '@/lib/api-client';
 import {notificationsKeys} from '@/lib/query-keys';
 import type {NotificationListResponseDto} from '@/types';
 
+const refetchInterval = import.meta.env.DEV ? 60000 : 10000;
+
 export const useNotifications = (limit?: number) => {
   const {accessToken} = useAuthStore();
 
@@ -16,7 +18,7 @@ export const useNotifications = (limit?: number) => {
       return api.get<NotificationListResponseDto>(endpoint);
     },
     enabled: !!accessToken,
-    refetchInterval: 10000,
+    refetchInterval,
   });
 };
 
@@ -27,7 +29,7 @@ export const useUnreadCount = () => {
     queryKey: notificationsKeys.unreadCount(),
     queryFn: () => api.get<{count: number}>('/notifications/unread-count'),
     enabled: !!accessToken,
-    refetchInterval: 10000,
+    refetchInterval,
   });
 };
 

@@ -237,11 +237,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                           {training.title}
                         </div>
                         {training.trainerName && (
-                          <div
-                            className="
-                              truncate text-xs text-muted-foreground
-                            "
-                          >
+                          <div className="truncate text-xs text-muted-foreground">
                             {training.trainerName}
                           </div>
                         )}
