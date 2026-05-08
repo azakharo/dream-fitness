@@ -1,6 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {api} from '@/lib/api-client';
-import {bookingsKeys, trainingsKeys} from '@/lib/query-keys';
+import {balanceKeys, bookingsKeys, trainingsKeys} from '@/lib/query-keys';
 import type {
   BookingListResponseDto,
   BookingResponseDto,
@@ -42,6 +42,7 @@ export const useCreateBooking = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({queryKey: bookingsKeys.all()});
       void queryClient.invalidateQueries({queryKey: trainingsKeys.all()});
+      void queryClient.invalidateQueries({queryKey: balanceKeys.all()});
     },
   });
 };
@@ -57,6 +58,7 @@ export const useCancelBooking = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({queryKey: bookingsKeys.all()});
       void queryClient.invalidateQueries({queryKey: trainingsKeys.all()});
+      void queryClient.invalidateQueries({queryKey: balanceKeys.all()});
     },
   });
 };
