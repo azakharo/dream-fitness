@@ -18,6 +18,10 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as ClientScheduleRouteImport } from './routes/_client.schedule'
+import { Route as ClientProfileRouteImport } from './routes/_client.profile'
+import { Route as ClientNotificationsRouteImport } from './routes/_client.notifications'
+import { Route as ClientHistoryRouteImport } from './routes/_client.history'
 import { Route as ClientDashboardRouteImport } from './routes/_client.dashboard'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
@@ -67,6 +71,26 @@ const AdminReportsRoute = AdminReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
+const ClientScheduleRoute = ClientScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => ClientRoute,
+} as any)
+const ClientProfileRoute = ClientProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ClientRoute,
+} as any)
+const ClientNotificationsRoute = ClientNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => ClientRoute,
+} as any)
+const ClientHistoryRoute = ClientHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => ClientRoute,
+} as any)
 const ClientDashboardRoute = ClientDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -100,6 +124,10 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ClientDashboardRoute
+  '/history': typeof ClientHistoryRoute
+  '/notifications': typeof ClientNotificationsRoute
+  '/profile': typeof ClientProfileRoute
+  '/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
@@ -113,6 +141,10 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/dashboard': typeof ClientDashboardRoute
+  '/history': typeof ClientHistoryRoute
+  '/notifications': typeof ClientNotificationsRoute
+  '/profile': typeof ClientProfileRoute
+  '/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
@@ -130,6 +162,10 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_client/dashboard': typeof ClientDashboardRoute
+  '/_client/history': typeof ClientHistoryRoute
+  '/_client/notifications': typeof ClientNotificationsRoute
+  '/_client/profile': typeof ClientProfileRoute
+  '/_client/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
@@ -146,6 +182,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/history'
+    | '/notifications'
+    | '/profile'
+    | '/schedule'
     | '/admin/reports'
     | '/admin/schedule'
     | '/admin/users'
@@ -159,6 +199,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard'
+    | '/history'
+    | '/notifications'
+    | '/profile'
+    | '/schedule'
     | '/admin/reports'
     | '/admin/schedule'
     | '/admin/users'
@@ -175,6 +219,10 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_client/dashboard'
+    | '/_client/history'
+    | '/_client/notifications'
+    | '/_client/profile'
+    | '/_client/schedule'
     | '/admin/reports'
     | '/admin/schedule'
     | '/admin/users'
@@ -256,6 +304,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_client/schedule': {
+      id: '/_client/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof ClientScheduleRouteImport
+      parentRoute: typeof ClientRoute
+    }
+    '/_client/profile': {
+      id: '/_client/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ClientProfileRouteImport
+      parentRoute: typeof ClientRoute
+    }
+    '/_client/notifications': {
+      id: '/_client/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof ClientNotificationsRouteImport
+      parentRoute: typeof ClientRoute
+    }
+    '/_client/history': {
+      id: '/_client/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof ClientHistoryRouteImport
+      parentRoute: typeof ClientRoute
+    }
     '/_client/dashboard': {
       id: '/_client/dashboard'
       path: '/dashboard'
@@ -308,11 +384,19 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ClientRouteChildren {
   ClientDashboardRoute: typeof ClientDashboardRoute
+  ClientHistoryRoute: typeof ClientHistoryRoute
+  ClientNotificationsRoute: typeof ClientNotificationsRoute
+  ClientProfileRoute: typeof ClientProfileRoute
+  ClientScheduleRoute: typeof ClientScheduleRoute
   ClientBookingIdRoute: typeof ClientBookingIdRoute
 }
 
 const ClientRouteChildren: ClientRouteChildren = {
   ClientDashboardRoute: ClientDashboardRoute,
+  ClientHistoryRoute: ClientHistoryRoute,
+  ClientNotificationsRoute: ClientNotificationsRoute,
+  ClientProfileRoute: ClientProfileRoute,
+  ClientScheduleRoute: ClientScheduleRoute,
   ClientBookingIdRoute: ClientBookingIdRoute,
 }
 

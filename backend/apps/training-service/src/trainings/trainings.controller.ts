@@ -22,7 +22,7 @@ import { InternalGuard } from '@app/shared';
 import { TrainingsService } from './trainings.service';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UpdateTrainingDto } from './dto/update-training.dto';
-import { TrainingResponseDto } from '@app/contracts';
+import { TrainingListResponseDto, TrainingResponseDto } from '@app/contracts';
 import { TrainingFilterDto } from './dto/training-filter.dto';
 
 @ApiTags('trainings')
@@ -48,7 +48,7 @@ export class TrainingsController {
   @ApiOkResponse({ type: [TrainingResponseDto] })
   async findAll(
     @Query() filterDto: TrainingFilterDto,
-  ): Promise<{ data: TrainingResponseDto[]; total: number }> {
+  ): Promise<TrainingListResponseDto> {
     return this.trainingsService.findAll(filterDto);
   }
 

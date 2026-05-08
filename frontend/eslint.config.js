@@ -41,6 +41,12 @@ export default defineConfig([
         'warn',
         {allowConstantExport: true},
       ],
+      'better-tailwindcss/enforce-consistent-line-wrapping': [
+        'error',
+        {
+          strictness: 'loose',
+        },
+      ],
     },
     settings: {
       'better-tailwindcss': {

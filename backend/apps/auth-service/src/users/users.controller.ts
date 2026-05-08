@@ -13,8 +13,8 @@ import { ApiTags, ApiOperation, ApiOkResponse, ApiBody } from '@nestjs/swagger';
 import { InternalUser } from '@app/shared';
 import { InternalGuard } from '@app/shared';
 import { UsersService } from './users.service';
+import { UserResponseDto } from '@app/contracts';
 import { BalanceResponseDto } from './dto/balance-response.dto';
-import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 interface AuthUser {

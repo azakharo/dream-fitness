@@ -19,18 +19,18 @@ import { HealthModule } from './health/health.module';
       throttlers: [
         {
           name: 'short',
-          ttl: 1000, // 1 second
-          limit: 3, // 3 requests per second
+          ttl: 1000, // ms
+          limit: 30, // requests
         },
         {
           name: 'medium',
-          ttl: 10000, // 10 seconds
-          limit: 20, // 20 requests per 10 seconds
+          ttl: 10000,
+          limit: 200,
         },
         {
           name: 'long',
-          ttl: 60000, // 1 minute
-          limit: 100, // 100 requests per minute
+          ttl: 60000,
+          limit: 1000,
         },
       ],
     }),

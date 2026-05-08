@@ -2,7 +2,7 @@ import request from 'supertest';
 import { Response } from 'supertest';
 import { CreateTrainingDto } from '../../src/trainings/dto/create-training.dto';
 import { UpdateTrainingDto } from '../../src/trainings/dto/update-training.dto';
-import { TrainingResponseDto } from '@app/contracts';
+import { TrainingListResponseDto, TrainingResponseDto } from '@app/contracts';
 
 export type TestResponse<T> = Omit<Response, 'body'> & {
   body: T;
@@ -32,15 +32,12 @@ export class TrainingsHelper {
       page?: number;
       limit?: number;
     },
-  ): Promise<TestResponse<{ data: TrainingResponseDto[]; total: number }>> {
+  ): Promise<TestResponse<TrainingListResponseDto>> {
     const response = await this.request
       .get('/trainings')
       .set(headers)
       .query(query || {});
-    return response as unknown as TestResponse<{
-      data: TrainingResponseDto[];
-      total: number;
-    }>;
+    return response as unknown as TestResponse<TrainingListResponseDto>;
   }
 
   async findById(

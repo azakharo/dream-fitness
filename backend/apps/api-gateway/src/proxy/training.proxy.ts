@@ -27,10 +27,13 @@ import {
   UpdateTrainerDto,
   CreateTrainingDto,
   UpdateTrainingDto,
-  TrainerListResponseDto,
   TrainerResponseDto,
   TrainingListResponseDto,
   TrainingResponseDto,
+} from '@app/contracts/training';
+import {
+  WeekScheduleResponseDto,
+  TrainerScheduleResponseDto,
 } from '@app/contracts/training';
 
 const TRAINING_SERVICE_URL = 'TRAINING_SERVICE_URL';
@@ -48,7 +51,7 @@ export class TrainingProxyController {
   @ApiResponse({
     status: 200,
     description: 'Trainers retrieved',
-    type: TrainerListResponseDto,
+    type: [TrainerResponseDto],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getTrainers(@Req() req: RequestWithUser) {
@@ -140,11 +143,7 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiResponse({
-    status: 200,
-    description: 'Trainer deleted',
-    schema: { type: 'object', properties: { deleted: { type: 'boolean' } } },
-  })
+  @ApiResponse({ status: 200, description: 'Trainer deactivated' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Trainer not found' })
@@ -258,11 +257,7 @@ export class TrainingProxyController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
-  @ApiResponse({
-    status: 200,
-    description: 'Training deleted',
-    schema: { type: 'object', properties: { deleted: { type: 'boolean' } } },
-  })
+  @ApiResponse({ status: 200, description: 'Training cancelled' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin only' })
   @ApiResponse({ status: 404, description: 'Training not found' })
@@ -283,35 +278,38 @@ export class TrainingProxyController {
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
-    description: 'Schedule retrieved',
-    type: TrainingListResponseDto,
+    description: 'Weekly schedule retrieved',
+    type: WeekScheduleResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getSchedule(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
       null,
-      '/schedule',
+      '/schedule/week',
       'GET',
       TRAINING_SERVICE_URL,
       TRAINING_SERVICE_DEFAULT_URL,
     );
   }
 
-  @Get('schedule/:date')
+  @Get('schedule/trainer/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
-    description: 'Schedule for date retrieved',
-    type: TrainingListResponseDto,
+    description: 'Trainer schedule retrieved',
+    type: TrainerScheduleResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getScheduleByDate(@Req() req: RequestWithUser, @Param('date') date: string) {
+  getTrainerSchedule(
+    @Req() req: RequestWithUser,
+    @Param('id') trainerId: string,
+  ) {
     return this.proxyService.proxyRequest(
       req,
       null,
-      `/schedule/${date}`,
+      `/schedule/trainer/${trainerId}`,
       'GET',
       TRAINING_SERVICE_URL,
       TRAINING_SERVICE_DEFAULT_URL,

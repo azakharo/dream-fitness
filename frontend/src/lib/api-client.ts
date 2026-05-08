@@ -119,5 +119,8 @@ export const api = {
   put: <T>(endpoint: string, body?: unknown) =>
     kyInstance.put(endpoint, {json: transformDatesInBody(body)}).json<T>(),
 
+  patch: <T>(endpoint: string, body?: unknown) =>
+    kyInstance.patch(endpoint, {json: transformDatesInBody(body)}).json<T>(),
+
   delete: <T>(endpoint: string) => kyInstance.delete(endpoint).json<T>(),
 };

@@ -1,6 +1,6 @@
 import * as request from 'supertest';
 import { TestResponse } from './auth.helper';
-import { UserResponseDto } from '../../src/users/dto/user-response.dto';
+import { UserResponseDto } from '@app/contracts';
 import { UpdateUserDto } from '../../src/users/dto/update-user.dto';
 import { BalanceResponseDto } from '../../src/users/dto/balance-response.dto';
 

@@ -391,7 +391,15 @@ http GET http://localhost:3003/bookings --session=user2
 http GET http://localhost:3003/waitlist/position?trainingId="<TRAINING_ID_1>" --session=user2
 ```
 
-**Ожидаемый результат:** 404 Not Found — `NotOnWaitlistException` (пользователь больше не в очереди).
+**Ожидаемый результат:** 200 OK (position=-1 означает, что пользователь не в очереди).
+
+```json
+{
+  "position": -1,
+  "totalInQueue": 0,
+  "waitlistId": ""
+}
+```
 
 ---
 

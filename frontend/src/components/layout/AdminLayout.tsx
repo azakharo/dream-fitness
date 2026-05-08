@@ -9,7 +9,7 @@ export const AdminLayout: React.FC = () => {
 
       <div className="md:pl-64">
         <Header />
-        <main className="container py-6">
+        <main className="container px-4 py-6">
           <Outlet />
         </main>
       </div>

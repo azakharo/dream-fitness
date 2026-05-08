@@ -15,6 +15,7 @@ import {
   ApiOkResponse,
   ApiCreatedResponse,
   ApiBody,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { CurrentUser, InternalGuard } from '@app/shared';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -23,7 +24,10 @@ import { WaitlistQueryDto } from './dto';
 import { WaitlistPositionResponseDto } from './dto/waitlist-position-response.dto';
 import { JoinWaitlistDto } from '@app/contracts/booking';
 import { JoinWaitlistCommand, LeaveWaitlistCommand } from '../cqrs/commands';
-import { GetWaitlistPositionQuery } from '../cqrs/queries';
+import {
+  GetWaitlistPositionQuery,
+  GetUserWaitlistQuery,
+} from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
 
 @ApiTags('Waitlist')
@@ -34,6 +38,22 @@ export class WaitlistController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get user waitlist entries' })
+  @ApiResponse({
+    status: 200,
+    description: 'Waitlist retrieved',
+    type: WaitlistResponseDto,
+    isArray: true,
+  })
+  async getWaitlist(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<WaitlistResponseDto[]> {
+    return this.queryBus.execute<GetUserWaitlistQuery, WaitlistResponseDto[]>(
+      new GetUserWaitlistQuery(user.id),
+    );
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

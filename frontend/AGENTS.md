@@ -85,8 +85,26 @@ frontend/
 
 ## Правила по работе с кодом
 
-- Если во время выполнения задачи изменялись TypeScript или JavaScript файлы исходного кода, то после выполнения задачи (в самом конце), нужно проверить, нет ли ошибок TypeScript (`npm run ts`) и других принятых правил кодирования (`npm run lint`). Обнаруженные проблемы необходимо исправить.
+- Если во время выполнения задачи изменялись TypeScript или JavaScript файлы исходного кода, то после выполнения задачи (в самом конце), нужно проверить, нет ли ошибок TypeScript (`npm run ts`) или нарушения других принятых правил кодирования (`npm run lint`). Обнаруженные проблемы необходимо исправить.
 - Если во время выполнения задачи изменился backend API, нужно напомнить пользователю выполнить авто-генерацию типов данных: `npm run gen:types`.
 - Файл `src/types/api.generated.ts` автогенерируется и НЕ должен редактироваться вручную.
 - The Date → string and similar conversions should happen in the API client layer, keeping backend-specific formatting out of UI components. This follows the principle that UI should work with native types while the API layer handles serialization.
 - Все файлы React компонентов (pages, components и т.д.) именуются в **PascalCase**, идентично названию экспортируемого компонента.
+
+## Правила работы с датой и временем
+
+Все операции с датой и временем должны выполняться через функции из [`src/lib/date-utils.ts`](src/lib/date-utils.ts). Используется библиотека `date-fns` с русской локализацией.
+
+### Основные принципы
+
+1. **Использовать тип Date внутри UI**: Компоненты должны работать с нативными объектами `Date`, а не со строками.
+2. **Конвертация на границе API**: Преобразование `Date ↔ string` происходит только в слое API клиента.
+3. **Единая точка входа**: Все форматирование и манипуляции с датами — через `date-utils.ts`.
+
+### Константы форматов
+
+Форматы определены в [`src/lib/constants.ts`](src/lib/constants.ts):
+
+- `DATE_FORMAT = 'dd.MM.yyyy'`
+- `TIME_FORMAT = 'HH:mm'`
+- `DATETIME_FORMAT = 'dd.MM.yyyy HH:mm'`

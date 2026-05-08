@@ -13,6 +13,8 @@ import { GetUserBookingsHandler } from './queries';
 import { GetBookingByIdHandler } from './queries';
 import { GetWaitlistPositionHandler } from './queries';
 import { GetTrainingAvailabilityHandler } from './queries';
+import { GetUserWaitlistHandler } from './queries';
+import { GetTrainingBookingCountHandler } from './queries';
 import { BookingSaga } from './sagas';
 import { CancellationSaga } from './sagas';
 import { WaitlistPromotionSaga } from './sagas';
@@ -35,6 +37,8 @@ import { WaitlistPromotionSaga } from './sagas';
     GetBookingByIdHandler,
     GetWaitlistPositionHandler,
     GetTrainingAvailabilityHandler,
+    GetUserWaitlistHandler,
+    GetTrainingBookingCountHandler,
     BookingSaga,
     CancellationSaga,
     WaitlistPromotionSaga,

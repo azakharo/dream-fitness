@@ -74,27 +74,6 @@ export class NotificationProxyController {
     );
   }
 
-  @Get('notifications/:id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiResponse({
-    status: 200,
-    description: 'Notification retrieved',
-    type: NotificationDto,
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Notification not found' })
-  getNotificationById(@Req() req: RequestWithUser, @Param('id') id: string) {
-    return this.proxyService.proxyRequest(
-      req,
-      null,
-      `/notifications/${id}`,
-      'GET',
-      NOTIFICATION_SERVICE_URL,
-      NOTIFICATION_SERVICE_DEFAULT_URL,
-    );
-  }
-
   @Patch('notifications/:id/read')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -1,6 +1,10 @@
 import {Link} from '@tanstack/react-router';
-import {Bell} from 'lucide-react';
-import {useNotifications, useUnreadCount} from '@/hooks/use-notifications';
+import {Bell, Check} from 'lucide-react';
+import {
+  useNotifications,
+  useUnreadCount,
+  useMarkAsRead,
+} from '@/hooks/use-notifications';
 import {useUIStore} from '@/stores/ui-store';
 import {Button} from '@/components/ui/Button';
 import {Badge} from '@/components/ui/Badge';
@@ -9,8 +13,10 @@ import {ROUTES} from '@/lib/routes';
 
 export const NotificationsBell: React.FC = () => {
   const {data: unreadData} = useUnreadCount();
-  const {data: notifications} = useNotifications(5);
+  const {data: notificationData} = useNotifications(5);
   const {notificationsOpen, setNotificationsOpen} = useUIStore();
+  const notifications = notificationData?.items ?? [];
+  const {mutate: markAsRead} = useMarkAsRead();
 
   const unreadCount = unreadData?.count ?? 0;
 
@@ -43,12 +49,35 @@ export const NotificationsBell: React.FC = () => {
             notifications?.map(notification => (
               <div
                 key={notification.id}
-                className="
-                  border-b py-2
+                className={`
+                  rounded-sm border-b px-3 py-2
                   last:border-b-0
-                "
+                  ${!notification.isRead ? 'bg-blue-50/50' : ''}
+                `}
               >
-                <p className="text-sm font-medium">{notification.title}</p>
+                <div className="flex items-center gap-2">
+                  {!notification.isRead && (
+                    <span className="size-2 shrink-0 rounded-full bg-blue-500" />
+                  )}
+                  <p
+                    className={`
+                      flex-1 text-sm
+                      ${!notification.isRead ? 'font-semibold' : 'font-medium'}
+                    `}
+                  >
+                    {notification.title}
+                  </p>
+                  {!notification.isRead && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => markAsRead(notification.id)}
+                      className="size-8 shrink-0 rounded-full"
+                    >
+                      <Check className="size-4" />
+                    </Button>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {notification.content}
                 </p>

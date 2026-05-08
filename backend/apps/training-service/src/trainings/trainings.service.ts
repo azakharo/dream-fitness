@@ -3,7 +3,7 @@ import { DeepPartial } from 'typeorm';
 import { TrainingRepository } from './repositories/training.repository';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UpdateTrainingDto } from './dto/update-training.dto';
-import { TrainingResponseDto } from '@app/contracts';
+import { TrainingListResponseDto, TrainingResponseDto } from '@app/contracts';
 import { Training } from './entities/training.entity';
 import { TrainersService } from '../trainers/trainers.service';
 import { TrainerNotFoundException } from '../common/exceptions/trainer-not-found.exception';
@@ -14,6 +14,7 @@ import { ScheduleConflictException } from '../common/exceptions/schedule-conflic
 import { PastDateException } from '../common/exceptions/past-date.exception';
 import { EventsPublisher } from '../events/events.publisher';
 import { TrainingStatus } from '@app/shared';
+import { BookingClientService } from '../clients/booking-client.service';
 
 @Injectable()
 export class TrainingsService {
@@ -21,12 +22,23 @@ export class TrainingsService {
     private readonly trainingRepository: TrainingRepository,
     private readonly trainersService: TrainersService,
     private readonly eventsPublisher: EventsPublisher,
+    private readonly bookingClientService: BookingClientService,
   ) {}
 
   private async toResponseDto(
     training: Training,
   ): Promise<TrainingResponseDto> {
     const trainer = await this.trainersService.findById(training.trainerId);
+    let currentParticipants = 0;
+    try {
+      const bookingCount = await this.bookingClientService.getBookingCount(
+        training.id,
+      );
+      currentParticipants = bookingCount.confirmedCount;
+    } catch {
+      // If booking service is unavailable, use 0
+    }
+    const availableSlots = Math.max(0, training.capacity - currentParticipants);
     return {
       id: training.id,
       trainerId: training.trainerId,
@@ -37,8 +49,8 @@ export class TrainingsService {
       scheduledAt: training.scheduledAt.toISOString(),
       durationMinutes: training.durationMinutes,
       capacity: training.capacity,
-      currentParticipants: 0,
-      availableSlots: training.capacity,
+      currentParticipants,
+      availableSlots,
       price: training.price,
       status: training.status,
       createdAt: training.createdAt.toISOString(),
@@ -187,14 +199,14 @@ export class TrainingsService {
     dateTo?: string;
     page?: number;
     limit?: number;
-  }): Promise<{ data: TrainingResponseDto[]; total: number }> {
+  }): Promise<TrainingListResponseDto> {
     const { data, total } =
       await this.trainingRepository.findWithFilters(filterDto);
     return {
-      data: await Promise.all(
+      items: await Promise.all(
         data.map((training) => this.toResponseDto(training)),
       ),
-      total,
+      count: total,
     };
   }
 
@@ -210,9 +222,15 @@ export class TrainingsService {
       throw new TrainingNotFoundException(id);
     }
 
-    const currentParticipants = 0;
-    const availableSlots = training.capacity;
-    const isAvailable = true;
+    let currentParticipants = 0;
+    try {
+      const bookingCount = await this.bookingClientService.getBookingCount(id);
+      currentParticipants = bookingCount.confirmedCount;
+    } catch {
+      // If booking service is unavailable, use 0
+    }
+    const availableSlots = Math.max(0, training.capacity - currentParticipants);
+    const isAvailable = availableSlots > 0;
 
     return {
       trainingId: training.id,

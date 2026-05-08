@@ -77,4 +77,11 @@ export class WaitlistRepository extends Repository<Waitlist> {
       order: { createdAt: 'ASC' },
     });
   }
+
+  async findByUserId(userId: string): Promise<Waitlist[]> {
+    return this.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+  }
 }
