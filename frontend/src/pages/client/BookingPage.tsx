@@ -78,6 +78,7 @@ export const BookingPage: React.FC = () => {
             totalCapacity={training.capacity}
             price={training.price}
             userBalance={userBalance}
+            isAlreadyBooked={isAlreadyBooked}
           />
           <BookingActions
             trainingId={id}

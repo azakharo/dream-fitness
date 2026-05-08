@@ -5,6 +5,7 @@ interface AvailabilityStatusProps {
   totalCapacity: number;
   price: number;
   userBalance: number;
+  isAlreadyBooked: boolean;
 }
 
 const formatNumber = (num: number) => num.toLocaleString('ru-RU');
@@ -14,6 +15,7 @@ export const AvailabilityStatus: React.FC<AvailabilityStatusProps> = ({
   totalCapacity,
   price,
   userBalance,
+  isAlreadyBooked,
 }) => {
   const fillPercentage =
     totalCapacity > 0 ? (availableSpots / totalCapacity) * 100 : 0;
@@ -65,18 +67,20 @@ export const AvailabilityStatus: React.FC<AvailabilityStatusProps> = ({
               {formatNumber(userBalance)} баллов
             </span>
           </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Статус баланса:</span>
-            {hasEnoughBalance ? (
-              <span className="flex items-center gap-1 font-medium text-green-600">
-                ✓ Достаточно
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 font-medium text-red-600">
-                ✗ Недостаточно
-              </span>
-            )}
-          </div>
+          {!isAlreadyBooked && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Статус баланса:</span>
+              {hasEnoughBalance ? (
+                <span className="flex items-center gap-1 font-medium text-green-600">
+                  ✓ Достаточно
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 font-medium text-red-600">
+                  ✗ Недостаточно
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
