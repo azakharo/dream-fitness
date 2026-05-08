@@ -218,7 +218,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                         to="/booking/$id"
                         params={{id: training.id}}
                         className={`
-                          block rounded-md p-2 text-xs transition-all
+                          block rounded-md p-2 text-sm transition-all
                           hover:ring-2 hover:ring-primary/20
                           ${
                             isFull
@@ -239,28 +239,28 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                         {training.trainerName && (
                           <div
                             className="
-                              truncate text-[10px] text-muted-foreground
+                              truncate text-xs text-muted-foreground
                             "
                           >
                             {training.trainerName}
                           </div>
                         )}
                         {isBooked && (
-                          <div className="text-[10px] font-medium text-primary">
+                          <div className="text-xs font-medium text-primary">
                             Вы записаны
                           </div>
                         )}
                         {!isBooked && waitlistPosition !== undefined &&
                           // prettier-ignore
                           <div
-                            className="text-[10px] font-medium text-orange-600"
+                            className="text-xs font-medium text-orange-600"
                           >
                             {`Лист ожидания: позиция ${waitlistPosition}`}
                           </div>}
                         {!isBooked && waitlistPosition === undefined && (
                           <div
                             className={`
-                              text-[10px]
+                              text-xs
                               ${
                                 isFull
                                   ? 'font-medium text-destructive'
