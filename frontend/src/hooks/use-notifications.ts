@@ -16,6 +16,7 @@ export const useNotifications = (limit?: number) => {
       return api.get<NotificationListResponseDto>(endpoint);
     },
     enabled: !!accessToken,
+    refetchInterval: 10000,
   });
 };
 
@@ -26,7 +27,7 @@ export const useUnreadCount = () => {
     queryKey: notificationsKeys.unreadCount(),
     queryFn: () => api.get<{count: number}>('/notifications/unread-count'),
     enabled: !!accessToken,
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 10000,
   });
 };
 
