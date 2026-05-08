@@ -177,7 +177,7 @@ export class BookingProxyController {
     return this.proxyService.proxyRequest(
       req,
       null,
-      `/waitlist/${trainingId}`,
+      `/waitlist/position?trainingId=${trainingId}`,
       'GET',
       BOOKING_SERVICE_URL,
       BOOKING_SERVICE_DEFAULT_URL,
