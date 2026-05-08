@@ -8,7 +8,6 @@ import {
   Req,
   UseGuards,
   All,
-  Query,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -164,7 +163,7 @@ export class BookingProxyController {
     );
   }
 
-  @Get('waitlist/:trainingId')
+  @Get('waitlist/position')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiResponse({
@@ -174,14 +173,11 @@ export class BookingProxyController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Not on waitlist' })
-  getWaitlistPosition(
-    @Req() req: RequestWithUser,
-    @Param('trainingId') trainingId: string,
-  ) {
+  getWaitlistPosition(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
       null,
-      `/waitlist/position?trainingId=${trainingId}`,
+      '/waitlist/position',
       'GET',
       BOOKING_SERVICE_URL,
       BOOKING_SERVICE_DEFAULT_URL,
@@ -253,14 +249,11 @@ export class BookingProxyController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Not on waitlist' })
-  leaveWaitlist(
-    @Req() req: RequestWithUser,
-    @Query('trainingId') trainingId: string,
-  ) {
+  leaveWaitlist(@Req() req: RequestWithUser) {
     return this.proxyService.proxyRequest(
       req,
       null,
-      `/waitlist?trainingId=${trainingId}`,
+      '/waitlist',
       'DELETE',
       BOOKING_SERVICE_URL,
       BOOKING_SERVICE_DEFAULT_URL,
