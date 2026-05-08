@@ -64,7 +64,7 @@ $ npm run stop:dev:infra -- -v
 
 ### Running Tests Locally
 
-The project has **unit tests** (no database required) and **E2E tests** (require PostgreSQL and RabbitMQ).
+The project has **unit tests** (no database required) and **E2E tests** (require PostgreSQL).
 
 #### Prerequisites
 
@@ -173,7 +173,8 @@ $ npm run docker:prod:down -- -v
 
 ## Run integration tests
 
-Test the whole system making requests to the api gateway from the outside.
+All the micro-services, Postgres and RabbitMQ are run in containers in Docker via docker compose.
+Test the whole system (as a black box) making requests to the api gateway from the host machine.
 
 ### Run migrations and create admin and test users
 
