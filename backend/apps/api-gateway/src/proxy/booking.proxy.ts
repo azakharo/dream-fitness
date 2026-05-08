@@ -9,6 +9,8 @@ import {
   UseGuards,
   All,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -110,6 +112,7 @@ export class BookingProxyController {
   }
 
   @Post('bookings/:id/cancel')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiBody({ type: CancelBookingDto })
