@@ -44,12 +44,25 @@ export const NotificationsBell: React.FC = () => {
             notifications?.map(notification => (
               <div
                 key={notification.id}
-                className="
-                  border-b py-2
+                className={`
+                  rounded-sm border-b px-3 py-2
                   last:border-b-0
-                "
+                  ${!notification.isRead ? 'bg-blue-50/50' : ''}
+                `}
               >
-                <p className="text-sm font-medium">{notification.title}</p>
+                <div className="flex items-center gap-2">
+                  {!notification.isRead && (
+                    <span className="size-2 shrink-0 rounded-full bg-blue-500" />
+                  )}
+                  <p
+                    className={`
+                      text-sm
+                      ${!notification.isRead ? 'font-semibold' : 'font-medium'}
+                    `}
+                  >
+                    {notification.title}
+                  </p>
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {notification.content}
                 </p>
