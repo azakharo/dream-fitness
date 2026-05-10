@@ -1042,7 +1042,8 @@ interface PopularTrainingsChartProps {
 ```typescript
 interface FinancialReportProps {
   data: {
-    period: string;
+    startDate: Date;
+    endDate: Date;
     deposits: number;
     withdrawals: number;
     refunds: number;
