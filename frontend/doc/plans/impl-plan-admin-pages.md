@@ -59,32 +59,37 @@ frontend/src/
 │   ├── AdminUserDetailPage.tsx     # Детальная страница пользователя
 │   └── AdminReportsPage.tsx        # Отчёты и статистика
 │
-├── components/admin/               # Компоненты административной части
-│   ├── dashboard/
-│   │   ├── StatsWidget.tsx         # Виджет статистики
-│   │   ├── RecentActivity.tsx      # Последние действия
-│   │   └── QuickStats.tsx          # Быстрая статистика
-│   ├── trainers/
-│   │   ├── TrainersTable.tsx       # Таблица тренеров
-│   │   ├── TrainerForm.tsx         # Форма создания/редактирования тренера
-│   │   └── TrainerDeleteDialog.tsx # Диалог удаления тренера
-│   ├── trainings/
-│   │   ├── TrainingsTable.tsx      # Таблица тренировок
-│   │   ├── TrainingForm.tsx        # Форма создания/редактирования тренировки
-│   │   ├── TrainingFilters.tsx     # Фильтры для таблицы
-│   │   ├── ParticipantsDrawer.tsx  # Drawer со списком записавшихся
-│   │   └── TrainingDeleteDialog.tsx# Диалог удаления тренировки
-│   ├── users/
-│   │   ├── UsersTable.tsx          # Таблица пользователей
-│   │   ├── UserFilters.tsx         # Фильтры для таблицы
-│   │   ├── UserInfoCard.tsx        # Карточка информации о пользователе
-│   │   ├── UserTransactionsList.tsx# Список транзакций пользователя
-│   │   ├── UserBookingsList.tsx    # Список бронирований пользователя
-│   │   └── BlockUserDialog.tsx     # Диалог блокировки пользователя
-│   └── reports/
-│       ├── LoadingChart.tsx        # График загрузки
-│       ├── PopularTrainingsChart.tsx # Топ популярных тренировок
-│       └── FinancialReport.tsx     # Финансовый отчёт
+├── components/
+│   ├── common/                     # Общие компоненты
+│   │   ├── DataTable.tsx           # Переиспользуемая таблица
+│   │   └── PageHeader.tsx          # Заголовок страницы
+│   │
+│   └── admin/                      # Компоненты административной части
+│       ├── dashboard/
+│       │   ├── StatsWidget.tsx     # Виджет статистики
+│       │   ├── RecentActivity.tsx  # Последние действия
+│       │   └── QuickStats.tsx      # Быстрая статистика
+│       ├── trainers/
+│       │   ├── TrainersTable.tsx   # Таблица тренеров
+│       │   ├── TrainerForm.tsx     # Форма создания/редактирования тренера
+│       │   └── TrainerDeleteDialog.tsx # Диалог удаления тренера
+│       ├── trainings/
+│       │   ├── TrainingsTable.tsx  # Таблица тренировок
+│       │   ├── TrainingForm.tsx    # Форма создания/редактирования тренировки
+│       │   ├── TrainingFilters.tsx # Фильтры для таблицы
+│       │   ├── ParticipantsDrawer.tsx  # Drawer со списком записавшихся
+│       │   └── TrainingDeleteDialog.tsx# Диалог удаления тренировки
+│       ├── users/
+│       │   ├── UsersTable.tsx      # Таблица пользователей
+│       │   ├── UserFilters.tsx     # Фильтры для таблицы
+│       │   ├── UserInfoCard.tsx    # Карточка информации о пользователе
+│       │   ├── UserTransactionsList.tsx# Список транзакций пользователя
+│       │   ├── UserBookingsList.tsx    # Список бронирований пользователя
+│       │   └── BlockUserDialog.tsx # Диалог блокировки пользователя
+│       └── reports/
+│           ├── LoadingChart.tsx    # График загрузки
+│           ├── PopularTrainingsChart.tsx # Топ популярных тренировок
+│           └── FinancialReport.tsx # Финансовый отчёт
 │
 ├── hooks/
 │   ├── use-trainings.ts            # ✅ Уже есть (требуется расширение)
@@ -110,6 +115,11 @@ graph TD
         AUP[AdminUsersPage]
         AUD[AdminUserDetailPage]
         ARP[AdminReportsPage]
+    end
+
+    subgraph Common Components
+        DT[DataTable]
+        PH[PageHeader]
     end
 
     subgraph Dashboard Components
@@ -154,31 +164,44 @@ graph TD
         useReport[use-reports]
     end
 
+    %% Page dependencies
     ADP --> SW
     ADP --> RA
     ADP --> QS
+    ADP --> PH
 
     ASP --> TRT
     ASP --> TFilters
     ASP --> PD
     ASP --> TRDelete
+    ASP --> PH
 
     ASE --> TRF
     ASE --> TF
+    ASE --> PH
 
     AUP --> UT
     AUP --> UF
     AUP --> BUD
+    AUP --> PH
 
     AUD --> UIC
     AUD --> UTL
     AUD --> UBL
     AUD --> BUD
+    AUD --> PH
 
     ARP --> LC
     ARP --> PTC
     ARP --> FR
+    ARP --> PH
 
+    %% DataTable dependencies
+    TT --> DT
+    TRT --> DT
+    UT --> DT
+
+    %% Hook dependencies
     SW --> useTrain
     SW --> useUser
 
@@ -1066,26 +1089,150 @@ interface FinancialReportProps {
 
 **Файл:** `components/common/DataTable.tsx`
 
-**Назначение:** Переиспользуемый компонент таблицы с пагинацией и сортировкой.
+**Назначение:** Переиспользуемый компонент таблицы с пагинацией, сортировкой и выбором строк.
+
+**Подход:** Controlled компонент — состояние управляется извне (parent), таблица только отображает данные и триггерит колбэки при изменениях.
+
+**Зависимости:**
+
+- shadcn/ui Table компонент (`npx shadcn@latest add table`)
 
 **Пропсы:**
 
 ```typescript
-interface Column<T> {
+interface ColumnDef<T> {
   key: keyof T | string;
   header: string;
-  render?: (item: T) => React.ReactNode;
   sortable?: boolean;
+  render?: (item: T) => React.ReactNode;
+  width?: string; // CSS width
+}
+
+interface PaginationState {
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
+interface SortingState {
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
 }
 
 interface DataTableProps<T> {
-  columns: Column<T>[];
+  // Columns definition
+  columns: ColumnDef<T>[];
+
+  // Data
   data: T[];
+
+  // Pagination (controlled from parent)
+  pagination: PaginationState;
+  onPaginationChange: (pagination: {page: number; pageSize: number}) => void;
+
+  // Sorting (controlled from parent)
+  sorting: SortingState;
+  onSortingChange: (sorting: SortingState) => void;
+
+  // Row selection
+  selectedRows: Set<string>;
+  onSelectedRowsChange: (selectedRows: Set<string>) => void;
+  rowIdKey: keyof T; // Key for unique row identifier
+
+  // Row interactions
+  onRowClick?: (item: T) => void;
+
+  // States
   isLoading?: boolean;
   emptyMessage?: string;
-  onRowClick?: (item: T) => void;
 }
 ```
+
+**Функционал:**
+
+1. **Pagination** — навигация по страницам с отображением общего количества записей
+2. **Sorting** — сортировка по колонкам (клик по заголовку с индикатором направления)
+3. **Row selection** — выбор нескольких строк через checkbox в первой колонке
+4. **Row click** — клик по строке для навигации (опционально)
+5. **Row actions** — действия над строкой через render prop в ColumnDef
+6. **Loading state** — skeleton при загрузке данных
+7. **Empty state** — сообщение когда нет данных
+
+**UI:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [☐] │ Имя           │ Email            │ Статус   │ Действия               │
+├─────┼────────────────┼──────────────────┼──────────┼────────────────────────┤
+│ [☐] │ Иван Петров    │ ivan@mail.com    │ 🟢       │ [✏️] [🗑️]             │
+│ [☑] │ Мария Сидорова │ maria@mail.com   │ 🟢       │ [✏️] [🗑️]             │
+│ [☐] │ Алексей Козлов │ alex@mail.com    │ 🔴       │ [✏️] [🗑️]             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Выбрано: 1 из 3                          Страница: 1 из 5  [←] [1] [2] [→] │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Пример использования:**
+
+```tsx
+// В AdminUsersPage.tsx
+const [pagination, setPagination] = useState({page: 1, pageSize: 10});
+const [sorting, setSorting] = useState({sortBy: 'name', sortOrder: 'asc'});
+const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+
+const {data, isLoading} = useUsers({...pagination, ...sorting});
+
+const columns: ColumnDef<User>[] = [
+  {key: 'name', header: 'Имя', sortable: true},
+  {key: 'email', header: 'Email', sortable: true},
+  {
+    key: 'status',
+    header: 'Статус',
+    render: user => <StatusBadge status={user.status} />,
+  },
+  {
+    key: 'actions',
+    header: 'Действия',
+    render: user => (
+      <div className="flex gap-2">
+        <Button variant="ghost" size="icon" onClick={() => onView(user)}>
+          <EyeIcon />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={() => onBlock(user)}>
+          <LockIcon />
+        </Button>
+      </div>
+    ),
+  },
+];
+
+return (
+  <DataTable
+    columns={columns}
+    data={data?.items ?? []}
+    pagination={{...pagination, total: data?.total ?? 0}}
+    onPaginationChange={setPagination}
+    sorting={sorting}
+    onSortingChange={setSorting}
+    selectedRows={selectedRows}
+    onSelectedRowsChange={setSelectedRows}
+    rowIdKey="id"
+    onRowClick={onView}
+    isLoading={isLoading}
+    emptyMessage="Пользователи не найдены"
+  />
+);
+```
+
+**Примечания:**
+
+1. **State management** — Parent компонент решает, где хранить state (URL, React state, Zustand). DataTable не управляет состоянием самостоятельно.
+
+2. **Server-side operations** — Pagination и sorting выполняются на backend. DataTable только триггерит колбэки, а parent делает API запросы.
+
+3. **Row actions** — Реализуются через render prop в ColumnDef. Это даёт максимальную гибкость — actions это просто ещё одна колонка.
+
+4. **Selection** — Используется Set<string> для хранения ID выбранных строк. rowIdKey указывает, какое поле использовать как уникальный идентификатор.
 
 ---
 
@@ -1205,56 +1352,56 @@ onError: error => {
 3. `use-users.ts` — хуки для пользователей
 4. `use-reports.ts` — хуки для отчётов (с моками)
 
-### Этап 2: Admin Dashboard
+### Этап 2: Общие компоненты
+
+1. Добавить shadcn/ui Table компонент (`npx shadcn@latest add table`)
+2. `DataTable` — переиспользуемая таблица с pagination, sorting, row selection
+3. `PageHeader` — заголовок страницы с кнопкой возврата
+
+### Этап 3: Admin Dashboard
 
 1. `StatsWidget` — виджет статистики
 2. `QuickStats` — сетка статистики
 3. `RecentActivity` — последние действия
 4. `AdminDashboardPage` — интеграция
 
-### Этап 3: Trainers Management
+### Этап 4: Trainers Management
 
-1. `TrainersTable` — таблица тренеров
+1. `TrainersTable` — таблица тренеров (использует DataTable)
 2. `TrainerForm` — форма создания/редактирования
 3. `TrainerDeleteDialog` — диалог удаления
 4. Интеграция в AdminDashboardPage (drawer/modal)
 
-### Этап 4: Trainings Management
+### Этап 5: Trainings Management
 
 1. `TrainingFilters` — фильтры
-2. `TrainingsTable` — таблица тренировок
+2. `TrainingsTable` — таблица тренировок (использует DataTable)
 3. `TrainingForm` — форма создания/редактирования
 4. `ParticipantsDrawer` — drawer с участниками
 5. `TrainingDeleteDialog` — диалог удаления
 6. `AdminSchedulePage` — список тренировок
 7. `AdminScheduleEditPage` — создание/редактирование
 
-### Этап 5: Users Management
+### Этап 6: Users Management
 
 1. `UserFilters` — фильтры
-2. `UsersTable` — таблица пользователей
+2. `UsersTable` — таблица пользователей (использует DataTable)
 3. `BlockUserDialog` — диалог блокировки
 4. `AdminUsersPage` — интеграция
 
-### Этап 6: User Detail Page
+### Этап 7: User Detail Page
 
 1. `UserInfoCard` — карточка информации о пользователе
 2. `UserTransactionsList` — список транзакций
 3. `UserBookingsList` — список бронирований
 4. `AdminUserDetailPage` — страница с деталями пользователя
 
-### Этап 7: Reports
+### Этап 8: Reports
 
 1. `LoadingChart` — график загрузки
 2. `PopularTrainingsChart` — топ тренировок
 3. `FinancialReport` — финансовый отчёт
 4. `AdminReportsPage` — интеграция
-
-### Этап 8: Общие компоненты
-
-1. `DataTable` — переиспользуемая таблица
-2. `PageHeader` — заголовок страницы
-3. Skeleton компоненты
 
 ---
 
