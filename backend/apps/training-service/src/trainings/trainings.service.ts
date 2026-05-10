@@ -30,11 +30,13 @@ export class TrainingsService {
   ): Promise<TrainingResponseDto> {
     const trainer = await this.trainersService.findById(training.trainerId);
     let currentParticipants = 0;
+    let waitlistCount = 0;
     try {
       const bookingCount = await this.bookingClientService.getBookingCount(
         training.id,
       );
       currentParticipants = bookingCount.confirmedCount;
+      waitlistCount = bookingCount.waitlistCount;
     } catch {
       // If booking service is unavailable, use 0
     }
@@ -51,6 +53,7 @@ export class TrainingsService {
       capacity: training.capacity,
       currentParticipants,
       availableSlots,
+      waitlistCount,
       price: training.price,
       status: training.status,
       createdAt: training.createdAt.toISOString(),
