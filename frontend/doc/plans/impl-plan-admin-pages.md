@@ -40,6 +40,7 @@
 | Trainers Management  | Высокий   | Средняя   |
 | Trainings Management | Высокий   | Высокая   |
 | Users Management     | Средний   | Средняя   |
+| User Detail Page     | Средний   | Низкая    |
 | Reports              | Низкий    | Высокая   |
 
 ---
@@ -55,6 +56,7 @@ frontend/src/
 │   ├── AdminSchedulePage.tsx       # Список тренировок
 │   ├── AdminScheduleEditPage.tsx   # Создание/редактирование тренировки
 │   ├── AdminUsersPage.tsx          # Управление пользователями
+│   ├── AdminUserDetailPage.tsx     # Детальная страница пользователя
 │   └── AdminReportsPage.tsx        # Отчёты и статистика
 │
 ├── components/admin/               # Компоненты административной части
@@ -75,7 +77,9 @@ frontend/src/
 │   ├── users/
 │   │   ├── UsersTable.tsx          # Таблица пользователей
 │   │   ├── UserFilters.tsx         # Фильтры для таблицы
-│   │   ├── UserDetailsDrawer.tsx   # Drawer с деталями пользователя
+│   │   ├── UserInfoCard.tsx        # Карточка информации о пользователе
+│   │   ├── UserTransactionsList.tsx# Список транзакций пользователя
+│   │   ├── UserBookingsList.tsx    # Список бронирований пользователя
 │   │   └── BlockUserDialog.tsx     # Диалог блокировки пользователя
 │   └── reports/
 │       ├── LoadingChart.tsx        # График загрузки
@@ -104,6 +108,7 @@ graph TD
         ASP[AdminSchedulePage]
         ASE[AdminScheduleEditPage]
         AUP[AdminUsersPage]
+        AUD[AdminUserDetailPage]
         ARP[AdminReportsPage]
     end
 
@@ -130,7 +135,9 @@ graph TD
     subgraph Users Components
         UT[UsersTable]
         UF[UserFilters]
-        UD[UserDetailsDrawer]
+        UIC[UserInfoCard]
+        UTL[UserTransactionsList]
+        UBL[UserBookingsList]
         BUD[BlockUserDialog]
     end
 
@@ -161,8 +168,12 @@ graph TD
 
     AUP --> UT
     AUP --> UF
-    AUP --> UD
     AUP --> BUD
+
+    AUD --> UIC
+    AUD --> UTL
+    AUD --> UBL
+    AUD --> BUD
 
     ARP --> LC
     ARP --> PTC
@@ -184,7 +195,9 @@ graph TD
 
     UT --> useUser
     UF --> useUser
-    UD --> useUser
+    UIC --> useUser
+    UTL --> useUser
+    UBL --> useUser
 
     LC --> useReport
     PTC --> useReport
@@ -796,35 +809,46 @@ interface UserFiltersProps {
 
 ---
 
-#### UserDetailsDrawer
+### 7.6.6. User Detail Page
 
-**Файл:** `components/admin/users/UserDetailsDrawer.tsx`
+**Файл:** [`AdminUserDetailPage.tsx`](../../src/pages/admin/AdminUserDetailPage.tsx)
+
+**Маршрут:** `/admin/users/:userId`
+
+**Требования:**
+
+- Отдельная страница с детальной информацией о пользователе
+- Возможность поделиться ссылкой на страницу с другим администратором
+- История транзакций и бронирований
+
+**Компоненты:**
+
+#### UserInfoCard
+
+**Файл:** `components/admin/users/UserInfoCard.tsx`
 
 **Пропсы:**
 
 ```typescript
-interface UserDetailsDrawerProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  user: UserResponseDto | null;
+interface UserInfoCardProps {
+  user: UserResponseDto;
   isLoading?: boolean;
+  onBlock?: () => void;
+  onUnblock?: () => void;
 }
 ```
 
 **Функционал:**
 
-- Drawer с детальной информацией о пользователе
-- Все поля профиля
-- История последних транзакций
-- История последних бронирований
+- Карточка с основной информацией о пользователе
+- Кнопки блокировки/разблокировки
+- Skeleton при загрузке
 
 **UI:**
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ Профиль пользователя                                          [✕]           │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ Иван Петров                                                                 │
+│ Иван Петров                                                   [🔒 Заблокировать] │
 │ ─────────────────────────────────────────────────────────────────────────── │
 │ Email: ivan@mail.com                                                        │
 │ Телефон: +7 999 123 45 67                                                   │
@@ -833,22 +857,107 @@ interface UserDetailsDrawerProps {
 │ Баланс: 1,500 баллов                                                        │
 │ Статус: Активен                                                             │
 │ Дата регистрации: 01.01.2024                                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ Последние транзакции                                                        │
-│ ─────────────────────────────────────────────────────────────────────────── │
-│ • Депозит +500 баллов                                    10 янв             │
-│ • Списание -300 баллов (Yoga)                            08 янв             │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ Последние тренировки                                                        │
-│ ─────────────────────────────────────────────────────────────────────────── │
-│ • Yoga, 15 янв 10:00 (записан)                                               │
-│ • CrossFit, 10 янв 18:00 (посещено)                                         │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-#### BlockUserDialog
+#### UserTransactionsList
+
+**Файл:** `components/admin/users/UserTransactionsList.tsx`
+
+**Пропсы:**
+
+```typescript
+interface UserTransactionsListProps {
+  userId: string;
+  limit?: number;
+}
+```
+
+**Функционал:**
+
+- Список последних транзакций пользователя
+- Пагинация или кнопка "Показать ещё"
+- Skeleton при загрузке
+- Empty state
+
+**UI:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Последние транзакции                                                        │
+│ ─────────────────────────────────────────────────────────────────────────── │
+│ • Депозит +500 баллов                                    10 янв             │
+│ • Списание -300 баллов (Yoga)                            08 янв             │
+│ • Депозит +1000 баллов                                   01 янв             │
+│                                                                             │
+│ [Показать ещё →]                                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+#### UserBookingsList
+
+**Файл:** `components/admin/users/UserBookingsList.tsx`
+
+**Пропсы:**
+
+```typescript
+interface UserBookingsListProps {
+  userId: string;
+  limit?: number;
+}
+```
+
+**Функционал:**
+
+- Список последних бронирований пользователя
+- Статус бронирования (записан, посещено, отменено)
+- Пагинация или кнопка "Показать ещё"
+- Skeleton при загрузке
+- Empty state
+
+**UI:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Последние тренировки                                                        │
+│ ─────────────────────────────────────────────────────────────────────────── │
+│ • Yoga, 15 янв 10:00 (записан)                                              │
+│ • CrossFit, 10 янв 18:00 (посещено)                                         │
+│ • Boxing, 05 янв 19:00 (отменено)                                           │
+│                                                                             │
+│ [Показать ещё →]                                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+#### AdminUserDetailPage Layout
+
+**UI:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ [← Назад к списку]                                                          │
+│                                                                             │
+│ ┌─────────────────────────────────────────────────────────────────────────┐ │
+│ │ UserInfoCard                                                            │ │
+│ └─────────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+│ ┌───────────────────────────────┐ ┌───────────────────────────────────────┐ │
+│ │ UserTransactionsList          │ │ UserBookingsList                      │ │
+│ │                               │ │                                       │ │
+│ │                               │ │                                       │ │
+│ └───────────────────────────────┘ └───────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 7.6.7. BlockUserDialog
 
 **Файл:** `components/admin/users/BlockUserDialog.tsx`
 
@@ -872,7 +981,7 @@ interface BlockUserDialogProps {
 
 ---
 
-### 7.6.6. Reports Page
+### 7.6.8. Reports Page
 
 **Примечание:** Страница отчётов требует backend API, который ещё не реализован. Сейчас можно реализовать UI с моковыми данными.
 
@@ -1075,18 +1184,24 @@ onError: error => {
 
 1. `UserFilters` — фильтры
 2. `UsersTable` — таблица пользователей
-3. `UserDetailsDrawer` — drawer с деталями
-4. `BlockUserDialog` — диалог блокировки
-5. `AdminUsersPage` — интеграция
+3. `BlockUserDialog` — диалог блокировки
+4. `AdminUsersPage` — интеграция
 
-### Этап 6: Reports
+### Этап 6: User Detail Page
+
+1. `UserInfoCard` — карточка информации о пользователе
+2. `UserTransactionsList` — список транзакций
+3. `UserBookingsList` — список бронирований
+4. `AdminUserDetailPage` — страница с деталями пользователя
+
+### Этап 7: Reports
 
 1. `LoadingChart` — график загрузки
 2. `PopularTrainingsChart` — топ тренировок
 3. `FinancialReport` — финансовый отчёт
 4. `AdminReportsPage` — интеграция
 
-### Этап 7: Общие компоненты
+### Этап 8: Общие компоненты
 
 1. `DataTable` — переиспользуемая таблица
 2. `PageHeader` — заголовок страницы
@@ -1102,6 +1217,7 @@ onError: error => {
 - [ ] Trainers Management позволяет CRUD операции с тренерами
 - [ ] Trainings Management позволяет CRUD операции с тренировками
 - [ ] Users Management позволяет просмотр и блокировку пользователей
+- [ ] User Detail Page отображает детальную информацию о пользователе с возможностью обмена ссылкой
 - [ ] Reports отображает графики и таблицы (с моковыми данными)
 
 ### Нефункциональные требования
