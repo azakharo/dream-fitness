@@ -688,6 +688,8 @@ export interface components {
       capacity: number;
       currentParticipants: number;
       availableSlots: number;
+      /** @description Number of users on the waitlist */
+      waitlistCount: number;
       price: number;
       /** @enum {string} */
       status: 'scheduled' | 'cancelled' | 'completed';
