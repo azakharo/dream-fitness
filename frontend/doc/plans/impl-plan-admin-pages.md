@@ -283,9 +283,9 @@ export const useTrainingParticipants = (trainingId: string) => {
 
 **API Endpoints:**
 
-- `GET /api/auth/users` — список пользователей (требуется добавить на backend)
-- `GET /api/auth/users/:id` — детали пользователя (требуется добавить на backend)
-- `PATCH /api/auth/users/:id/status` — блокировка/разблокировка (требуется добавить на backend)
+- `GET /api/auth/users` — список пользователей
+- `GET /api/auth/users/:id` — детали пользователя
+- `PATCH /api/auth/users/:id/status` — блокировка/разблокировка
 
 **Хуки:**
 
@@ -1124,21 +1124,19 @@ onError: error => {
 
 ### Зависимости
 
-| Зависимость           | Статус      | Влияние                                  |
-| --------------------- | ----------- | ---------------------------------------- |
-| Backend API Trainings | ✅ Готов    | Нет                                      |
-| Backend API Trainers  | ✅ Готов    | Нет                                      |
-| Backend API Users     | ⚠️ Частично | Требуется добавить endpoints для админки |
-| Backend API Reports   | ❌ Нет      | Использовать моковые данные              |
-| Auth Flow             | ✅ Готов    | Нет                                      |
-| AdminLayout           | ✅ Готов    | Нет                                      |
-| UI Components         | ✅ Готов    | Нет                                      |
+| Зависимость           | Статус   | Влияние                     |
+| --------------------- | -------- | --------------------------- |
+| Backend API Trainings | ✅ Готов | Нет                         |
+| Backend API Trainers  | ✅ Готов | Нет                         |
+| Backend API Reports   | ❌ Нет   | Использовать моковые данные |
+| Auth Flow             | ✅ Готов | Нет                         |
+| AdminLayout           | ✅ Готов | Нет                         |
+| UI Components         | ✅ Готов | Нет                         |
 
 ### Риски
 
 | Риск                                               | Вероятность | Влияние | Митигация                               |
 | -------------------------------------------------- | ----------- | ------- | --------------------------------------- |
-| Отсутствие API для Users                           | Высокая     | Среднее | Добавить endpoints в backend            |
 | Отсутствие API для Reports                         | Высокая     | Низкое  | Использовать моковые данные             |
 | Сложность форм с datetime                          | Средняя     | Среднее | Использовать существующий DatePicker    |
 | Блокировка пользователя с активными бронированиями | Средняя     | Среднее | Проверять наличие активных бронирований |
@@ -1147,18 +1145,16 @@ onError: error => {
 
 ## Примечания
 
-1. **Backend API для Users** — текущий backend не имеет endpoints для списка пользователей и их блокировки. Требуется добавить эти endpoints.
+1. **Backend API для Reports** — отчёты не реализованы на backend. Сейчас достаточно реализовать UI с моковыми данными.
 
-2. **Backend API для Reports** — отчёты не реализованы на backend. Сейчас достаточно реализовать UI с моковыми данными.
+2. **Управление тренерами** — реализуется через drawer/modal на странице Dashboard или отдельной вкладкой в Sidebar.
 
-3. **Управление тренерами** — реализуется через drawer/modal на странице Dashboard или отдельной вкладкой в Sidebar.
+3. **Типы тренировок** — использовать `TRAINING_TYPE_OPTIONS` из [`constants.ts`](../../src/types/constants.ts).
 
-4. **Типы тренировок** — использовать `TRAINING_TYPE_OPTIONS` из [`constants.ts`](../../src/types/constants.ts).
+4. **Статусы тренировок** — использовать `TRAINING_STATUS_OPTIONS` из [`constants.ts`](../../src/types/constants.ts).
 
-5. **Статусы тренировок** — использовать `TRAINING_STATUS_OPTIONS` из [`constants.ts`](../../src/types/constants.ts).
+5. **Навигация** — использовать `ROUTES` из [`routes.ts`](../../src/lib/routes.ts) для типобезопасной навигации.
 
-6. **Навигация** — использовать `ROUTES` из [`routes.ts`](../../src/lib/routes.ts) для типобезопасной навигации.
+6. **Формы** — использовать React Hook Form + Zod по аналогии с [`auth.schema.ts`](../../src/schemas/auth.schema.ts).
 
-7. **Формы** — использовать React Hook Form + Zod по аналогии с [`auth.schema.ts`](../../src/schemas/auth.schema.ts).
-
-8. **Графики** — использовать recharts, так как он хорошо интегрируется с React и имеет хорошие TypeScript типы.
+7. **Графики** — использовать recharts, так как он хорошо интегрируется с React и имеет хорошие TypeScript типы.
