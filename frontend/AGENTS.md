@@ -4,7 +4,7 @@
 
 Frontend для системы управления фитнес-клубом DreamFitness. Веб-приложение на React 19 + TypeScript с Vite.
 
-Клиенты могут управлять абонементами, записываться на групповые и индивидуальные тренировки. Администраторы контролируют заполненность тренировок и состояние счетов пользователей.
+Клиенты могут пополнять баланс, записываться на групповые и индивидуальные тренировки. Администраторы контролируют заполненность тренировок и состояние счетов пользователей.
 
 ## Основные документы
 
@@ -46,22 +46,25 @@ Frontend для системы управления фитнес-клубом Dr
 frontend/
 ├── src/
 │   ├── components/
-│   │   ├── ui/                    # shadcn/ui компоненты
+│   │   ├── ui/                     # shadcn/ui компоненты
 │   │   ├── layout/                 # Layout компоненты (ClientLayout, AdminLayout)
 │   │   ├── auth/                   # Auth компоненты (LoginForm, ProtectedRoute)
+│   │   ├── client/                 # Компоненты для клиентских (пользовательских) страниц
+│   │   ├── admin/                  # Компоненты для страниц администратора
 │   │   └── common/                 # Общие компоненты (LoadingSpinner, EmptyState)
 │   ├── pages/                      # Страницы приложения
 │   │   ├── auth/                   # Login, Register
-│   │   ├── client/                 # Dashboard, Schedule, Booking, Profile, History
-│   │   └── admin/                  # Admin Dashboard, Schedule, Users, Reports
+│   │   ├── client/                 # Пользовательские страницы: Dashboard, Schedule, Booking, Profile, History
+│   │   └── admin/                  # Страницы администратора: Admin Dashboard, Schedule, Users, Reports
 │   ├── hooks/                      # Custom hooks (useTrainings, useBookings, etc.)
 │   ├── stores/                     # Zustand stores (auth-store, ui-store)
-│   ├── lib/                        # Utilities (api-client, utils, constants)
+│   ├── lib/                        # Utilities (api-client, utils, constants).
+│   ├── routers/                    # Tanstack Router routes
 │   ├── schemas/                    # Zod schemas для валидации форм
 │   ├── types/                      # TypeScript типы
 │   │   ├── api.generated.ts        # Автогенерируется (НЕ РЕДАКТИРОВАТЬ)
 │   │   ├── constants.ts            # Runtime values для UI (dropdowns, filters)
-│   │   └── index.ts                 # Re-export всех типов
+│   │   └── index.ts                # Re-export всех типов
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── router.tsx
