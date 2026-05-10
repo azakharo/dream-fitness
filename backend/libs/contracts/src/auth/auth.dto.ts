@@ -216,3 +216,47 @@ export class TransactionListResponseDto {
   @ApiProperty({ example: 10 })
   limit!: number;
 }
+
+export class FindAllUsersQueryDto {
+  @ApiPropertyOptional({ example: 1, minimum: 1 })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  page?: number;
+
+  @ApiPropertyOptional({ example: 10, minimum: 1, maximum: 100 })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  limit?: number;
+
+  @ApiPropertyOptional({ enum: UserStatus })
+  @IsOptional()
+  @IsEnum(UserStatus)
+  status?: UserStatus;
+
+  @ApiPropertyOptional({ enum: UserRole })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
+}
+
+export class UpdateUserStatusDto {
+  @ApiProperty({ enum: UserStatus })
+  @IsEnum(UserStatus)
+  status!: UserStatus;
+}
+
+export class UserListResponseDto {
+  @ApiProperty({ type: [UserDto] })
+  items!: UserDto[];
+
+  @ApiProperty({ example: 25 })
+  total!: number;
+
+  @ApiProperty({ example: 1 })
+  page!: number;
+
+  @ApiProperty({ example: 10 })
+  limit!: number;
+}

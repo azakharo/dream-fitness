@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { UserStatus, UserRole } from '@app/shared';
+
+export interface FindAllUsersFilters {
+  status?: UserStatus;
+  role?: UserRole;
+  page: number;
+  limit: number;
+}
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -65,5 +73,41 @@ export class UserRepository extends Repository<User> {
       lock: { mode: 'pessimistic_write' },
     });
     return user || undefined;
+  }
+
+  async findAllWithFilters(
+    options: FindAllUsersFilters,
+  ): Promise<{ users: User[]; total: number }> {
+    const { page, limit, status, role } = options;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.createQueryBuilder('user').select([
+      'id',
+      'email',
+      'name',
+      'phone',
+      'birthDate',
+      'gender',
+      'role',
+      'balance',
+      'status',
+      'createdAt',
+    ]);
+
+    if (status) {
+      queryBuilder.andWhere('user.status = :status', { status });
+    }
+
+    if (role) {
+      queryBuilder.andWhere('user.role = :role', { role });
+    }
+
+    const [users, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .orderBy('user.createdAt', 'DESC')
+      .getManyAndCount();
+
+    return { users, total };
   }
 }

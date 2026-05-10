@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DeepPartial } from 'typeorm';
 import { UserRepository } from './repositories/user.repository';
-import { RegisterDto } from '@app/contracts';
-import { UserResponseDto } from '@app/contracts';
+import {
+  RegisterDto,
+  UserResponseDto,
+  FindAllUsersQueryDto,
+} from '@app/contracts';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UserStatus } from '@app/shared';
 import { UserAlreadyExistsException } from '../common/exceptions/user-already-exists.exception';
 
 @Injectable()
@@ -96,5 +100,34 @@ export class UsersService {
       select: ['name'],
     });
     return user?.name || null;
+  }
+
+  async findAll(
+    query: FindAllUsersQueryDto,
+  ): Promise<{ users: UserResponseDto[]; total: number }> {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const { users, total } = await this.userRepository.findAllWithFilters({
+      page,
+      limit,
+      status: query.status,
+      role: query.role,
+    });
+    return {
+      users: users.map((user) => this.toResponseDto(user)),
+      total,
+    };
+  }
+
+  async findById(id: string): Promise<UserResponseDto | undefined> {
+    return this.getUserById(id);
+  }
+
+  async updateStatus(
+    id: string,
+    status: UserStatus,
+  ): Promise<UserResponseDto | undefined> {
+    await this.userRepository.update(id, { status } as DeepPartial<User>);
+    return this.getUserById(id);
   }
 }

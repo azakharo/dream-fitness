@@ -5,6 +5,7 @@ import {
   Param,
   UseGuards,
   Body,
+  Query,
   HttpCode,
   HttpStatus,
   NotFoundException,
@@ -13,7 +14,12 @@ import { ApiTags, ApiOperation, ApiOkResponse, ApiBody } from '@nestjs/swagger';
 import { InternalUser } from '@app/shared';
 import { InternalGuard } from '@app/shared';
 import { UsersService } from './users.service';
-import { UserResponseDto } from '@app/contracts';
+import {
+  UserResponseDto,
+  FindAllUsersQueryDto,
+  UpdateUserStatusDto,
+  UserListResponseDto,
+} from '@app/contracts';
 import { BalanceResponseDto } from './dto/balance-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -90,5 +96,53 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
     return { name };
+  }
+
+  @Get('users')
+  @UseGuards(InternalGuard)
+  @ApiOperation({ summary: 'List all users (admin only)' })
+  @ApiOkResponse({ type: UserListResponseDto })
+  async findAll(
+    @Query() query: FindAllUsersQueryDto,
+  ): Promise<UserListResponseDto> {
+    const result = await this.usersService.findAll(query);
+    return {
+      items: result.users,
+      total: result.total,
+      page: query.page || 1,
+      limit: query.limit || 10,
+    };
+  }
+
+  @Get('users/:id')
+  @UseGuards(InternalGuard)
+  @ApiOperation({ summary: 'Get user details by ID (admin only)' })
+  @ApiOkResponse({ type: UserResponseDto })
+  async findById(@Param('id') id: string): Promise<UserResponseDto> {
+    const user = await this.usersService.findById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  @Patch('users/:id/status')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalGuard)
+  @ApiOperation({ summary: 'Block/unblock user (admin only)' })
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiBody({ type: UpdateUserStatusDto })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: UpdateUserStatusDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersService.updateStatus(
+      id,
+      updateStatusDto.status,
+    );
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }
