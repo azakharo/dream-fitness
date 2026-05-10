@@ -79,7 +79,7 @@ frontend/src/
 │   │   └── BlockUserDialog.tsx     # Диалог блокировки пользователя
 │   └── reports/
 │       ├── LoadingChart.tsx        # График загрузки
-│       ├── PopularTrainingsChart.tsx# Топ популярных тренировок
+│       ├── PopularTrainingsChart.tsx # Топ популярных тренировок
 │       └── FinancialReport.tsx     # Финансовый отчёт
 │
 ├── hooks/
@@ -1147,7 +1147,7 @@ onError: error => {
 
 ## Примечания
 
-1. **Backend API для Users** — текущий backend не имеет endpoints для списка пользователей и их блокировки. Требуется либо добавить эти endpoints.
+1. **Backend API для Users** — текущий backend не имеет endpoints для списка пользователей и их блокировки. Требуется добавить эти endpoints.
 
 2. **Backend API для Reports** — отчёты не реализованы на backend. Сейчас достаточно реализовать UI с моковыми данными.
 
@@ -1161,4 +1161,4 @@ onError: error => {
 
 7. **Формы** — использовать React Hook Form + Zod по аналогии с [`auth.schema.ts`](../../src/schemas/auth.schema.ts).
 
-8. **Графики** — рекомендуется использовать recharts, так как он хорошо интегрируется с React и имеет хорошие TypeScript типы.
+8. **Графики** — использовать recharts, так как он хорошо интегрируется с React и имеет хорошие TypeScript типы.
