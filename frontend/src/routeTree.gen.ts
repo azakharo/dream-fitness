@@ -25,6 +25,7 @@ import { Route as ClientHistoryRouteImport } from './routes/_client.history'
 import { Route as ClientDashboardRouteImport } from './routes/_client.dashboard'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
+import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 import { Route as AdminScheduleIdRouteImport } from './routes/admin.schedule.$id'
 import { Route as ClientBookingIdRouteImport } from './routes/_client.booking.$id'
 
@@ -106,6 +107,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
 const AdminScheduleIdRoute = AdminScheduleIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -130,10 +136,11 @@ export interface FileRoutesByFullPath {
   '/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/booking/$id': typeof ClientBookingIdRoute
   '/admin/schedule/$id': typeof AdminScheduleIdRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,10 +154,11 @@ export interface FileRoutesByTo {
   '/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/booking/$id': typeof ClientBookingIdRoute
   '/admin/schedule/$id': typeof AdminScheduleIdRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,10 +176,11 @@ export interface FileRoutesById {
   '/_client/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/_client/booking/$id': typeof ClientBookingIdRoute
   '/admin/schedule/$id': typeof AdminScheduleIdRoute
+  '/admin/users/$id': typeof AdminUsersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/booking/$id'
     | '/admin/schedule/$id'
+    | '/admin/users/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/booking/$id'
     | '/admin/schedule/$id'
+    | '/admin/users/$id'
   id:
     | '__root__'
     | '/'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/_client/booking/$id'
     | '/admin/schedule/$id'
+    | '/admin/users/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -353,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/admin/users/$id': {
+      id: '/admin/users/$id'
+      path: '/$id'
+      fullPath: '/admin/users/$id'
+      preLoaderRoute: typeof AdminUsersIdRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
     '/admin/schedule/$id': {
       id: '/admin/schedule/$id'
       path: '/$id'
@@ -415,17 +434,29 @@ const AdminScheduleRouteWithChildren = AdminScheduleRoute._addFileChildren(
   AdminScheduleRouteChildren,
 )
 
+interface AdminUsersRouteChildren {
+  AdminUsersIdRoute: typeof AdminUsersIdRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersIdRoute: AdminUsersIdRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminScheduleRoute: typeof AdminScheduleRouteWithChildren
-  AdminUsersRoute: typeof AdminUsersRoute
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminScheduleRoute: AdminScheduleRouteWithChildren,
-  AdminUsersRoute: AdminUsersRoute,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
 

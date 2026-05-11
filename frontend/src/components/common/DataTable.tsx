@@ -138,12 +138,13 @@ export function DataTable<T>({
             </TableHeader>
             <TableBody>
               {Array.from({length: pagination.pageSize}).map((_, rowIndex) => (
+                // eslint-disable-next-line react-x/no-array-index-key
                 <TableRow key={rowIndex}>
                   <TableCell>
                     <Skeleton className="size-4" />
                   </TableCell>
-                  {columns.map((column, colIndex) => (
-                    <TableCell key={colIndex}>
+                  {columns.map(column => (
+                    <TableCell key={column.header}>
                       <Skeleton className="h-4 w-full" />
                     </TableCell>
                   ))}
