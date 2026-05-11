@@ -538,8 +538,8 @@ export interface components {
       id: string;
       email: string;
       name: string;
-      phone?: Record<string, never>;
-      birthDate?: Record<string, never>;
+      phone?: string;
+      birthDate?: string;
       /** @enum {string} */
       gender?: 'male' | 'female';
       /** @enum {string} */
@@ -571,8 +571,8 @@ export interface components {
       id: string;
       email: string;
       name: string;
-      phone?: Record<string, never>;
-      birthDate?: Record<string, never>;
+      phone?: string;
+      birthDate?: string;
       /** @enum {string} */
       gender?: 'male' | 'female';
       /** @enum {string} */
@@ -617,8 +617,8 @@ export interface components {
       id: string;
       email: string;
       name: string;
-      phone?: Record<string, never>;
-      birthDate?: Record<string, never>;
+      phone?: string;
+      birthDate?: string;
       /** @enum {string} */
       gender?: 'male' | 'female';
       /** @enum {string} */
