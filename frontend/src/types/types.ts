@@ -62,6 +62,8 @@ export type WaitlistResponseDto = components['schemas']['WaitlistResponseDto'];
 export type WaitlistDto = components['schemas']['WaitlistDto'];
 export type JoinWaitlistDto = components['schemas']['JoinWaitlistDto'];
 export type BookingStatus = BookingDto['status'];
+export type TrainingBookingCountDto =
+  components['schemas']['TrainingBookingCountDto'];
 
 // ===========================================
 // Notification Domain
@@ -80,4 +82,8 @@ export type NotificationType = NotificationDto['type'];
 // User Domain
 // ===========================================
 
+export type UserDto = components['schemas']['UserDto'];
+export type UserListResponseDto = components['schemas']['UserListResponseDto'];
+export type UpdateUserStatusDto = components['schemas']['UpdateUserStatusDto'];
 export type UserRole = 'client' | 'admin';
+export type UserStatus = UserDto['status'];
