@@ -46,7 +46,7 @@ export const PopularTrainingsChart: React.FC<PopularTrainingsChartProps> = ({
           <CardTitle>Популярные тренировки</CardTitle>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-[300px] w-full" />
+          <Skeleton className="h-75 w-full" />
         </CardContent>
       </Card>
     );
@@ -58,7 +58,7 @@ export const PopularTrainingsChart: React.FC<PopularTrainingsChartProps> = ({
         <CardTitle>Популярные тренировки</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
+        <div className="h-75 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
@@ -93,7 +93,11 @@ export const PopularTrainingsChart: React.FC<PopularTrainingsChartProps> = ({
               />
               <Bar dataKey="bookings" radius={[4, 4, 0, 0]}>
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getBarColor(entry.type)} />
+                  <Cell
+                    // eslint-disable-next-line react-x/no-array-index-key
+                    key={`${entry.name}-${entry.type}-${index}`}
+                    fill={getBarColor(entry.type)}
+                  />
                 ))}
               </Bar>
             </BarChart>

@@ -62,7 +62,7 @@ export const FinancialReport: React.FC<FinancialReportProps> = ({
           </div>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-[200px] w-full" />
+          <Skeleton className="h-50 w-full" />
         </CardContent>
       </Card>
     );
@@ -83,7 +83,7 @@ export const FinancialReport: React.FC<FinancialReportProps> = ({
         {data.length === 0 ? (
           <div
             className="
-              flex h-[200px] items-center justify-center text-muted-foreground
+              flex h-50 items-center justify-center text-muted-foreground
             "
           >
             Нет данных за выбранный период
@@ -102,6 +102,7 @@ export const FinancialReport: React.FC<FinancialReportProps> = ({
               </TableHeader>
               <TableBody>
                 {data.map((item, index) => (
+                  // eslint-disable-next-line react-x/no-array-index-key
                   <TableRow key={index}>
                     <TableCell className="font-medium">
                       {formatPeriod(item.startDate, item.endDate)}

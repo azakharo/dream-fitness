@@ -129,8 +129,11 @@ export function DataTable<T>({
                 <TableHead className="w-12">
                   <Skeleton className="size-4" />
                 </TableHead>
-                {columns.map((column, index) => (
-                  <TableHead key={index} style={{width: column.width}}>
+                {columns.map(column => (
+                  <TableHead
+                    key={column.key.toString()}
+                    style={{width: column.width}}
+                  >
                     <Skeleton className="h-4 w-20" />
                   </TableHead>
                 ))}
@@ -260,6 +263,7 @@ export function DataTable<T>({
               (pageNum, index) =>
                 pageNum === '...' ? (
                   <span
+                    // eslint-disable-next-line react-x/no-array-index-key
                     key={`ellipsis-${index}`}
                     className="px-2 text-muted-foreground"
                   >

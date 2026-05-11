@@ -19,10 +19,10 @@ const seededRandom = (seed: number): number => {
 };
 
 export const AdminReportsPage: React.FC = () => {
-  const [dateFrom, setDateFrom] = useState<Date>(
+  const [dateFrom, setDateFrom] = useState<Date>(() =>
     startOfDay(subDays(new Date(), 30)),
   );
-  const [dateTo, setDateTo] = useState<Date>(endOfDay(new Date()));
+  const [dateTo, setDateTo] = useState<Date>(() => endOfDay(new Date()));
 
   const {data: loadingStats, isLoading: isLoadingStats} = useLoadingStats(
     dateFrom,

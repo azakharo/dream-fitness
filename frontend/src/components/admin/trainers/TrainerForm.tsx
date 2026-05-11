@@ -36,7 +36,7 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
   const isEditMode = !!trainer;
 
   const form = useForm<TrainerFormData>({
-    resolver: zodResolver(trainerFormSchema) as never,
+    resolver: zodResolver(trainerFormSchema),
     defaultValues: {
       name: trainer?.name ?? '',
       bio: getStringValue(trainer?.bio),
@@ -64,13 +64,15 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
   };
 
   return (
-    <Form form={form as never}>
+    <Form form={form}>
       <form
-        onSubmit={form.handleSubmit(handleSubmit) as never}
+        onSubmit={() => {
+          void form.handleSubmit(handleSubmit)();
+        }}
         className="space-y-4"
       >
         <FormField
-          control={form.control as never}
+          control={form.control}
           name="name"
           render={({field}) => (
             <FormItem>
@@ -84,7 +86,7 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
         />
 
         <FormField
-          control={form.control as never}
+          control={form.control}
           name="bio"
           render={({field}) => (
             <FormItem>
@@ -93,7 +95,7 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
                 <textarea
                   className={cn(
                     `
-                      flex min-h-[80px] w-full rounded-md border border-input
+                      flex min-h-20 w-full rounded-md border border-input
                       bg-background px-3 py-2 text-sm ring-offset-background
                     `,
                     'placeholder:text-muted-foreground',
@@ -114,7 +116,7 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
         />
 
         <FormField
-          control={form.control as never}
+          control={form.control}
           name="avatarUrl"
           render={({field}) => (
             <FormItem>
@@ -134,7 +136,7 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
 
         {isEditMode && (
           <FormField
-            control={form.control as never}
+            control={form.control}
             name="isActive"
             render={({field}) => (
               <FormItem

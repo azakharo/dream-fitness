@@ -24,7 +24,9 @@ export const AdminUsersPage: React.FC = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const {data: usersData, isLoading: usersLoading} = useUsers({
     ...filters,

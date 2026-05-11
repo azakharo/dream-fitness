@@ -82,6 +82,7 @@ export const ParticipantsDrawer: React.FC<ParticipantsDrawerProps> = ({
               <div className="space-y-2">
                 {Array.from({length: 3}).map((_, index) => (
                   <div
+                    // eslint-disable-next-line react-x/no-array-index-key
                     key={index}
                     className="h-12 animate-pulse rounded-sm bg-muted"
                   />

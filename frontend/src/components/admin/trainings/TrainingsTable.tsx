@@ -70,6 +70,7 @@ export const TrainingsTable: React.FC<TrainingsTableProps> = ({
       <div className="rounded-md border">
         <div className="divide-y divide-border">
           {Array.from({length: 5}).map((_, index) => (
+            // eslint-disable-next-line react-x/no-array-index-key
             <div key={index} className="flex items-center gap-4 p-4">
               <div className="h-4 w-20 animate-pulse rounded-sm bg-muted" />
               <div className="h-4 w-20 animate-pulse rounded-sm bg-muted" />
