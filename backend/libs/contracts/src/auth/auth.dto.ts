@@ -70,10 +70,10 @@ export class UserResponseDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   phone: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   birthDate: string | null;
 
   @ApiPropertyOptional({ enum: UserGender })
@@ -102,10 +102,10 @@ export class UserDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   phone: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   birthDate: string | null;
 
   @ApiPropertyOptional({ enum: UserGender })
@@ -134,10 +134,10 @@ export class UserProfileDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   phone: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   birthDate: string | null;
 
   @ApiPropertyOptional({ enum: UserGender })
