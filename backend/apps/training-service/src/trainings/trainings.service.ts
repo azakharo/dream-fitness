@@ -157,9 +157,22 @@ export class TrainingsService {
     const updateData = Object.fromEntries(
       Object.entries(dto).filter(([, value]) => value !== undefined),
     );
+
+    // Build saveData with explicit type conversion for scheduledAt
+    const saveData: DeepPartial<Training> = {
+      ...updateData,
+    };
+    if (saveData.scheduledAt !== undefined) {
+      // Ensure scheduledAt is converted to Date, not left as string
+      // (TypeORM expects Date type for timestamp columns)
+      saveData.scheduledAt = new Date(
+        saveData.scheduledAt as unknown as string,
+      );
+    }
+
     const updatedTraining = await this.trainingRepository.save({
       ...training,
-      ...updateData,
+      ...saveData,
     } as DeepPartial<Training>);
     const response = await this.toResponseDto(updatedTraining);
     await this.eventsPublisher.publishTrainingUpdated({
