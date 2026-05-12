@@ -6,7 +6,7 @@ import {Users, Pencil, Trash} from 'lucide-react';
 import {Badge} from '@/components/ui/Badge';
 import {Button} from '@/components/ui/Button';
 import type {TrainingResponseDto} from '@/types';
-import {TRAINING_TYPE_OPTIONS} from '@/types/constants';
+import {TRAINING_TYPE_OPTIONS, TRAINING_STATUS_LABELS} from '@/types/constants';
 
 interface TrainingsTableProps {
   trainings: TrainingResponseDto[];
@@ -32,16 +32,7 @@ const getStatusBadgeVariant = (
 };
 
 const getStatusLabel = (status: TrainingResponseDto['status']): string => {
-  switch (status) {
-    case 'scheduled':
-      return 'Запланирована';
-    case 'completed':
-      return 'Завершена';
-    case 'cancelled':
-      return 'Отменена';
-    default:
-      return status;
-  }
+  return TRAINING_STATUS_LABELS[status] ?? status;
 };
 
 const getTypeLabel = (type: TrainingResponseDto['type']): string => {

@@ -47,7 +47,7 @@ export const TRAINING_STATUSES: TrainingStatus[] = [
   'completed',
 ];
 
-const TRAINING_STATUS_LABELS: Record<TrainingStatus, string> = {
+export const TRAINING_STATUS_LABELS: Record<TrainingStatus, string> = {
   scheduled: 'Запланирована',
   completed: 'Завершена',
   cancelled: 'Отменена',
