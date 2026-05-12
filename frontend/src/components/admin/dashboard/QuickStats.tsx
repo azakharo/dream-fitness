@@ -53,7 +53,7 @@ export const QuickStats: React.FC = () => {
         isLoading={isTrainingsLoading}
       />
       <StatsWidget
-        title="Средняя заполняемость"
+        title="Средняя заполняемость (mock)"
         value={`${avgOccupancy.toFixed(0)}%`}
         icon={<TrendingUp className="size-6 text-purple-600" />}
         trend={{value: 8, isPositive: true}}
