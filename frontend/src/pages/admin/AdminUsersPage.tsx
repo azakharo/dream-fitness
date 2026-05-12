@@ -12,8 +12,12 @@ import {
 } from '@/hooks/use-users';
 import type {UserDto} from '@/types';
 import type {SortingState} from '@/components/common/DataTable';
+import {useNavigate} from '@tanstack/react-router';
+import {ROUTES} from '@/lib/routes';
 
 export const AdminUsersPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const [filters, setFilters] = useState<UserFiltersType>({});
   const [selectedUser, setSelectedUser] = useState<UserDto | null>(null);
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
@@ -42,7 +46,7 @@ export const AdminUsersPage: React.FC = () => {
   const unblockUser = useUnblockUser();
 
   const handleView = (user: UserDto) => {
-    window.location.href = `/admin/users/${user.id}`;
+    void navigate({to: ROUTES.USER, params: {id: user.id}});
   };
 
   const handleBlock = (user: UserDto) => {

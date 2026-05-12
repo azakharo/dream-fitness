@@ -26,6 +26,7 @@ export const ADMIN_ROUTES = {
   ADMIN_SCHEDULE_NEW: '/admin/schedule/new',
   ADMIN_SCHEDULE_EDIT: '/admin/schedule/$id',
   USERS: '/admin/users',
+  USER: '/admin/users/$id',
   REPORTS: '/admin/reports',
 } as const;
 
