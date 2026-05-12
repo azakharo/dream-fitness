@@ -18,6 +18,7 @@ import {ROUTES} from '@/lib/routes';
 export const AdminUsersPage: React.FC = () => {
   const navigate = useNavigate();
 
+  // TODO store the filters in URL for proper navigation between users <-> user details
   const [filters, setFilters] = useState<UserFiltersType>({});
   const [selectedUser, setSelectedUser] = useState<UserDto | null>(null);
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);

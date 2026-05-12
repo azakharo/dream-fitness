@@ -197,6 +197,7 @@ export class TrainingsService {
 
   async findAll(filterDto: {
     type?: string;
+    status?: TrainingStatus;
     trainerId?: string;
     dateFrom?: string;
     dateTo?: string;
