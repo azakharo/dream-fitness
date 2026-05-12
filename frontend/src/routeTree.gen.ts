@@ -28,8 +28,9 @@ import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin.users.index'
 import { Route as AdminScheduleIndexRouteImport } from './routes/admin.schedule.index'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
-import { Route as AdminScheduleIdRouteImport } from './routes/admin.schedule.$id'
+import { Route as AdminScheduleNewRouteImport } from './routes/admin.schedule.new'
 import { Route as ClientBookingIdRouteImport } from './routes/_client.booking.$id'
+import { Route as AdminScheduleEditIdRouteImport } from './routes/admin.schedule.edit.$id'
 
 const UnauthorizedRoute = UnauthorizedRouteImport.update({
   id: '/unauthorized',
@@ -124,15 +125,20 @@ const AdminUsersIdRoute = AdminUsersIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AdminUsersRoute,
 } as any)
-const AdminScheduleIdRoute = AdminScheduleIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
+const AdminScheduleNewRoute = AdminScheduleNewRouteImport.update({
+  id: '/new',
+  path: '/new',
   getParentRoute: () => AdminScheduleRoute,
 } as any)
 const ClientBookingIdRoute = ClientBookingIdRouteImport.update({
   id: '/booking/$id',
   path: '/booking/$id',
   getParentRoute: () => ClientRoute,
+} as any)
+const AdminScheduleEditIdRoute = AdminScheduleEditIdRouteImport.update({
+  id: '/edit/$id',
+  path: '/edit/$id',
+  getParentRoute: () => AdminScheduleRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -151,10 +157,11 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/booking/$id': typeof ClientBookingIdRoute
-  '/admin/schedule/$id': typeof AdminScheduleIdRoute
+  '/admin/schedule/new': typeof AdminScheduleNewRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/admin/schedule/': typeof AdminScheduleIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/admin/schedule/edit/$id': typeof AdminScheduleEditIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -169,10 +176,11 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin': typeof AdminIndexRoute
   '/booking/$id': typeof ClientBookingIdRoute
-  '/admin/schedule/$id': typeof AdminScheduleIdRoute
+  '/admin/schedule/new': typeof AdminScheduleNewRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/admin/schedule': typeof AdminScheduleIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/admin/schedule/edit/$id': typeof AdminScheduleEditIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -193,10 +201,11 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/_client/booking/$id': typeof ClientBookingIdRoute
-  '/admin/schedule/$id': typeof AdminScheduleIdRoute
+  '/admin/schedule/new': typeof AdminScheduleNewRoute
   '/admin/users/$id': typeof AdminUsersIdRoute
   '/admin/schedule/': typeof AdminScheduleIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/admin/schedule/edit/$id': typeof AdminScheduleEditIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -216,10 +225,11 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/'
     | '/booking/$id'
-    | '/admin/schedule/$id'
+    | '/admin/schedule/new'
     | '/admin/users/$id'
     | '/admin/schedule/'
     | '/admin/users/'
+    | '/admin/schedule/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -234,10 +244,11 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin'
     | '/booking/$id'
-    | '/admin/schedule/$id'
+    | '/admin/schedule/new'
     | '/admin/users/$id'
     | '/admin/schedule'
     | '/admin/users'
+    | '/admin/schedule/edit/$id'
   id:
     | '__root__'
     | '/'
@@ -257,10 +268,11 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/'
     | '/_client/booking/$id'
-    | '/admin/schedule/$id'
+    | '/admin/schedule/new'
     | '/admin/users/$id'
     | '/admin/schedule/'
     | '/admin/users/'
+    | '/admin/schedule/edit/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -406,11 +418,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersIdRouteImport
       parentRoute: typeof AdminUsersRoute
     }
-    '/admin/schedule/$id': {
-      id: '/admin/schedule/$id'
-      path: '/$id'
-      fullPath: '/admin/schedule/$id'
-      preLoaderRoute: typeof AdminScheduleIdRouteImport
+    '/admin/schedule/new': {
+      id: '/admin/schedule/new'
+      path: '/new'
+      fullPath: '/admin/schedule/new'
+      preLoaderRoute: typeof AdminScheduleNewRouteImport
       parentRoute: typeof AdminScheduleRoute
     }
     '/_client/booking/$id': {
@@ -419,6 +431,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/booking/$id'
       preLoaderRoute: typeof ClientBookingIdRouteImport
       parentRoute: typeof ClientRoute
+    }
+    '/admin/schedule/edit/$id': {
+      id: '/admin/schedule/edit/$id'
+      path: '/edit/$id'
+      fullPath: '/admin/schedule/edit/$id'
+      preLoaderRoute: typeof AdminScheduleEditIdRouteImport
+      parentRoute: typeof AdminScheduleRoute
     }
   }
 }
@@ -457,13 +476,15 @@ const ClientRouteWithChildren =
   ClientRoute._addFileChildren(ClientRouteChildren)
 
 interface AdminScheduleRouteChildren {
-  AdminScheduleIdRoute: typeof AdminScheduleIdRoute
+  AdminScheduleNewRoute: typeof AdminScheduleNewRoute
   AdminScheduleIndexRoute: typeof AdminScheduleIndexRoute
+  AdminScheduleEditIdRoute: typeof AdminScheduleEditIdRoute
 }
 
 const AdminScheduleRouteChildren: AdminScheduleRouteChildren = {
-  AdminScheduleIdRoute: AdminScheduleIdRoute,
+  AdminScheduleNewRoute: AdminScheduleNewRoute,
   AdminScheduleIndexRoute: AdminScheduleIndexRoute,
+  AdminScheduleEditIdRoute: AdminScheduleEditIdRoute,
 }
 
 const AdminScheduleRouteWithChildren = AdminScheduleRoute._addFileChildren(

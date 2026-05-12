@@ -64,7 +64,7 @@ export const AdminSchedulePage: React.FC = () => {
   };
 
   const handleCreateTraining = () => {
-    void navigate({to: ROUTES.ADMIN_SCHEDULE_EDIT, params: {id: 'new'}});
+    void navigate({to: ROUTES.ADMIN_SCHEDULE_NEW});
   };
 
   const trainings = trainingsData?.items ?? [];

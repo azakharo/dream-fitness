@@ -1,35 +1,28 @@
 import React from 'react';
-import {useNavigate, useParams} from '@tanstack/react-router';
+import {useParams, useRouter} from '@tanstack/react-router';
+import {toast} from 'sonner';
 
 import {PageHeader} from '@/components/common/PageHeader';
 import {TrainingForm} from '@/components/admin/trainings/TrainingForm';
-import {
-  useTraining,
-  useCreateTraining,
-  useUpdateTraining,
-} from '@/hooks/use-trainings';
+import {useTraining, useUpdateTraining} from '@/hooks/use-trainings';
 import {useTrainers} from '@/hooks/use-trainers';
-import type {CreateTrainingDto, UpdateTrainingDto} from '@/types';
-import {ROUTES} from '@/lib/routes';
+import type {UpdateTrainingDto} from '@/types';
 
 export const AdminScheduleEditPage: React.FC = () => {
-  const navigate = useNavigate();
-  const {id} = useParams({from: '/admin/schedule/$id'});
-  const isEditMode = id !== 'new';
-
+  const router = useRouter();
+  const {id} = useParams({from: '/admin/schedule/edit/$id'});
   const {data: training, isLoading: trainingLoading} = useTraining(id);
   const {data: trainersData} = useTrainers({activeOnly: true});
-  const createTraining = useCreateTraining();
   const updateTraining = useUpdateTraining();
 
   const trainers = trainersData ?? [];
 
   const handleSuccess = () => {
-    void navigate({to: ROUTES.ADMIN_SCHEDULE});
+    void router.history.back();
   };
 
   const handleCancel = () => {
-    void navigate({to: ROUTES.ADMIN_SCHEDULE});
+    void router.history.back();
   };
 
   const handleSubmit = (data: {
@@ -43,9 +36,11 @@ export const AdminScheduleEditPage: React.FC = () => {
     description?: string;
     status?: string;
   }) => {
-    const trainingData = {
+    if (!training) return;
+
+    const updateData: UpdateTrainingDto = {
       title: data.title,
-      type: data.type as CreateTrainingDto['type'],
+      type: data.type as UpdateTrainingDto['type'],
       trainerId: data.trainerId,
       scheduledAt: data.scheduledAt.toISOString(),
       durationMinutes: data.durationMinutes,
@@ -54,42 +49,35 @@ export const AdminScheduleEditPage: React.FC = () => {
       description: data.description,
     };
 
-    if (isEditMode && training) {
-      const updateData: UpdateTrainingDto = {
-        ...trainingData,
-      };
-      if (data.status) {
-        updateData.status = data.status as UpdateTrainingDto['status'];
-      }
-      updateTraining.mutate(
-        {id, data: updateData},
-        {
-          onSuccess: handleSuccess,
-        },
-      );
-    } else {
-      createTraining.mutate(trainingData as CreateTrainingDto, {
-        onSuccess: handleSuccess,
-      });
+    if (data.status) {
+      updateData.status = data.status as UpdateTrainingDto['status'];
     }
-  };
 
-  const isLoading = isEditMode && trainingLoading;
+    updateTraining.mutate(
+      {id, data: updateData},
+      {
+        onSuccess: handleSuccess,
+        onError: error => {
+          const message =
+            error instanceof Error
+              ? error.message
+              : 'Ошибка при обновлении тренировки';
+          toast.error(message);
+        },
+      },
+    );
+  };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEditMode ? 'Редактирование тренировки' : 'Создание тренировки'}
-        description={
-          isEditMode
-            ? 'Измените данные тренировки и нажмите "Сохранить"'
-            : 'Заполните данные тренировки и нажмите "Создать"'
-        }
+        title="Редактирование тренировки"
+        description="Измените данные тренировки и нажмите 'Сохранить'"
         showBack
         onBack={handleCancel}
       />
 
-      {isLoading ? (
+      {trainingLoading ? (
         <div className="rounded-lg border p-6">
           <div className="space-y-4">
             <div className="h-10 w-full animate-pulse rounded-sm bg-muted" />
