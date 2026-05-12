@@ -30,9 +30,9 @@ export const AdminUserDetailPage: React.FC = () => {
 
   const handleConfirmBlock = () => {
     if (userId && blockAction === 'block') {
-      void blockUserMutation.mutateAsync(userId);
+      blockUserMutation.mutate(userId);
     } else if (userId && blockAction === 'unblock') {
-      void unblockUserMutation.mutateAsync(userId);
+      unblockUserMutation.mutate(userId);
     }
     setBlockDialogOpen(false);
   };

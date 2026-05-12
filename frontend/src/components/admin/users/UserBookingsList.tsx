@@ -128,7 +128,7 @@ export const UserBookingsList: React.FC<UserBookingsListProps> = ({
     return (
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Последние тренировки</CardTitle>
+          <CardTitle className="text-lg">Последние тренировки (mock)</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Нет записей</p>
@@ -140,7 +140,7 @@ export const UserBookingsList: React.FC<UserBookingsListProps> = ({
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg">Последние тренировки</CardTitle>
+        <CardTitle className="text-lg">Последние тренировки (mock)</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {displayedBookings.map(booking => (

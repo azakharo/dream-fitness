@@ -121,7 +121,7 @@ export const UserTransactionsList: React.FC<UserTransactionsListProps> = ({
     return (
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Последние транзакции</CardTitle>
+          <CardTitle className="text-lg">Последние транзакции (mock)</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">Нет транзакций</p>
@@ -133,7 +133,7 @@ export const UserTransactionsList: React.FC<UserTransactionsListProps> = ({
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg">Последние транзакции</CardTitle>
+        <CardTitle className="text-lg">Последние транзакции (mock)</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {displayedTransactions.map(transaction => (
