@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useParams} from '@tanstack/react-router';
 
 import {PageHeader} from '@/components/common/PageHeader';
 import {BlockUserDialog} from '@/components/admin/users/BlockUserDialog';
@@ -9,9 +10,7 @@ import {useBlockUser, useUnblockUser, useUser} from '@/hooks/use-users';
 import {ROUTES} from '@/lib/routes';
 
 export const AdminUserDetailPage: React.FC = () => {
-  const userId = window.location.pathname
-    .split('/admin/users/')[1]
-    ?.split('?')[0];
+  const {id: userId} = useParams({from: ROUTES.USER});
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
   const [blockAction, setBlockAction] = useState<'block' | 'unblock'>('block');
 
@@ -38,16 +37,12 @@ export const AdminUserDetailPage: React.FC = () => {
     setBlockDialogOpen(false);
   };
 
+  const pageHeader = <PageHeader title="Детали пользователя" showBack />;
+
   if (error) {
     return (
       <div className="container mx-auto py-8">
-        <PageHeader
-          title="Детали пользователя"
-          showBack
-          onBack={() => {
-            window.location.href = ROUTES.USERS;
-          }}
-        />
+        {pageHeader}
         <div
           className="
             rounded-lg border border-destructive bg-destructive/10 p-6
@@ -62,13 +57,7 @@ export const AdminUserDetailPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <PageHeader
-        title="Детали пользователя"
-        showBack
-        onBack={() => {
-          window.location.href = ROUTES.USERS;
-        }}
-      />
+      {pageHeader}
 
       {user && (
         <>

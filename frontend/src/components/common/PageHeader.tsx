@@ -2,6 +2,7 @@ import * as React from 'react';
 import {ArrowLeft} from 'lucide-react';
 
 import {Button} from '@/components/ui/Button';
+import {useRouter} from '@tanstack/react-router';
 
 export interface PageHeaderProps {
   title: string;
@@ -18,11 +19,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   showBack = false,
   onBack,
 }) => {
+  const router = useRouter();
+
   const handleBack = () => {
     if (onBack) {
       onBack();
     } else {
-      window.history.back();
+      router.history.back();
     }
   };
 
