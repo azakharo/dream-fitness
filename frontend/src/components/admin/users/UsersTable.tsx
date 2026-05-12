@@ -87,13 +87,11 @@ export const UsersTable: React.FC<UsersTableProps> = ({
     {
       key: 'name',
       header: 'Имя',
-      sortable: true,
       render: user => <span className="font-medium">{user.name}</span>,
     },
     {
       key: 'email',
       header: 'Email',
-      sortable: true,
     },
     {
       key: 'phone',
@@ -103,7 +101,6 @@ export const UsersTable: React.FC<UsersTableProps> = ({
     {
       key: 'balance',
       header: 'Баланс',
-      sortable: true,
       render: user => (
         <span className="font-mono">{formatBalance(user.balance)}</span>
       ),
@@ -111,7 +108,6 @@ export const UsersTable: React.FC<UsersTableProps> = ({
     {
       key: 'status',
       header: 'Статус',
-      sortable: true,
       render: user => (
         <Badge variant={getStatusBadgeVariant(user.status)}>
           {getStatusLabel(user.status)}
@@ -121,7 +117,6 @@ export const UsersTable: React.FC<UsersTableProps> = ({
     {
       key: 'createdAt',
       header: 'Дата регистрации',
-      sortable: true,
       render: user => (
         <span className="text-muted-foreground">
           {formatDate(user.createdAt)}
