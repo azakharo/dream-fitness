@@ -94,34 +94,212 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
   };
 
   return (
-    <Form form={form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit) as never}
-        className="space-y-4"
-      >
-        <FormField
-          control={form.control as never}
-          name="title"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Название</FormLabel>
-              <FormControl>
-                <Input placeholder="Введите название тренировки" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <Form
+      form={form}
+      onSubmit={form.handleSubmit(handleSubmit) as never}
+      className="space-y-4"
+    >
+      <FormField
+        control={form.control as never}
+        name="title"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Название</FormLabel>
+            <FormControl>
+              <Input placeholder="Введите название тренировки" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
+      <FormField
+        control={form.control as never}
+        name="type"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Тип тренировки</FormLabel>
+            <FormControl>
+              <select
+                {...field}
+                className={cn(
+                  `
+                    flex h-10 w-full rounded-md border border-input
+                    bg-background px-3 py-2 text-sm ring-offset-background
+                    focus-visible:ring-2 focus-visible:ring-ring
+                    focus-visible:ring-offset-2 focus-visible:outline-none
+                  `,
+                  !field.value && 'text-muted-foreground',
+                )}
+              >
+                <option value="">Выберите тип</option>
+                {TRAINING_TYPE_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control as never}
+        name="trainerId"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Тренер</FormLabel>
+            <FormControl>
+              <select
+                {...field}
+                className={cn(
+                  `
+                    flex h-10 w-full rounded-md border border-input
+                    bg-background px-3 py-2 text-sm ring-offset-background
+                    focus-visible:ring-2 focus-visible:ring-ring
+                    focus-visible:ring-offset-2 focus-visible:outline-none
+                  `,
+                  !field.value && 'text-muted-foreground',
+                )}
+              >
+                <option value="">Выберите тренера</option>
+                {trainers.map(trainer => (
+                  <option key={trainer.id} value={trainer.id}>
+                    {trainer.name}
+                  </option>
+                ))}
+              </select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control as never}
+        name="scheduledAt"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Дата и время</FormLabel>
+            <FormControl>
+              <Input
+                type="datetime-local"
+                value={
+                  field.value ? formatDateForInput(field.value as Date) : ''
+                }
+                onChange={e => {
+                  const date = parseDateFromString(e.target.value);
+                  field.onChange(date);
+                }}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control as never}
+        name="durationMinutes"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Длительность (минуты)</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min={15}
+                max={480}
+                {...field}
+                onChange={e => field.onChange(Number(e.target.value))}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control as never}
+        name="capacity"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Количество мест</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min={1}
+                max={100}
+                {...field}
+                onChange={e => field.onChange(Number(e.target.value))}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control as never}
+        name="price"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Цена (баллы)</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min={0}
+                {...field}
+                onChange={e => field.onChange(Number(e.target.value))}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control as never}
+        name="description"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Описание</FormLabel>
+            <FormControl>
+              <textarea
+                className={cn(
+                  `
+                    flex min-h-[80px] w-full rounded-md border border-input
+                    bg-background px-3 py-2 text-sm ring-offset-background
+                  `,
+                  'placeholder:text-muted-foreground',
+                  `
+                    focus-visible:ring-2 focus-visible:ring-ring
+                    focus-visible:ring-offset-2 focus-visible:outline-none
+                  `,
+                  'disabled:cursor-not-allowed disabled:opacity-50',
+                )}
+                placeholder="Описание тренировки..."
+                {...field}
+                value={(field.value as string) ?? ''}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {isEditMode && (
         <FormField
           control={form.control as never}
-          name="type"
+          name="status"
           render={({field}) => (
             <FormItem>
-              <FormLabel>Тип тренировки</FormLabel>
+              <FormLabel>Статус</FormLabel>
               <FormControl>
                 <select
                   {...field}
+                  value={(field.value as string) ?? ''}
                   className={cn(
                     `
                       flex h-10 w-full rounded-md border border-input
@@ -132,8 +310,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
                     !field.value && 'text-muted-foreground',
                   )}
                 >
-                  <option value="">Выберите тип</option>
-                  {TRAINING_TYPE_OPTIONS.map(option => (
+                  {TRAINING_STATUS_OPTIONS.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -144,194 +321,16 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
             </FormItem>
           )}
         />
+      )}
 
-        <FormField
-          control={form.control as never}
-          name="trainerId"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Тренер</FormLabel>
-              <FormControl>
-                <select
-                  {...field}
-                  className={cn(
-                    `
-                      flex h-10 w-full rounded-md border border-input
-                      bg-background px-3 py-2 text-sm ring-offset-background
-                      focus-visible:ring-2 focus-visible:ring-ring
-                      focus-visible:ring-offset-2 focus-visible:outline-none
-                    `,
-                    !field.value && 'text-muted-foreground',
-                  )}
-                >
-                  <option value="">Выберите тренера</option>
-                  {trainers.map(trainer => (
-                    <option key={trainer.id} value={trainer.id}>
-                      {trainer.name}
-                    </option>
-                  ))}
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control as never}
-          name="scheduledAt"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Дата и время</FormLabel>
-              <FormControl>
-                <Input
-                  type="datetime-local"
-                  value={
-                    field.value ? formatDateForInput(field.value as Date) : ''
-                  }
-                  onChange={e => {
-                    const date = parseDateFromString(e.target.value);
-                    field.onChange(date);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control as never}
-          name="durationMinutes"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Длительность (минуты)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={15}
-                  max={480}
-                  {...field}
-                  onChange={e => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control as never}
-          name="capacity"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Количество мест</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  max={100}
-                  {...field}
-                  onChange={e => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control as never}
-          name="price"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Цена (баллы)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  {...field}
-                  onChange={e => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control as never}
-          name="description"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Описание</FormLabel>
-              <FormControl>
-                <textarea
-                  className={cn(
-                    `
-                      flex min-h-[80px] w-full rounded-md border border-input
-                      bg-background px-3 py-2 text-sm ring-offset-background
-                    `,
-                    'placeholder:text-muted-foreground',
-                    `
-                      focus-visible:ring-2 focus-visible:ring-ring
-                      focus-visible:ring-offset-2 focus-visible:outline-none
-                    `,
-                    'disabled:cursor-not-allowed disabled:opacity-50',
-                  )}
-                  placeholder="Описание тренировки..."
-                  {...field}
-                  value={(field.value as string) ?? ''}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {isEditMode && (
-          <FormField
-            control={form.control as never}
-            name="status"
-            render={({field}) => (
-              <FormItem>
-                <FormLabel>Статус</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    value={(field.value as string) ?? ''}
-                    className={cn(
-                      `
-                        flex h-10 w-full rounded-md border border-input
-                        bg-background px-3 py-2 text-sm ring-offset-background
-                        focus-visible:ring-2 focus-visible:ring-ring
-                        focus-visible:ring-offset-2 focus-visible:outline-none
-                      `,
-                      !field.value && 'text-muted-foreground',
-                    )}
-                  >
-                    {TRAINING_STATUS_OPTIONS.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Отмена
+          </Button>
         )}
-
-        <div className="flex justify-end gap-2">
-          {onCancel && (
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Отмена
-            </Button>
-          )}
-          <Button type="submit">{isEditMode ? 'Сохранить' : 'Создать'}</Button>
-        </div>
-      </form>
+        <Button type="submit">{isEditMode ? 'Сохранить' : 'Создать'}</Button>
+      </div>
     </Form>
   );
 };
