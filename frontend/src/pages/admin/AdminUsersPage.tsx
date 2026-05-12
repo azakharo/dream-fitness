@@ -20,16 +20,20 @@ export const AdminUsersPage: React.FC = () => {
   const [blockAction, setBlockAction] = useState<'block' | 'unblock'>('block');
 
   const [pagination, setPagination] = useState({page: 1, pageSize: 10});
+  // TODO implement sorting
   const [sorting, setSorting] = useState<SortingState>({
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
+  // TODO implement batch operations
   const [selectedRows, setSelectedRows] = useState<Set<string>>(
     () => new Set(),
   );
 
   const {data: usersData, isLoading: usersLoading} = useUsers({
     ...filters,
+    // TODO impl searching by name or email
+    search: undefined,
     page: pagination.page,
     limit: pagination.pageSize,
   });

@@ -45,7 +45,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="relative max-w-[300px] min-w-[200px] flex-1">
+      <div className="relative max-w-75 min-w-50 flex-1">
         <Search
           className="
             absolute top-1/2 left-3 size-4 -translate-y-1/2
@@ -54,7 +54,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
         />
         <Input
           type="search"
-          placeholder="Поиск по имени или email..."
+          placeholder="Поиск (не реализовано)..."
           value={filters.search || ''}
           onChange={handleSearchChange}
           className="pl-9"

@@ -92,6 +92,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({limit = 10}) => {
   return (
     <Card className="p-6">
       <div className="mb-4 flex items-center justify-between">
+        {/* TODO реализовать Последние действия */}
         <h3 className="text-lg font-semibold">Последние действия (mock)</h3>
         <button
           className="
