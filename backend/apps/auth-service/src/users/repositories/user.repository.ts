@@ -82,16 +82,16 @@ export class UserRepository extends Repository<User> {
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.createQueryBuilder('user').select([
-      'id',
-      'email',
-      'name',
-      'phone',
-      'birthDate',
-      'gender',
-      'role',
-      'balance',
-      'status',
-      'createdAt',
+      'user.id',
+      'user.email',
+      'user.name',
+      'user.phone',
+      'user.birthDate',
+      'user.gender',
+      'user.role',
+      'user.balance',
+      'user.status',
+      'user.createdAt',
     ]);
 
     if (status) {
