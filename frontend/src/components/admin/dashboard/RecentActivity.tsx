@@ -92,7 +92,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({limit = 10}) => {
   return (
     <Card className="p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Последние действия</h3>
+        <h3 className="text-lg font-semibold">Последние действия (mock)</h3>
         <button
           className="
             flex items-center gap-1 text-sm text-muted-foreground
@@ -127,8 +127,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({limit = 10}) => {
                 </p>
               </div>
               <span className="text-xs whitespace-nowrap text-muted-foreground">
-                {formatDistanceToNow(activity.timestamp, {addSuffix: false})}{' '}
-                назад
+                {formatDistanceToNow(activity.timestamp, {addSuffix: true})}
               </span>
             </div>
           ))}

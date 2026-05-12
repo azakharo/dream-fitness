@@ -9,8 +9,8 @@ import {useLoadingStats} from '@/hooks/use-reports';
 
 export const QuickStats: React.FC = () => {
   const now = new Date();
-  const weekStart = startOfWeek(now, {weekStartsOn: 1});
-  const weekEnd = endOfWeek(now, {weekStartsOn: 1});
+  const weekStart = startOfWeek(now);
+  const weekEnd = endOfWeek(now);
 
   const {data: usersData, isLoading: isUsersLoading} = useUsers({
     status: 'active',
