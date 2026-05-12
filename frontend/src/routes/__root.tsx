@@ -7,8 +7,8 @@ import {NotFoundPage} from '@/pages/NotFoundPage';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 минут
-      retry: 1,
+      staleTime: import.meta.env.PROD ? 1000 * 5 : 0,
+      retry: import.meta.env.PROD ? 1 : 0,
     },
   },
 });
