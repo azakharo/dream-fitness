@@ -87,7 +87,6 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
   }, [training, form]);
 
   const handleSubmit = (data: TrainingFormData) => {
-    console.log('Training form submitted:', data);
     if (onSuccess) {
       onSuccess(data);
     }

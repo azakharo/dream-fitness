@@ -123,5 +123,12 @@ export const api = {
   patch: <T>(endpoint: string, body?: unknown) =>
     kyInstance.patch(endpoint, {json: transformDatesInBody(body)}).json<T>(),
 
-  delete: <T>(endpoint: string) => kyInstance.delete(endpoint).json<T>(),
+  delete: async <T>(endpoint: string): Promise<T | void> => {
+    const response = await kyInstance.delete(endpoint);
+    const text = await response.text();
+    if (!text) {
+      return undefined;
+    }
+    return JSON.parse(text) as T;
+  },
 };
