@@ -7,6 +7,7 @@ import {
   Body,
   Req,
   Res,
+  Query,
   UseGuards,
   All,
 } from '@nestjs/common';
@@ -37,6 +38,7 @@ import {
   UpdateUserStatusDto,
   UserListResponseDto,
   UserDto,
+  FindAllUsersQueryDto,
 } from '@app/contracts/auth';
 
 const AUTH_SERVICE_URL = 'AUTH_SERVICE_URL';
@@ -363,7 +365,12 @@ export class AuthProxyController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  listUsers(@Req() req: RequestWithUser) {
+  listUsers(
+    @Req() req: RequestWithUser,
+    // Нужно для swagger doc
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Query() _query: FindAllUsersQueryDto,
+  ) {
     return this.proxyService.proxyRequest(
       req,
       null,
