@@ -1,6 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {api} from '@/lib/api-client';
 import {balanceKeys, transactionsKeys} from '@/lib/query-keys';
+import {formatDateKey} from '@/lib/date-utils';
 import type {
   BalanceResponseDto,
   TransactionListResponseDto,
@@ -27,9 +28,8 @@ export const useTransactions = (filters?: TransactionFilters) => {
       const params = new URLSearchParams();
       if (filters?.type) params.set('type', filters.type);
       if (filters?.fromDate)
-        params.set('fromDate', filters.fromDate.toISOString().split('T')[0]);
-      if (filters?.toDate)
-        params.set('toDate', filters.toDate.toISOString().split('T')[0]);
+        params.set('fromDate', formatDateKey(filters.fromDate));
+      if (filters?.toDate) params.set('toDate', formatDateKey(filters.toDate));
 
       const queryString = params.toString();
       const endpoint = queryString

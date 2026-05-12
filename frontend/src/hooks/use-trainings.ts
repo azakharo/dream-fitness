@@ -2,6 +2,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {toast} from 'sonner';
 import {api} from '@/lib/api-client';
 import {scheduleKeys, trainersKeys, trainingsKeys} from '@/lib/query-keys';
+import {formatDateKey} from '@/lib/date-utils';
 import type {
   CreateTrainingDto,
   TrainerResponseDto,
@@ -27,9 +28,8 @@ export const useTrainings = (filters?: TrainingFilters) => {
       if (filters?.type) params.set('type', filters.type);
       if (filters?.trainerId) params.set('trainerId', filters.trainerId);
       if (filters?.dateFrom)
-        params.set('dateFrom', filters.dateFrom.toISOString().split('T')[0]);
-      if (filters?.dateTo)
-        params.set('dateTo', filters.dateTo.toISOString().split('T')[0]);
+        params.set('dateFrom', formatDateKey(filters.dateFrom));
+      if (filters?.dateTo) params.set('dateTo', formatDateKey(filters.dateTo));
       if (filters?.status) params.set('status', filters.status);
 
       const queryString = params.toString();
@@ -59,7 +59,7 @@ export const useSchedule = (date?: Date) => {
     queryKey: scheduleKeys.byDate(date),
     queryFn: () => {
       if (date) {
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = formatDateKey(date);
         return api.get<TrainingListResponseDto>(`/schedule/${dateStr}`);
       }
       return api.get<TrainingListResponseDto>('/schedule');

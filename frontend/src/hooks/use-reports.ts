@@ -1,4 +1,5 @@
 import {useQuery} from '@tanstack/react-query';
+import {formatDateKey} from '@/lib/date-utils';
 
 export interface LoadingStatsData {
   totalTrainings: number;
@@ -32,8 +33,8 @@ const generateMockLoadingStats = (
   dateFrom?: Date,
   dateTo?: Date,
 ): LoadingStatsData => {
-  const from = dateFrom ? dateFrom.toISOString().split('T')[0] : '2024-01-01';
-  const to = dateTo ? dateTo.toISOString().split('T')[0] : '2024-01-31';
+  const from = dateFrom ? formatDateKey(dateFrom) : '2024-01-01';
+  const to = dateTo ? formatDateKey(dateTo) : '2024-01-31';
 
   return {
     totalTrainings: 45,
@@ -93,8 +94,8 @@ const generateMockFinancialReport = (
   dateFrom: Date,
   dateTo: Date,
 ): FinancialReportData => {
-  const from = dateFrom.toISOString().split('T')[0];
-  const to = dateTo.toISOString().split('T')[0];
+  const from = formatDateKey(dateFrom);
+  const to = formatDateKey(dateTo);
 
   return {
     totalRevenue: 224000,
@@ -113,8 +114,8 @@ export const useLoadingStats = (dateFrom?: Date, dateTo?: Date) => {
     queryKey: [
       'reports',
       'loading',
-      dateFrom?.toISOString(),
-      dateTo?.toISOString(),
+      dateFrom ? formatDateKey(dateFrom) : undefined,
+      dateTo ? formatDateKey(dateTo) : undefined,
     ],
     queryFn: () => Promise.resolve(generateMockLoadingStats(dateFrom, dateTo)),
     staleTime: 5 * 60 * 1000,
@@ -134,8 +135,8 @@ export const useFinancialReport = (dateFrom: Date, dateTo: Date) => {
     queryKey: [
       'reports',
       'financial',
-      dateFrom.toISOString(),
-      dateTo.toISOString(),
+      formatDateKey(dateFrom),
+      formatDateKey(dateTo),
     ],
     queryFn: () =>
       Promise.resolve(generateMockFinancialReport(dateFrom, dateTo)),

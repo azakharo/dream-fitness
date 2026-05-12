@@ -9,6 +9,7 @@ import {Button} from '@/components/ui';
 import {Input} from '@/components/ui';
 import {DatePicker} from '@/components/ui/DatePicker';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {formatDateKey} from '@/lib/date-utils';
 import {
   Form,
   FormControl,
@@ -107,7 +108,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
                       field.value ? new Date(field.value as string) : undefined
                     }
                     onChange={date =>
-                      field.onChange(date?.toISOString().split('T')[0])
+                      field.onChange(date ? formatDateKey(date) : undefined)
                     }
                     placeholder="Выберите дату"
                     disabled={false}

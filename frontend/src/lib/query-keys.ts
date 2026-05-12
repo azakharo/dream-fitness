@@ -11,6 +11,8 @@
  * @see https://tanstack.com/query/latest/docs/framework/react/guides/query-keys
  */
 
+import {formatDateKey} from '@/lib/date-utils';
+
 // Filter types for query keys
 export interface BookingFilters {
   status?: string;
@@ -75,7 +77,7 @@ export const scheduleKeys = {
   all: () => ['schedule'] as const,
   byDate: (date?: Date) =>
     date
-      ? ([...scheduleKeys.all(), date.toISOString()] as const)
+      ? ([...scheduleKeys.all(), formatDateKey(date)] as const)
       : scheduleKeys.all(),
 };
 

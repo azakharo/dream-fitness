@@ -8,6 +8,7 @@ import type {
   AfterResponseState,
 } from 'ky';
 import {useAuthStore} from '@/stores/auth-store';
+import {formatDateKey} from '@/lib/date-utils';
 
 const API_BASE = (import.meta.env.VITE_ENABLED_API_PROXYING ?? '') + '/api';
 
@@ -35,7 +36,7 @@ let refreshPromise: Promise<void> | null = null;
  */
 function transformDatesInBody(body: unknown): unknown {
   if (body instanceof Date) {
-    return body.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+    return formatDateKey(body);
   }
   if (Array.isArray(body)) {
     return body.map(transformDatesInBody);
