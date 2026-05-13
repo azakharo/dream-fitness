@@ -3,14 +3,17 @@ import {
   Get,
   Post,
   Patch,
+  Param,
   Body,
   Req,
   Res,
+  Query,
   UseGuards,
   All,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import {
   ApiBearerAuth,
   ApiExcludeEndpoint,
@@ -18,6 +21,7 @@ import {
   ApiBody,
   ApiResponse,
 } from '@nestjs/swagger';
+import { Roles } from '@app/shared/decorators';
 import type { RequestWithUser } from '@app/shared';
 import { ProxyService } from './proxy.service';
 import {
@@ -31,6 +35,11 @@ import {
   BalanceResponseDto,
   TransactionListResponseDto,
   TransactionResponseDto,
+  UpdateUserStatusDto,
+  UpdateUserDto,
+  UserListResponseDto,
+  UserDto,
+  FindAllUsersQueryDto,
 } from '@app/contracts/auth';
 
 const AUTH_SERVICE_URL = 'AUTH_SERVICE_URL';
@@ -196,7 +205,7 @@ export class AuthProxyController {
   @Patch('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiBody({ type: RegisterDto })
+  @ApiBody({ type: UpdateUserDto })
   @ApiResponse({
     status: 200,
     description: 'Profile updated',
@@ -205,7 +214,7 @@ export class AuthProxyController {
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  updateProfile(@Req() req: RequestWithUser, @Body() body: RegisterDto) {
+  updateProfile(@Req() req: RequestWithUser, @Body() body: UpdateUserDto) {
     return this.proxyService.proxyRequest(
       req,
       body,
@@ -340,6 +349,84 @@ export class AuthProxyController {
       null,
       '/auth/transactions',
       'GET',
+      AUTH_SERVICE_URL,
+      AUTH_SERVICE_DEFAULT_URL,
+    );
+  }
+
+  // Admin endpoints
+  @Get('users')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'List all users (admin only)',
+    type: UserListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  listUsers(
+    @Req() req: RequestWithUser,
+    // Нужно для swagger doc
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Query() _query: FindAllUsersQueryDto,
+  ) {
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      '/auth/users',
+      'GET',
+      AUTH_SERVICE_URL,
+      AUTH_SERVICE_DEFAULT_URL,
+    );
+  }
+
+  @Get('users/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Get user details by ID (admin only)',
+    type: UserDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  getUserById(@Req() req: RequestWithUser, @Param('id') id: string) {
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/auth/users/${id}`,
+      'GET',
+      AUTH_SERVICE_URL,
+      AUTH_SERVICE_DEFAULT_URL,
+    );
+  }
+
+  @Patch('users/:id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Block/unblock user (admin only)',
+    type: UserDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  updateUserStatus(
+    @Req() req: RequestWithUser,
+    @Param('id') id: string,
+    @Body() body: UpdateUserStatusDto,
+  ) {
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      `/auth/users/${id}/status`,
+      'PATCH',
       AUTH_SERVICE_URL,
       AUTH_SERVICE_DEFAULT_URL,
     );

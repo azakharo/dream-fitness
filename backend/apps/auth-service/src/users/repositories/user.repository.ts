@@ -1,6 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { UserStatus, UserRole } from '@app/shared';
+
+export interface FindAllUsersFilters {
+  status?: UserStatus;
+  role?: UserRole;
+  ids?: string[];
+  page: number;
+  limit: number;
+}
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -65,5 +74,45 @@ export class UserRepository extends Repository<User> {
       lock: { mode: 'pessimistic_write' },
     });
     return user || undefined;
+  }
+
+  async findAllWithFilters(
+    options: FindAllUsersFilters,
+  ): Promise<{ users: User[]; total: number }> {
+    const { page, limit, status, role, ids } = options;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.createQueryBuilder('user').select([
+      'user.id',
+      'user.email',
+      'user.name',
+      'user.phone',
+      'user.birthDate',
+      'user.gender',
+      'user.role',
+      'user.balance',
+      'user.status',
+      'user.createdAt',
+    ]);
+
+    if (status) {
+      queryBuilder.andWhere('user.status = :status', { status });
+    }
+
+    if (role) {
+      queryBuilder.andWhere('user.role = :role', { role });
+    }
+
+    if (ids && ids.length > 0) {
+      queryBuilder.andWhere('user.id IN (:...ids)', { ids });
+    }
+
+    const [users, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .orderBy('user.createdAt', 'DESC')
+      .getManyAndCount();
+
+    return { users, total };
   }
 }

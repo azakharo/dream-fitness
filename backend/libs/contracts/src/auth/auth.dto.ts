@@ -10,6 +10,7 @@ import {
   IsDateString,
   IsUUID,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserGender, UserRole, UserStatus } from '@app/shared/enums';
 import { TransactionResponseDto } from './transaction.dto';
@@ -70,10 +71,10 @@ export class UserResponseDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   phone: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   birthDate: string | null;
 
   @ApiPropertyOptional({ enum: UserGender })
@@ -102,10 +103,10 @@ export class UserDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   phone: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   birthDate: string | null;
 
   @ApiPropertyOptional({ enum: UserGender })
@@ -134,10 +135,10 @@ export class UserProfileDto {
   @ApiProperty()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   phone: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String })
   birthDate: string | null;
 
   @ApiPropertyOptional({ enum: UserGender })
@@ -206,6 +207,79 @@ export class BalanceResponseDto {
 export class TransactionListResponseDto {
   @ApiProperty({ type: [TransactionResponseDto] })
   items!: TransactionResponseDto[];
+
+  @ApiProperty({ example: 25 })
+  total!: number;
+
+  @ApiProperty({ example: 1 })
+  page!: number;
+
+  @ApiProperty({ example: 10 })
+  limit!: number;
+}
+
+export class FindAllUsersQueryDto {
+  @ApiPropertyOptional({ example: 1, minimum: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @IsPositive()
+  page?: number;
+
+  @ApiPropertyOptional({ example: 10, minimum: 1, maximum: 100 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @IsPositive()
+  limit?: number;
+
+  @ApiPropertyOptional({ enum: UserStatus })
+  @IsOptional()
+  @IsEnum(UserStatus)
+  status?: UserStatus;
+
+  @ApiPropertyOptional({ enum: UserRole })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
+
+  @ApiPropertyOptional({ example: 'uuid1,uuid2' })
+  @IsOptional()
+  @IsString()
+  ids?: string;
+}
+
+export class UpdateUserStatusDto {
+  @ApiProperty({ enum: UserStatus })
+  @IsEnum(UserStatus)
+  status!: UserStatus;
+}
+
+export class UpdateUserDto {
+  @ApiPropertyOptional({ example: 'John Doe', minLength: 2 })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({ example: '+1234567890' })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiPropertyOptional({ example: '1990-01-01' })
+  @IsOptional()
+  @IsDateString()
+  birthDate?: string;
+
+  @ApiPropertyOptional({ enum: UserGender })
+  @IsOptional()
+  @IsEnum(UserGender)
+  gender?: UserGender;
+}
+
+export class UserListResponseDto {
+  @ApiProperty({ type: [UserDto] })
+  items!: UserDto[];
 
   @ApiProperty({ example: 25 })
   total!: number;

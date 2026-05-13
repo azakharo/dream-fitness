@@ -10,3 +10,5 @@ export { GetUserWaitlistQuery } from './get-user-waitlist.query';
 export { GetUserWaitlistHandler } from './get-user-waitlist.handler';
 export { GetTrainingBookingCountQuery } from './get-training-booking-count.query';
 export { GetTrainingBookingCountHandler } from './get-training-booking-count.handler';
+export { GetTrainingParticipantsQuery } from './get-training-participants.query';
+export { GetTrainingParticipantsHandler } from './get-training-participants.handler';

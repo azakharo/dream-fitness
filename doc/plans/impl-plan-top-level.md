@@ -494,10 +494,10 @@ OpenAPI спецификация из backend уже лежит здесь: `fro
 
 **Trainers Management (CRUD):**
 
-- [ ] Trainers table
-- [ ] Create form
-- [ ] Edit form
-- [ ] Delete trainer dialog (confirmation)
+- [x] Trainers table
+- [x] Create form
+- [x] Edit form
+- [x] Delete trainer dialog (confirmation)
 
 **Trainings Management (CRUD):**
 

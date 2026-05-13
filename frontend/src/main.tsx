@@ -1,3 +1,6 @@
+// Global date-fns configuration - must be imported first
+import './lib/date-fns-setup';
+
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import {RouterProvider} from '@tanstack/react-router';

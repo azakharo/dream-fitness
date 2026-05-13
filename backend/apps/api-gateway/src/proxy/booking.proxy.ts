@@ -32,6 +32,7 @@ import {
   WaitlistDto,
   TrainingBookingCountDto,
 } from '@app/contracts/booking';
+import { UserDto } from '@app/contracts/auth';
 
 const BOOKING_SERVICE_URL = 'BOOKING_SERVICE_URL';
 const BOOKING_SERVICE_DEFAULT_URL = 'http://localhost:3003';
@@ -201,6 +202,30 @@ export class BookingProxyController {
       req,
       null,
       `/bookings/training/${trainingId}/count`,
+      'GET',
+      BOOKING_SERVICE_URL,
+      BOOKING_SERVICE_DEFAULT_URL,
+    );
+  }
+
+  @Get('bookings/training/:trainingId/participants')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Training participants retrieved',
+    type: UserDto,
+    isArray: true,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getTrainingParticipants(
+    @Req() req: RequestWithUser,
+    @Param('trainingId') trainingId: string,
+  ) {
+    return this.proxyService.proxyRequest(
+      req,
+      null,
+      `/bookings/training/${trainingId}/participants`,
       'GET',
       BOOKING_SERVICE_URL,
       BOOKING_SERVICE_DEFAULT_URL,

@@ -1,6 +1,7 @@
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {toast} from 'sonner';
+import {format} from 'date-fns';
 import type {UserProfileDto} from '@/types';
 import {useUpdateProfile} from '@/hooks/use-auth';
 import {editProfileSchema} from '@/schemas/user.schema';
@@ -40,14 +41,20 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
       name: user.name || '',
-      phone: (user.phone as unknown as string) || '',
-      birthDate: user.birthDate ? (user.birthDate as unknown as string) : '',
+      phone: user.phone || '',
+      birthDate: user.birthDate ? new Date(user.birthDate) : undefined,
       gender: user.gender || 'male',
     },
   });
 
   const onSubmit = (data: EditProfileFormData) => {
-    updateProfileMutation.mutate(data, {
+    const payload = {
+      ...data,
+      birthDate: data.birthDate
+        ? format(data.birthDate, 'yyyy-MM-dd')
+        : undefined,
+    };
+    updateProfileMutation.mutate(payload as EditProfileFormData, {
       onSuccess: () => {
         toast.success('Профиль обновлен!');
         onSuccess?.();
@@ -103,14 +110,14 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
                 <FormLabel>Дата рождения</FormLabel>
                 <FormControl>
                   <DatePicker
-                    value={
-                      field.value ? new Date(field.value as string) : undefined
-                    }
-                    onChange={date =>
-                      field.onChange(date?.toISOString().split('T')[0])
-                    }
+                    value={field.value as Date | undefined}
+                    onChange={date => field.onChange(date)}
                     placeholder="Выберите дату"
                     disabled={false}
+                    captionLayout="dropdown"
+                    // Обязательно указываем границы, чтобы сформировать список годов
+                    startMonth={new Date(1926, 0)}
+                    endMonth={new Date()}
                   />
                 </FormControl>
                 <FormMessage />

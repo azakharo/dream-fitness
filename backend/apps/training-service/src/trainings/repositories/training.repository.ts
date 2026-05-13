@@ -33,6 +33,7 @@ export class TrainingRepository extends Repository<Training> {
 
   async findWithFilters(filterDto: {
     type?: string;
+    status?: TrainingStatus;
     trainerId?: string;
     dateFrom?: string;
     dateTo?: string;
@@ -43,6 +44,12 @@ export class TrainingRepository extends Repository<Training> {
 
     if (filterDto.type) {
       queryBuilder.andWhere('training.type = :type', { type: filterDto.type });
+    }
+
+    if (filterDto.status) {
+      queryBuilder.andWhere('training.status = :status', {
+        status: filterDto.status,
+      });
     }
 
     if (filterDto.trainerId) {

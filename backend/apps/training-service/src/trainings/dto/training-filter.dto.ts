@@ -8,12 +8,16 @@ import {
   Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TrainingType } from '@app/shared';
+import { TrainingType, TrainingStatus } from '@app/shared';
 
 export class TrainingFilterDto {
   @IsOptional()
   @IsEnum(TrainingType)
   type?: TrainingType;
+
+  @IsOptional()
+  @IsEnum(TrainingStatus)
+  status?: TrainingStatus;
 
   @IsOptional()
   @IsUUID()

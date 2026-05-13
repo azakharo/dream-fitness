@@ -24,6 +24,7 @@ import {
   WaitlistResponseDto,
   TrainingBookingCountDto,
 } from '@app/contracts/booking';
+import { UserDto } from '@app/contracts/auth';
 import { BookingFilterDto } from './dto/booking-filter.dto';
 import { CreateBookingDto, CancelBookingDto } from '@app/contracts/booking';
 import { BookTrainingCommand, CancelBookingCommand } from '../cqrs/commands';
@@ -32,6 +33,7 @@ import {
   GetBookingByIdQuery,
   GetUserWaitlistQuery,
   GetTrainingBookingCountQuery,
+  GetTrainingParticipantsQuery,
 } from '../cqrs/queries';
 import type { AuthenticatedUser } from '@app/shared';
 import { Booking } from './entities/booking.entity';
@@ -119,6 +121,18 @@ export class BookingsController {
       GetTrainingBookingCountQuery,
       TrainingBookingCountDto
     >(new GetTrainingBookingCountQuery(trainingId));
+  }
+
+  @Get('training/:trainingId/participants')
+  @ApiOperation({ summary: 'Get participants for a training' })
+  @ApiOkResponse({ type: UserDto, isArray: true })
+  async getTrainingParticipants(
+    @Param('trainingId') trainingId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserDto[]> {
+    return this.queryBus.execute<GetTrainingParticipantsQuery, UserDto[]>(
+      new GetTrainingParticipantsQuery(trainingId, user.id, user.role),
+    );
   }
 
   @Get(':id')

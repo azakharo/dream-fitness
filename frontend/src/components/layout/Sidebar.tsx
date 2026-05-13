@@ -4,6 +4,7 @@ import {
   Calendar,
   Users,
   BarChart3,
+  Dumbbell,
   ChevronDown,
   ChevronRight,
   Menu,
@@ -22,7 +23,7 @@ interface NavItem {
 }
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
-  {label: 'Dashboard', href: ROUTES.ROOT, icon: LayoutDashboard},
+  {label: 'Dashboard', href: ROUTES.ADMIN_ROOT, icon: LayoutDashboard},
   {
     label: 'Расписание',
     icon: Calendar,
@@ -31,14 +32,24 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
       {label: 'Создать тренировку', href: ROUTES.ADMIN_SCHEDULE_NEW},
     ],
   },
+  {label: 'Тренеры', href: ROUTES.ADMIN_TRAINERS, icon: Dumbbell},
   {label: 'Пользователи', href: ROUTES.USERS, icon: Users},
   {label: 'Отчёты', href: ROUTES.REPORTS, icon: BarChart3},
 ];
 
 const SidebarNavItem: React.FC<{item: NavItem}> = ({item}) => {
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
+
+  const isGroupActive =
+    hasChildren &&
+    item.children!.some(
+      child =>
+        location.pathname === child.href ||
+        location.pathname.startsWith(child.href + '/'),
+    );
+
+  const [isOpen, setIsOpen] = useState(isGroupActive);
 
   if (hasChildren) {
     return (
@@ -48,10 +59,10 @@ const SidebarNavItem: React.FC<{item: NavItem}> = ({item}) => {
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
             `
-              flex w-full items-center justify-between rounded-md px-3 py-2
-              text-sm transition-colors
+              flex w-full cursor-pointer items-center justify-between rounded-md
+              px-3 py-2 text-sm transition-colors
             `,
-            'hover:bg-accent hover:text-accent-foreground',
+            isGroupActive ? '' : 'hover:bg-accent hover:text-accent-foreground',
           )}
         >
           <div className="flex items-center space-x-3">
@@ -137,7 +148,10 @@ export const Sidebar: React.FC = () => {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-14 items-center border-b px-4">
-            <Link to={ROUTES.ROOT} className="flex items-center space-x-2">
+            <Link
+              to={ROUTES.ADMIN_ROOT}
+              className="flex items-center space-x-2"
+            >
               <span className="text-xl font-bold text-primary">
                 DreamFitness
               </span>

@@ -180,6 +180,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/auth/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['AuthProxyController_listUsers'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/auth/users/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['AuthProxyController_getUserById'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/auth/users/{id}/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations['AuthProxyController_updateUserStatus'];
+    trace?: never;
+  };
   '/api/trainers': {
     parameters: {
       query?: never;
@@ -372,6 +420,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/bookings/training/{trainingId}/participants': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['BookingProxyController_getTrainingParticipants'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/notifications': {
     parameters: {
       query?: never;
@@ -490,8 +554,8 @@ export interface components {
       id: string;
       email: string;
       name: string;
-      phone?: Record<string, never>;
-      birthDate?: Record<string, never>;
+      phone?: string;
+      birthDate?: string;
       /** @enum {string} */
       gender?: 'male' | 'female';
       /** @enum {string} */
@@ -523,8 +587,8 @@ export interface components {
       id: string;
       email: string;
       name: string;
-      phone?: Record<string, never>;
-      birthDate?: Record<string, never>;
+      phone?: string;
+      birthDate?: string;
       /** @enum {string} */
       gender?: 'male' | 'female';
       /** @enum {string} */
@@ -534,6 +598,16 @@ export interface components {
       status: 'active' | 'blocked';
       createdAt: string;
       updatedAt: string;
+    };
+    UpdateUserDto: {
+      /** @example John Doe */
+      name?: string;
+      /** @example +1234567890 */
+      phone?: string;
+      /** @example 1990-01-01 */
+      birthDate?: string;
+      /** @enum {string} */
+      gender?: 'male' | 'female';
     };
     BalanceResponseDto: {
       /** @example 1500 */
@@ -564,6 +638,34 @@ export interface components {
       page: number;
       /** @example 10 */
       limit: number;
+    };
+    UserDto: {
+      id: string;
+      email: string;
+      name: string;
+      phone?: string;
+      birthDate?: string;
+      /** @enum {string} */
+      gender?: 'male' | 'female';
+      /** @enum {string} */
+      role: 'client' | 'admin';
+      balance: number;
+      /** @enum {string} */
+      status: 'active' | 'blocked';
+      createdAt: string;
+    };
+    UserListResponseDto: {
+      items: components['schemas']['UserDto'][];
+      /** @example 25 */
+      total: number;
+      /** @example 1 */
+      page: number;
+      /** @example 10 */
+      limit: number;
+    };
+    UpdateUserStatusDto: {
+      /** @enum {string} */
+      status: 'active' | 'blocked';
     };
     TrainerResponseDto: {
       id: string;
@@ -612,6 +714,8 @@ export interface components {
       capacity: number;
       currentParticipants: number;
       availableSlots: number;
+      /** @description Number of users on the waitlist */
+      waitlistCount: number;
       price: number;
       /** @enum {string} */
       status: 'scheduled' | 'cancelled' | 'completed';
@@ -1004,7 +1108,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['RegisterDto'];
+        'application/json': components['schemas']['UpdateUserDto'];
       };
     };
     responses: {
@@ -1246,6 +1350,136 @@ export interface operations {
       };
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AuthProxyController_listUsers: {
+    parameters: {
+      query?: {
+        page?: number;
+        limit?: number;
+        status?: 'active' | 'blocked';
+        role?: 'client' | 'admin';
+        ids?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List all users (admin only) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserListResponseDto'];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AuthProxyController_getUserById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Get user details by ID (admin only) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserDto'];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description User not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AuthProxyController_updateUserStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateUserStatusDto'];
+      };
+    };
+    responses: {
+      /** @description Block/unblock user (admin only) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserDto'];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description User not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -2038,6 +2272,35 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['TrainingBookingCountDto'];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BookingProxyController_getTrainingParticipants: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        trainingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Training participants retrieved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserDto'][];
         };
       };
       /** @description Unauthorized */

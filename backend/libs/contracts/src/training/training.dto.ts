@@ -151,6 +151,9 @@ export class TrainingResponseDto {
   @ApiProperty()
   availableSlots: number;
 
+  @ApiProperty({ description: 'Number of users on the waitlist' })
+  waitlistCount: number;
+
   @ApiProperty()
   price: number;
 

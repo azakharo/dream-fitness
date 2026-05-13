@@ -31,7 +31,7 @@ export const useLogin = () => {
       setUser(user);
       // Redirect based on user role - admins go to admin dashboard
       const destination =
-        user?.role === 'admin' ? ROUTES.ROOT : ROUTES.DASHBOARD;
+        user?.role === 'admin' ? ROUTES.ADMIN_ROOT : ROUTES.DASHBOARD;
       // Type assertion needed due to Tanstack React Router strict typing
       void navigate({to: destination, search: true});
     },

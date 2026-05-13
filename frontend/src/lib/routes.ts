@@ -21,11 +21,13 @@ export const CLIENT_ROUTES = {
 
 // Роуты администратора
 export const ADMIN_ROUTES = {
-  ROOT: '/admin',
+  ADMIN_ROOT: '/admin',
+  ADMIN_TRAINERS: '/admin/trainers',
   ADMIN_SCHEDULE: '/admin/schedule',
   ADMIN_SCHEDULE_NEW: '/admin/schedule/new',
-  ADMIN_SCHEDULE_EDIT: '/admin/schedule/$id',
+  ADMIN_SCHEDULE_EDIT: '/admin/schedule/edit/$id',
   USERS: '/admin/users',
+  USER: '/admin/users/$id',
   REPORTS: '/admin/reports',
 } as const;
 

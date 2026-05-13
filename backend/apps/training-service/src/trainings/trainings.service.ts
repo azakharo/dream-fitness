@@ -30,11 +30,13 @@ export class TrainingsService {
   ): Promise<TrainingResponseDto> {
     const trainer = await this.trainersService.findById(training.trainerId);
     let currentParticipants = 0;
+    let waitlistCount = 0;
     try {
       const bookingCount = await this.bookingClientService.getBookingCount(
         training.id,
       );
       currentParticipants = bookingCount.confirmedCount;
+      waitlistCount = bookingCount.waitlistCount;
     } catch {
       // If booking service is unavailable, use 0
     }
@@ -51,6 +53,7 @@ export class TrainingsService {
       capacity: training.capacity,
       currentParticipants,
       availableSlots,
+      waitlistCount,
       price: training.price,
       status: training.status,
       createdAt: training.createdAt.toISOString(),
@@ -154,9 +157,22 @@ export class TrainingsService {
     const updateData = Object.fromEntries(
       Object.entries(dto).filter(([, value]) => value !== undefined),
     );
+
+    // Build saveData with explicit type conversion for scheduledAt
+    const saveData: DeepPartial<Training> = {
+      ...updateData,
+    };
+    if (saveData.scheduledAt !== undefined) {
+      // Ensure scheduledAt is converted to Date, not left as string
+      // (TypeORM expects Date type for timestamp columns)
+      saveData.scheduledAt = new Date(
+        saveData.scheduledAt as unknown as string,
+      );
+    }
+
     const updatedTraining = await this.trainingRepository.save({
       ...training,
-      ...updateData,
+      ...saveData,
     } as DeepPartial<Training>);
     const response = await this.toResponseDto(updatedTraining);
     await this.eventsPublisher.publishTrainingUpdated({
@@ -194,6 +210,7 @@ export class TrainingsService {
 
   async findAll(filterDto: {
     type?: string;
+    status?: TrainingStatus;
     trainerId?: string;
     dateFrom?: string;
     dateTo?: string;

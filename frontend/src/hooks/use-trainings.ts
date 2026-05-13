@@ -1,10 +1,15 @@
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {toast} from 'sonner';
 import {api} from '@/lib/api-client';
 import {scheduleKeys, trainersKeys, trainingsKeys} from '@/lib/query-keys';
+import {formatDateKey} from '@/lib/date-utils';
 import type {
+  CreateTrainingDto,
   TrainerResponseDto,
   TrainingListResponseDto,
   TrainingResponseDto,
+  UpdateTrainingDto,
+  UserDto,
 } from '@/types';
 
 export interface TrainingFilters {
@@ -23,9 +28,8 @@ export const useTrainings = (filters?: TrainingFilters) => {
       if (filters?.type) params.set('type', filters.type);
       if (filters?.trainerId) params.set('trainerId', filters.trainerId);
       if (filters?.dateFrom)
-        params.set('dateFrom', filters.dateFrom.toISOString().split('T')[0]);
-      if (filters?.dateTo)
-        params.set('dateTo', filters.dateTo.toISOString().split('T')[0]);
+        params.set('dateFrom', formatDateKey(filters.dateFrom));
+      if (filters?.dateTo) params.set('dateTo', formatDateKey(filters.dateTo));
       if (filters?.status) params.set('status', filters.status);
 
       const queryString = params.toString();
@@ -55,10 +59,72 @@ export const useSchedule = (date?: Date) => {
     queryKey: scheduleKeys.byDate(date),
     queryFn: () => {
       if (date) {
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = formatDateKey(date);
         return api.get<TrainingListResponseDto>(`/schedule/${dateStr}`);
       }
       return api.get<TrainingListResponseDto>('/schedule');
     },
+  });
+};
+
+export const useCreateTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateTrainingDto) =>
+      api.post<TrainingResponseDto>('/trainings', data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({queryKey: trainingsKeys.all()});
+      void queryClient.invalidateQueries({queryKey: scheduleKeys.all()});
+      toast.success('Тренировка успешно создана');
+    },
+    onError: () => {
+      toast.error('Ошибка при создании тренировки');
+    },
+  });
+};
+
+export const useUpdateTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({id, data}: {id: string; data: UpdateTrainingDto}) =>
+      api.patch<TrainingResponseDto>(`/trainings/${id}`, data),
+    onSuccess: (_, variables) => {
+      void queryClient.invalidateQueries({queryKey: trainingsKeys.all()});
+      void queryClient.invalidateQueries({
+        queryKey: trainingsKeys.detail(variables.id),
+      });
+      void queryClient.invalidateQueries({queryKey: scheduleKeys.all()});
+      toast.success('Тренировка обновлена');
+    },
+    onError: () => {
+      toast.error('Ошибка при обновлении тренировки');
+    },
+  });
+};
+
+export const useDeleteTraining = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => api.delete<void>(`/trainings/${id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({queryKey: trainingsKeys.all()});
+      void queryClient.invalidateQueries({queryKey: scheduleKeys.all()});
+      toast.success('Тренировка отменена');
+    },
+    onError: () => {
+      toast.error('Ошибка при отмене тренировки');
+    },
+  });
+};
+
+export const useTrainingParticipants = (trainingId: string) => {
+  return useQuery({
+    queryKey: ['trainings', trainingId, 'participants'],
+    queryFn: () =>
+      api.get<UserDto[]>(`/bookings/training/${trainingId}/participants`),
+    enabled: !!trainingId,
   });
 };
