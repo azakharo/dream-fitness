@@ -16,6 +16,7 @@ import {trainerFormSchema} from '@/schemas/trainer.schema';
 import type {TrainerFormData} from '@/schemas/trainer.schema';
 import type {TrainerResponseDto} from '@/types';
 import {cn} from '@/lib/utils';
+import {useCreateTrainer, useUpdateTrainer} from '@/hooks/use-trainers';
 
 interface TrainerFormProps {
   trainer?: TrainerResponseDto;
@@ -34,6 +35,9 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
   onCancel,
 }) => {
   const isEditMode = !!trainer;
+
+  const createTrainer = useCreateTrainer();
+  const updateTrainer = useUpdateTrainer();
 
   const form = useForm<TrainerFormData>({
     resolver: zodResolver(trainerFormSchema),
@@ -57,9 +61,10 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
   }, [trainer, form]);
 
   const handleSubmit = (data: TrainerFormData) => {
-    console.log('Trainer form submitted:', data);
-    if (onSuccess) {
-      onSuccess();
+    if (trainer) {
+      updateTrainer.mutate({id: trainer.id, data}, {onSuccess: onSuccess});
+    } else {
+      createTrainer.mutate(data, {onSuccess: onSuccess});
     }
   };
 

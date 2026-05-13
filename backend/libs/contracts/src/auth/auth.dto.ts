@@ -255,6 +255,28 @@ export class UpdateUserStatusDto {
   status!: UserStatus;
 }
 
+export class UpdateUserDto {
+  @ApiPropertyOptional({ example: 'John Doe', minLength: 2 })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({ example: '+1234567890' })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiPropertyOptional({ example: '1990-01-01' })
+  @IsOptional()
+  @IsDateString()
+  birthDate?: string;
+
+  @ApiPropertyOptional({ enum: UserGender })
+  @IsOptional()
+  @IsEnum(UserGender)
+  gender?: UserGender;
+}
+
 export class UserListResponseDto {
   @ApiProperty({ type: [UserDto] })
   items!: UserDto[];

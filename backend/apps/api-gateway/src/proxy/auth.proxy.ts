@@ -36,6 +36,7 @@ import {
   TransactionListResponseDto,
   TransactionResponseDto,
   UpdateUserStatusDto,
+  UpdateUserDto,
   UserListResponseDto,
   UserDto,
   FindAllUsersQueryDto,
@@ -204,7 +205,7 @@ export class AuthProxyController {
   @Patch('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiBody({ type: RegisterDto })
+  @ApiBody({ type: UpdateUserDto })
   @ApiResponse({
     status: 200,
     description: 'Profile updated',
@@ -213,7 +214,7 @@ export class AuthProxyController {
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  updateProfile(@Req() req: RequestWithUser, @Body() body: RegisterDto) {
+  updateProfile(@Req() req: RequestWithUser, @Body() body: UpdateUserDto) {
     return this.proxyService.proxyRequest(
       req,
       body,

@@ -26,10 +26,12 @@
 | Constants             | [`constants.ts`](../../src/types/constants.ts)                                 | ✅ Готов    |
 | API Client            | [`api-client.ts`](../../src/lib/api-client.ts)                                 | ✅ Готов    |
 | UI Components         | [`/components/ui/`](../../src/components/ui/)                                  | ✅ Готов    |
+| Sheet Component       | [`sheet.tsx`](../../src/components/ui/sheet.tsx)                               | ✅ Готов    |
 | AdminDashboardPage    | [`AdminDashboardPage.tsx`](../../src/pages/admin/AdminDashboardPage.tsx)       | ⚠️ Заглушка |
 | AdminSchedulePage     | [`AdminSchedulePage.tsx`](../../src/pages/admin/AdminSchedulePage.tsx)         | ⚠️ Заглушка |
 | AdminScheduleEditPage | [`AdminScheduleEditPage.tsx`](../../src/pages/admin/AdminScheduleEditPage.tsx) | ⚠️ Заглушка |
 | AdminUsersPage        | [`AdminUsersPage.tsx`](../../src/pages/admin/AdminUsersPage.tsx)               | ⚠️ Заглушка |
+| AdminTrainersPage     | [`AdminTrainersPage.tsx`](../../src/pages/admin/AdminTrainersPage.tsx)         | ✅ Готов    |
 | AdminReportsPage      | [`AdminReportsPage.tsx`](../../src/pages/admin/AdminReportsPage.tsx)           | ⚠️ Заглушка |
 
 ### Требуется реализовать
@@ -37,11 +39,16 @@
 | Страница             | Приоритет | Сложность |
 | -------------------- | --------- | --------- |
 | Admin Dashboard      | Высокий   | Средняя   |
-| Trainers Management  | Высокий   | Средняя   |
 | Trainings Management | Высокий   | Высокая   |
 | Users Management     | Средний   | Средняя   |
 | User Detail Page     | Средний   | Низкая    |
 | Reports              | Низкий    | Высокая   |
+
+### ✅ Реализовано
+
+| Страница            | Файл                                                                   | Статус   |
+| ------------------- | ---------------------------------------------------------------------- | -------- |
+| Trainers Management | [`AdminTrainersPage.tsx`](../../src/pages/admin/AdminTrainersPage.tsx) | ✅ Готов |
 
 ---
 

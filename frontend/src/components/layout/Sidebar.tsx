@@ -4,6 +4,7 @@ import {
   Calendar,
   Users,
   BarChart3,
+  Dumbbell,
   ChevronDown,
   ChevronRight,
   Menu,
@@ -31,6 +32,7 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
       {label: 'Создать тренировку', href: ROUTES.ADMIN_SCHEDULE_NEW},
     ],
   },
+  {label: 'Тренеры', href: ROUTES.ADMIN_TRAINERS, icon: Dumbbell},
   {label: 'Пользователи', href: ROUTES.USERS, icon: Users},
   {label: 'Отчёты', href: ROUTES.REPORTS, icon: BarChart3},
 ];

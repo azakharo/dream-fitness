@@ -599,6 +599,16 @@ export interface components {
       createdAt: string;
       updatedAt: string;
     };
+    UpdateUserDto: {
+      /** @example John Doe */
+      name?: string;
+      /** @example +1234567890 */
+      phone?: string;
+      /** @example 1990-01-01 */
+      birthDate?: string;
+      /** @enum {string} */
+      gender?: 'male' | 'female';
+    };
     BalanceResponseDto: {
       /** @example 1500 */
       balance: number;
@@ -1098,7 +1108,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['RegisterDto'];
+        'application/json': components['schemas']['UpdateUserDto'];
       };
     };
     responses: {
