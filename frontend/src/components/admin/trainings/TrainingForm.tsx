@@ -56,7 +56,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
   const isEditMode = !!training;
 
   const form = useForm<TrainingFormData>({
-    resolver: zodResolver(trainingFormSchema) as never,
+    resolver: zodResolver(trainingFormSchema),
     defaultValues: {
       title: training?.title ?? '',
       type: training?.type ?? '',

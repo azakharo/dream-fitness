@@ -5,7 +5,7 @@ export const trainingFormSchema = z.object({
   type: z.string().min(1, 'Выберите тип тренировки'),
   trainerId: z.string().min(1, 'Выберите тренера'),
   scheduledAt: z.date(),
-  durationMinutes: z.number().min(15).max(480).default(60),
+  durationMinutes: z.number().min(15).max(480),
   capacity: z.number().min(1).max(100),
   price: z.number().min(0),
   description: z.string().optional(),
