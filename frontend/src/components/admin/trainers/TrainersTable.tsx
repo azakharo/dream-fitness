@@ -40,7 +40,6 @@ export const TrainersTable: React.FC<TrainersTableProps> = ({
     {
       key: 'name',
       header: 'Имя',
-      sortable: true,
     },
     {
       key: 'bio',
