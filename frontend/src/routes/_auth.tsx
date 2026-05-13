@@ -9,10 +9,12 @@ import {ROUTES} from '@/lib/routes';
  */
 export const Route = createFileRoute('/_auth')({
   beforeLoad: () => {
-    const {accessToken} = useAuthStore.getState();
+    const {accessToken, user} = useAuthStore.getState();
     if (accessToken) {
       // eslint-disable-next-line @typescript-eslint/only-throw-error
-      throw redirect({to: ROUTES.DASHBOARD});
+      throw redirect({
+        to: user?.role === 'admin' ? ROUTES.ADMIN_ROOT : ROUTES.DASHBOARD,
+      });
     }
   },
   component: () => <Outlet />,

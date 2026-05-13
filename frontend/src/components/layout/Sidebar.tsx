@@ -22,7 +22,7 @@ interface NavItem {
 }
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
-  {label: 'Dashboard', href: ROUTES.ROOT, icon: LayoutDashboard},
+  {label: 'Dashboard', href: ROUTES.ADMIN_ROOT, icon: LayoutDashboard},
   {
     label: 'Расписание',
     icon: Calendar,
@@ -137,7 +137,7 @@ export const Sidebar: React.FC = () => {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-14 items-center border-b px-4">
-            <Link to={ROUTES.ROOT} className="flex items-center space-x-2">
+            <Link to={ROUTES.ADMIN_ROOT} className="flex items-center space-x-2">
               <span className="text-xl font-bold text-primary">
                 DreamFitness
               </span>

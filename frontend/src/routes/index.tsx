@@ -8,7 +8,7 @@ export const Route = createFileRoute('/')({
     if (accessToken) {
       // Redirect based on user role - admins go to admin dashboard
       const destination =
-        user?.role === 'admin' ? ROUTES.ROOT : ROUTES.DASHBOARD;
+        user?.role === 'admin' ? ROUTES.ADMIN_ROOT : ROUTES.DASHBOARD;
       // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw redirect({to: destination});
     }
