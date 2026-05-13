@@ -31,9 +31,8 @@ export const AdminSchedulePage: React.FC = () => {
   const {data: trainersData} = useTrainers({activeOnly: true});
   const deleteTraining = useDeleteTraining();
 
-  const {isLoading: participantsLoading} = useTrainingParticipants(
-    selectedTraining?.id ?? '',
-  );
+  const {data: participantsData, isLoading: participantsLoading} =
+    useTrainingParticipants(selectedTraining?.id ?? '');
 
   const handleEdit = (training: TrainingResponseDto) => {
     void navigate({
@@ -102,7 +101,7 @@ export const AdminSchedulePage: React.FC = () => {
           open={participantsDrawerOpen}
           onOpenChange={setParticipantsDrawerOpen}
           training={selectedTraining}
-          participants={[]}
+          participants={participantsData ?? []}
           isLoading={participantsLoading}
         />
       )}

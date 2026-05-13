@@ -8,7 +8,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '../config';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { TransactionResponseDto } from '@app/contracts/auth';
+import { TransactionResponseDto, UserDto } from '@app/contracts/auth';
 
 @Injectable()
 export class AuthClientService {
@@ -163,6 +163,31 @@ export class AuthClientService {
       if (error instanceof AxiosError) {
         this.logger.error(
           `Failed to get name for user ${userId}: ${error.message}`,
+        );
+        throw new ServiceUnavailableException('Auth service unavailable');
+      }
+      throw error;
+    }
+  }
+
+  async getUsersByIds(userIds: string[]): Promise<UserDto[]> {
+    try {
+      const idsParam = userIds.join(',');
+      const url = `${this.configService.getAuthServiceUrl()}/auth/users?ids=${idsParam}`;
+      const response = await firstValueFrom(
+        this.httpService.get<{
+          items: UserDto[];
+          total: number;
+          page: number;
+          limit: number;
+        }>(url, { timeout: 5000 }),
+      );
+      return response.data.items;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        this.logger.error(
+          `Failed to get users by ids: ${error.message}`,
+          error,
         );
         throw new ServiceUnavailableException('Auth service unavailable');
       }

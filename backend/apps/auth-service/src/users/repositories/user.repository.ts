@@ -6,6 +6,7 @@ import { UserStatus, UserRole } from '@app/shared';
 export interface FindAllUsersFilters {
   status?: UserStatus;
   role?: UserRole;
+  ids?: string[];
   page: number;
   limit: number;
 }
@@ -78,7 +79,7 @@ export class UserRepository extends Repository<User> {
   async findAllWithFilters(
     options: FindAllUsersFilters,
   ): Promise<{ users: User[]; total: number }> {
-    const { page, limit, status, role } = options;
+    const { page, limit, status, role, ids } = options;
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.createQueryBuilder('user').select([
@@ -100,6 +101,10 @@ export class UserRepository extends Repository<User> {
 
     if (role) {
       queryBuilder.andWhere('user.role = :role', { role });
+    }
+
+    if (ids && ids.length > 0) {
+      queryBuilder.andWhere('user.id IN (:...ids)', { ids });
     }
 
     const [users, total] = await queryBuilder

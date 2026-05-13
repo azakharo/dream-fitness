@@ -6,10 +6,10 @@ import {formatDateKey} from '@/lib/date-utils';
 import type {
   CreateTrainingDto,
   TrainerResponseDto,
-  TrainingBookingCountDto,
   TrainingListResponseDto,
   TrainingResponseDto,
   UpdateTrainingDto,
+  UserDto,
 } from '@/types';
 
 export interface TrainingFilters {
@@ -124,9 +124,7 @@ export const useTrainingParticipants = (trainingId: string) => {
   return useQuery({
     queryKey: ['trainings', trainingId, 'participants'],
     queryFn: () =>
-      api.get<TrainingBookingCountDto>(
-        `/bookings/training/${trainingId}/count`,
-      ),
+      api.get<UserDto[]>(`/bookings/training/${trainingId}/participants`),
     enabled: !!trainingId,
   });
 };

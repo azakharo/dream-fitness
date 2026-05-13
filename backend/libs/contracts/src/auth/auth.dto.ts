@@ -242,6 +242,11 @@ export class FindAllUsersQueryDto {
   @IsOptional()
   @IsEnum(UserRole)
   role?: UserRole;
+
+  @ApiPropertyOptional({ example: 'uuid1,uuid2' })
+  @IsOptional()
+  @IsString()
+  ids?: string;
 }
 
 export class UpdateUserStatusDto {

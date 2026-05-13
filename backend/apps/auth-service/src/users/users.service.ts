@@ -107,11 +107,22 @@ export class UsersService {
   ): Promise<{ users: UserResponseDto[]; total: number }> {
     const page = query.page || 1;
     const limit = query.limit || 10;
+
+    // Parse comma-separated ids into array
+    let ids: string[] | undefined;
+    if (query.ids) {
+      ids = query.ids
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean);
+    }
+
     const { users, total } = await this.userRepository.findAllWithFilters({
       page,
       limit,
       status: query.status,
       role: query.role,
+      ids,
     });
     return {
       users: users.map((user) => this.toResponseDto(user)),

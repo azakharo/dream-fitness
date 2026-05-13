@@ -420,6 +420,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/bookings/training/{trainingId}/participants': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['BookingProxyController_getTrainingParticipants'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/notifications': {
     parameters: {
       query?: never;
@@ -1338,6 +1354,7 @@ export interface operations {
         limit?: number;
         status?: 'active' | 'blocked';
         role?: 'client' | 'admin';
+        ids?: string;
       };
       header?: never;
       path?: never;
@@ -2245,6 +2262,35 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['TrainingBookingCountDto'];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BookingProxyController_getTrainingParticipants: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        trainingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Training participants retrieved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserDto'][];
         };
       };
       /** @description Unauthorized */

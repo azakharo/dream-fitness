@@ -4,13 +4,13 @@ import {ru} from 'date-fns/locale';
 import {X} from 'lucide-react';
 
 import {Button} from '@/components/ui/Button';
-import type {TrainingResponseDto, BookingResponseDto} from '@/types';
+import type {TrainingResponseDto, UserDto} from '@/types';
 
 interface ParticipantsDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   training: TrainingResponseDto;
-  participants: BookingResponseDto[];
+  participants: UserDto[];
   isLoading?: boolean;
 }
 
@@ -18,15 +18,6 @@ const formatDateTime = (dateString: string): string => {
   try {
     const date = parseISO(dateString);
     return format(date, 'd MMMM yyyy, HH:mm', {locale: ru});
-  } catch {
-    return dateString;
-  }
-};
-
-const formatBookingTime = (dateString: string): string => {
-  try {
-    const date = parseISO(dateString);
-    return format(date, 'd MMM, HH:mm', {locale: ru});
   } catch {
     return dateString;
   }
@@ -99,13 +90,15 @@ export const ParticipantsDrawer: React.FC<ParticipantsDrawerProps> = ({
                       <span className="text-sm font-medium text-muted-foreground">
                         {index + 1}.
                       </span>
-                      <span className="text-sm">
-                        Участник {participant.userId}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {participant.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {participant.email}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {formatBookingTime(participant.createdAt)}
-                    </span>
                   </li>
                 ))}
               </ul>
