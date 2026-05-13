@@ -54,7 +54,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           aria-expanded={open}
           disabled={disabled}
           className={cn(
-            'w-[130px] justify-start text-left font-normal',
+            'min-w-32.5 justify-start text-left font-normal',
             !value && 'text-muted-foreground',
             className,
           )}
