@@ -188,9 +188,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
             <FormControl>
               <Input
                 type="datetime-local"
-                value={
-                  field.value ? formatDateForInput(field.value) : ''
-                }
+                value={field.value ? formatDateForInput(field.value) : ''}
                 onChange={e => {
                   const date = parseDateFromString(e.target.value);
                   field.onChange(date);
