@@ -97,13 +97,15 @@ export const AdminSchedulePage: React.FC = () => {
         onViewParticipants={handleViewParticipants}
       />
 
-      <ParticipantsDrawer
-        open={participantsDrawerOpen}
-        onOpenChange={setParticipantsDrawerOpen}
-        training={selectedTraining}
-        participants={[]}
-        isLoading={participantsLoading}
-      />
+      {selectedTraining && (
+        <ParticipantsDrawer
+          open={participantsDrawerOpen}
+          onOpenChange={setParticipantsDrawerOpen}
+          training={selectedTraining}
+          participants={[]}
+          isLoading={participantsLoading}
+        />
+      )}
 
       <TrainingDeleteDialog
         open={deleteDialogOpen}

@@ -9,7 +9,7 @@ import type {TrainingResponseDto, BookingResponseDto} from '@/types';
 interface ParticipantsDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  training: TrainingResponseDto | null;
+  training: TrainingResponseDto;
   participants: BookingResponseDto[];
   isLoading?: boolean;
 }
@@ -40,10 +40,6 @@ export const ParticipantsDrawer: React.FC<ParticipantsDrawerProps> = ({
   isLoading,
 }) => {
   if (!open) {
-    return null;
-  }
-
-  if (!training) {
     return null;
   }
 
