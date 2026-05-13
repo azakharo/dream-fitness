@@ -62,12 +62,13 @@ function SheetContent({
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
+        aria-describedby=""
         data-slot="sheet-content"
         data-side={side}
         className={cn(
           `
-            fixed z-50 flex flex-col gap-4 bg-popover bg-clip-padding text-sm
-            text-popover-foreground shadow-lg transition duration-200
+            fixed z-50 flex flex-col gap-4 bg-popover bg-clip-padding px-4
+            text-sm text-popover-foreground shadow-lg transition duration-200
             ease-in-out
             data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0
             data-[side=bottom]:h-auto data-[side=bottom]:border-t
