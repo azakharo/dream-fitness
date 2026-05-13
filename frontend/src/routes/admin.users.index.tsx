@@ -1,6 +1,6 @@
-import {AdminSchedulePage} from '@/pages/admin/AdminSchedulePage';
+import {AdminUsersPage} from '@/pages/admin/AdminUsersPage';
 import {createFileRoute} from '@tanstack/react-router';
 
 export const Route = createFileRoute('/admin/users/')({
-  component: AdminSchedulePage,
+  component: AdminUsersPage,
 });

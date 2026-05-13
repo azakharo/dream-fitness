@@ -90,12 +90,12 @@ export const ParticipantsDrawer: React.FC<ParticipantsDrawerProps> = ({
                       <span className="text-sm font-medium text-muted-foreground">
                         {index + 1}.
                       </span>
-                      <div className="flex flex-col">
+                      <div className="flex items-baseline gap-2">
                         <span className="text-sm font-medium">
                           {participant.name}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {participant.email}
+                          {participant.phone || participant.email}
                         </span>
                       </div>
                     </div>
