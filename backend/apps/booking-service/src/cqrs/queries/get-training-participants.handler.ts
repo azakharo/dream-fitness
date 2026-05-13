@@ -13,7 +13,7 @@ export class GetTrainingParticipantsHandler implements IQueryHandler<GetTraining
   ) {}
 
   async execute(query: GetTrainingParticipantsQuery): Promise<UserDto[]> {
-    const { trainingId } = query;
+    const { trainingId, userId, userRole } = query;
 
     const bookings =
       await this.bookingRepository.findConfirmedByTrainingId(trainingId);
@@ -24,6 +24,6 @@ export class GetTrainingParticipantsHandler implements IQueryHandler<GetTraining
       return [];
     }
 
-    return this.authClient.getUsersByIds(userIds);
+    return this.authClient.getUsersByIds(userId, userRole, userIds);
   }
 }

@@ -170,7 +170,11 @@ export class AuthClientService {
     }
   }
 
-  async getUsersByIds(userIds: string[]): Promise<UserDto[]> {
+  async getUsersByIds(
+    userId: string,
+    userRole: string,
+    userIds: string[],
+  ): Promise<UserDto[]> {
     try {
       const idsParam = userIds.join(',');
       const url = `${this.configService.getAuthServiceUrl()}/auth/users?ids=${idsParam}`;
@@ -180,7 +184,13 @@ export class AuthClientService {
           total: number;
           page: number;
           limit: number;
-        }>(url, { timeout: 5000 }),
+        }>(url, {
+          headers: {
+            'X-User-Id': userId,
+            'X-User-Role': userRole,
+          },
+          timeout: 5000,
+        }),
       );
       return response.data.items;
     } catch (error) {

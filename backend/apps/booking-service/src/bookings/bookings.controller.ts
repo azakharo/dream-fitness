@@ -128,9 +128,10 @@ export class BookingsController {
   @ApiOkResponse({ type: UserDto, isArray: true })
   async getTrainingParticipants(
     @Param('trainingId') trainingId: string,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<UserDto[]> {
     return this.queryBus.execute<GetTrainingParticipantsQuery, UserDto[]>(
-      new GetTrainingParticipantsQuery(trainingId),
+      new GetTrainingParticipantsQuery(trainingId, user.id, user.role),
     );
   }
 
