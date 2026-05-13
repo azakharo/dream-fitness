@@ -30,10 +30,6 @@ export const AdminUsersPage: React.FC = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
-  // TODO implement batch operations
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(
-    () => new Set(),
-  );
 
   const {data: usersData, isLoading: usersLoading} = useUsers({
     ...filters,
@@ -100,8 +96,6 @@ export const AdminUsersPage: React.FC = () => {
         onPaginationChange={setPagination}
         sorting={sorting}
         onSortingChange={setSorting}
-        selectedRows={selectedRows}
-        onSelectedRowsChange={setSelectedRows}
         onView={handleView}
         onBlock={handleBlock}
         onUnblock={handleUnblock}

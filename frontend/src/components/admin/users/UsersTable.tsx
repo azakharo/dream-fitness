@@ -20,8 +20,8 @@ interface UsersTableProps {
   onPaginationChange: (pagination: {page: number; pageSize: number}) => void;
   sorting: SortingState;
   onSortingChange: (sorting: SortingState) => void;
-  selectedRows: Set<string>;
-  onSelectedRowsChange: (selectedRows: Set<string>) => void;
+  selectedRows?: Set<string>;
+  onSelectedRowsChange?: (selectedRows: Set<string>) => void;
   onView: (user: UserDto) => void;
   onBlock: (user: UserDto) => void;
   onUnblock: (user: UserDto) => void;
