@@ -46,8 +46,8 @@ export interface DataTableProps<T> {
   onPaginationChange: (pagination: {page: number; pageSize: number}) => void;
   sorting: SortingState;
   onSortingChange: (sorting: SortingState) => void;
-  selectedRows: Set<string>;
-  onSelectedRowsChange: (selectedRows: Set<string>) => void;
+  selectedRows?: Set<string>;
+  onSelectedRowsChange?: (selectedRows: Set<string>) => void;
   rowIdKey: keyof T;
   onRowClick?: (item: T) => void;
   isLoading?: boolean;
@@ -82,10 +82,10 @@ export function DataTable<T>({
   };
 
   const handleSelectAll = () => {
-    if (selectedRows.size === data.length) {
-      onSelectedRowsChange(new Set());
+    if (selectedRows?.size === data.length) {
+      onSelectedRowsChange?.(new Set());
     } else {
-      onSelectedRowsChange(new Set(data.map(item => String(item[rowIdKey]))));
+      onSelectedRowsChange?.(new Set(data.map(item => String(item[rowIdKey]))));
     }
   };
 
@@ -97,7 +97,7 @@ export function DataTable<T>({
     } else {
       newSelected.add(itemId);
     }
-    onSelectedRowsChange(newSelected);
+    onSelectedRowsChange?.(newSelected);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -170,13 +170,17 @@ export function DataTable<T>({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={data.length > 0 && selectedRows.size === data.length}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Выбрать все"
-                />
-              </TableHead>
+              {onSelectedRowsChange && (
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={
+                      data.length > 0 && selectedRows?.size === data.length
+                    }
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Выбрать все"
+                  />
+                </TableHead>
+              )}
               {columns.map(column => (
                 <TableHead
                   key={String(column.key)}
@@ -211,7 +215,7 @@ export function DataTable<T>({
             ) : (
               data.map(item => {
                 const itemId = getRowId(item);
-                const isSelected = selectedRows.has(itemId);
+                const isSelected = selectedRows?.has(itemId) ?? false;
                 return (
                   <TableRow
                     key={itemId}
@@ -219,13 +223,15 @@ export function DataTable<T>({
                     className={cn(onRowClick && 'cursor-pointer')}
                     onClick={onRowClick ? () => onRowClick(item) : undefined}
                   >
-                    <TableCell onClick={e => e.stopPropagation()}>
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => handleSelectRow(item)}
-                        aria-label={`Выбрать строку ${itemId}`}
-                      />
-                    </TableCell>
+                    {onSelectedRowsChange && (
+                      <TableCell onClick={e => e.stopPropagation()}>
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => handleSelectRow(item)}
+                          aria-label={`Выбрать строку ${itemId}`}
+                        />
+                      </TableCell>
+                    )}
                     {columns.map(column => (
                       <TableCell key={String(column.key)}>
                         {column.render
@@ -242,9 +248,11 @@ export function DataTable<T>({
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          Выбрано: {selectedRows.size} из {pagination.total}
-        </div>
+        {onSelectedRowsChange && (
+          <div className="text-sm text-muted-foreground">
+            Выбрано: {selectedRows?.size ?? 0} из {pagination.total}
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
             Страница {pagination.page} из {totalPages || 1}

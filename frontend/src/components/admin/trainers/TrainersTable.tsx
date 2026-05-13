@@ -25,6 +25,8 @@ interface SortingState {
   sortOrder: 'asc' | 'desc';
 }
 
+const dummyFunc = () => {};
+
 const getBioDisplay = (bio: TrainerResponseDto['bio']): string => {
   if (!bio || typeof bio !== 'string') return '—';
   return bio;
@@ -122,11 +124,9 @@ export const TrainersTable: React.FC<TrainersTableProps> = ({
       columns={columns}
       data={trainers}
       pagination={pagination}
-      onPaginationChange={() => {}}
+      onPaginationChange={dummyFunc}
       sorting={sorting}
-      onSortingChange={() => {}}
-      selectedRows={new Set()}
-      onSelectedRowsChange={() => {}}
+      onSortingChange={dummyFunc}
       rowIdKey="id"
       isLoading={isLoading}
       emptyMessage="Тренеры не найдены"
