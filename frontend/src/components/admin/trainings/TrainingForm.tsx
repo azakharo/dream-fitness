@@ -97,12 +97,12 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       form={form}
       onSubmit={event => {
         event.preventDefault();
-        form.handleSubmit(handleSubmit) as never;
+        void form.handleSubmit(handleSubmit)();
       }}
       className="space-y-4"
     >
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="title"
         render={({field}) => (
           <FormItem>
@@ -116,7 +116,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       />
 
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="type"
         render={({field}) => (
           <FormItem>
@@ -148,7 +148,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       />
 
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="trainerId"
         render={({field}) => (
           <FormItem>
@@ -180,7 +180,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       />
 
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="scheduledAt"
         render={({field}) => (
           <FormItem>
@@ -189,7 +189,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
               <Input
                 type="datetime-local"
                 value={
-                  field.value ? formatDateForInput(field.value as Date) : ''
+                  field.value ? formatDateForInput(field.value) : ''
                 }
                 onChange={e => {
                   const date = parseDateFromString(e.target.value);
@@ -203,7 +203,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       />
 
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="durationMinutes"
         render={({field}) => (
           <FormItem>
@@ -223,7 +223,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       />
 
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="capacity"
         render={({field}) => (
           <FormItem>
@@ -243,7 +243,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       />
 
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="price"
         render={({field}) => (
           <FormItem>
@@ -262,7 +262,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
       />
 
       <FormField
-        control={form.control as never}
+        control={form.control}
         name="description"
         render={({field}) => (
           <FormItem>
@@ -283,7 +283,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
                 )}
                 placeholder="Описание тренировки..."
                 {...field}
-                value={(field.value as string) ?? ''}
+                value={field.value ?? ''}
               />
             </FormControl>
             <FormMessage />
@@ -293,7 +293,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
 
       {isEditMode && (
         <FormField
-          control={form.control as never}
+          control={form.control}
           name="status"
           render={({field}) => (
             <FormItem>
@@ -301,7 +301,7 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
               <FormControl>
                 <select
                   {...field}
-                  value={(field.value as string) ?? ''}
+                  value={field.value ?? ''}
                   className={cn(
                     `
                       flex h-10 w-full rounded-md border border-input
