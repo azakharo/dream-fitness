@@ -95,7 +95,10 @@ export const TrainingForm: React.FC<TrainingFormProps> = ({
   return (
     <Form
       form={form}
-      onSubmit={form.handleSubmit(handleSubmit) as never}
+      onSubmit={event => {
+        event.preventDefault();
+        form.handleSubmit(handleSubmit) as never;
+      }}
       className="space-y-4"
     >
       <FormField

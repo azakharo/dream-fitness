@@ -71,7 +71,8 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
   return (
     <Form
       form={form}
-      onSubmit={() => {
+      onSubmit={event => {
+        event.preventDefault();
         void form.handleSubmit(handleSubmit)();
       }}
       className="space-y-4"
