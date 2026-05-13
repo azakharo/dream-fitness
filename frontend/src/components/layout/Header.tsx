@@ -79,7 +79,7 @@ export const Header: React.FC = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to={ROUTES.DASHBOARD}>
+              <Link to={ROUTES.PROFILE}>
                 <User className="mr-2 size-4" />
                 Профиль
               </Link>
