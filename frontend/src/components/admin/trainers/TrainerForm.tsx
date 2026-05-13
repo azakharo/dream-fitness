@@ -69,139 +69,137 @@ export const TrainerForm: React.FC<TrainerFormProps> = ({
   };
 
   return (
-    <Form form={form}>
-      <form
-        onSubmit={() => {
-          void form.handleSubmit(handleSubmit)();
-        }}
-        className="space-y-4"
-      >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>Имя</FormLabel>
-              <FormControl>
-                <Input placeholder="Введите имя тренера" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <Form
+      form={form}
+      onSubmit={() => {
+        void form.handleSubmit(handleSubmit)();
+      }}
+      className="space-y-4"
+    >
+      <FormField
+        control={form.control}
+        name="name"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Имя</FormLabel>
+            <FormControl>
+              <Input placeholder="Введите имя тренера" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
+      <FormField
+        control={form.control}
+        name="bio"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>Биография</FormLabel>
+            <FormControl>
+              <textarea
+                className={cn(
+                  `
+                    flex min-h-20 w-full rounded-md border border-input
+                    bg-background px-3 py-2 text-sm ring-offset-background
+                  `,
+                  'placeholder:text-muted-foreground',
+                  `
+                    focus-visible:ring-2 focus-visible:ring-ring
+                    focus-visible:ring-offset-2 focus-visible:outline-none
+                  `,
+                  'disabled:cursor-not-allowed disabled:opacity-50',
+                )}
+                placeholder="Расскажите о тренере..."
+                {...field}
+                value={field.value ?? ''}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="avatarUrl"
+        render={({field}) => (
+          <FormItem>
+            <FormLabel>URL аватара</FormLabel>
+            <FormControl>
+              <Input
+                type="url"
+                placeholder="https://example.com/avatar.jpg"
+                {...field}
+                value={field.value ?? ''}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {isEditMode && (
         <FormField
           control={form.control}
-          name="bio"
+          name="isActive"
           render={({field}) => (
-            <FormItem>
-              <FormLabel>Биография</FormLabel>
+            <FormItem
+              className="
+                flex flex-row items-center justify-between rounded-lg border p-4
+              "
+            >
+              <div className="space-y-0.5">
+                <FormLabel>Статус</FormLabel>
+              </div>
               <FormControl>
-                <textarea
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={field.value}
+                  data-state={field.value ? 'checked' : 'unchecked'}
                   className={cn(
                     `
-                      flex min-h-20 w-full rounded-md border border-input
-                      bg-background px-3 py-2 text-sm ring-offset-background
+                      peer inline-flex h-6 w-11 shrink-0 cursor-pointer
+                      items-center rounded-full border-2 border-transparent
+                      transition-colors
                     `,
-                    'placeholder:text-muted-foreground',
                     `
                       focus-visible:ring-2 focus-visible:ring-ring
-                      focus-visible:ring-offset-2 focus-visible:outline-none
+                      focus-visible:ring-offset-2
+                      focus-visible:ring-offset-background
+                      focus-visible:outline-none
                     `,
                     'disabled:cursor-not-allowed disabled:opacity-50',
+                    field.value ? 'bg-primary' : 'bg-input',
                   )}
-                  placeholder="Расскажите о тренере..."
-                  {...field}
-                  value={field.value ?? ''}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="avatarUrl"
-          render={({field}) => (
-            <FormItem>
-              <FormLabel>URL аватара</FormLabel>
-              <FormControl>
-                <Input
-                  type="url"
-                  placeholder="https://example.com/avatar.jpg"
-                  {...field}
-                  value={field.value ?? ''}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {isEditMode && (
-          <FormField
-            control={form.control}
-            name="isActive"
-            render={({field}) => (
-              <FormItem
-                className="
-                  flex flex-row items-center justify-between rounded-lg border
-                  p-4
-                "
-              >
-                <div className="space-y-0.5">
-                  <FormLabel>Статус</FormLabel>
-                </div>
-                <FormControl>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={field.value}
+                  onClick={() => field.onChange(!field.value)}
+                >
+                  <span
                     data-state={field.value ? 'checked' : 'unchecked'}
                     className={cn(
                       `
-                        peer inline-flex h-6 w-11 shrink-0 cursor-pointer
-                        items-center rounded-full border-2 border-transparent
-                        transition-colors
+                        pointer-events-none block size-5 rounded-full
+                        bg-background shadow-lg ring-0 transition-transform
                       `,
-                      `
-                        focus-visible:ring-2 focus-visible:ring-ring
-                        focus-visible:ring-offset-2
-                        focus-visible:ring-offset-background
-                        focus-visible:outline-none
-                      `,
-                      'disabled:cursor-not-allowed disabled:opacity-50',
-                      field.value ? 'bg-primary' : 'bg-input',
+                      field.value ? 'translate-x-5' : 'translate-x-0',
                     )}
-                    onClick={() => field.onChange(!field.value)}
-                  >
-                    <span
-                      data-state={field.value ? 'checked' : 'unchecked'}
-                      className={cn(
-                        `
-                          pointer-events-none block size-5 rounded-full
-                          bg-background shadow-lg ring-0 transition-transform
-                        `,
-                        field.value ? 'translate-x-5' : 'translate-x-0',
-                      )}
-                    />
-                  </button>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        )}
-
-        <div className="flex justify-end gap-2">
-          {onCancel && (
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Отмена
-            </Button>
+                  />
+                </button>
+              </FormControl>
+            </FormItem>
           )}
-          <Button type="submit">{isEditMode ? 'Сохранить' : 'Создать'}</Button>
-        </div>
-      </form>
+        />
+      )}
+
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Отмена
+          </Button>
+        )}
+        <Button type="submit">{isEditMode ? 'Сохранить' : 'Создать'}</Button>
+      </div>
     </Form>
   );
 };
