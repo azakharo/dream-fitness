@@ -1,0 +1,224 @@
+# Production Docker Compose configuration
+# Usage: docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+
+services:
+  # ============================================
+  # Infrastructure (Postgres and RabbitMQ)
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: dreamfitness-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-dreamfitness}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD is required}
+      POSTGRES_DB: ${DATABASE_NAME:-dreamfitness}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-dreamfitness}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dreamfitness-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: dreamfitness-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-dreamfitness}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - dreamfitness-network
+
+  # ============================================
+  # Application Services
+  # ============================================
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-api-gateway
+    restart: always
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.production
+      - ./backend/.env.docker
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    command: node dist/apps/api-gateway/main.js
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - dreamfitness-network
+
+  auth-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-auth-service
+    restart: always
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.production
+      - ./backend/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: node dist/apps/auth-service/main.js
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - dreamfitness-network
+
+  training-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-training-service
+    restart: always
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.production
+      - ./backend/.env.docker
+    depends_on:
+      auth-service:
+        condition: service_healthy
+    command: node dist/apps/training-service/main.js
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - dreamfitness-network
+
+  booking-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-booking-service
+    restart: always
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.production
+      - ./backend/.env.docker
+    depends_on:
+      training-service:
+        condition: service_healthy
+    command: node dist/apps/booking-service/main.js
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - dreamfitness-network
+
+  notification-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: dreamfitness-notification-service
+    restart: always
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.production
+      - ./backend/.env.docker
+    depends_on:
+      booking-service:
+        condition: service_healthy
+    command: node dist/apps/notification-service/main.js
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - dreamfitness-network
+
+  # ============================================
+  # Nginx (Frontend + Reverse Proxy)
+  # ============================================
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    container_name: dreamfitness-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    depends_on:
+      - api-gateway
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - dreamfitness-network
+
+  # ============================================
+  # Certbot (Let's Encrypt)
+  # ============================================
+  certbot:
+    image: certbot/certbot:latest
+    container_name: dreamfitness-certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot:rw
+      - ./certbot/conf:/etc/letsencrypt:rw
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - dreamfitness-network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  dreamfitness-network:
+    driver: bridge
