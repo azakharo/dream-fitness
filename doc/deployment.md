@@ -117,7 +117,7 @@ This guide covers the complete deployment process for DreamFitness using Docker 
 ### Required Software
 
 - Docker Engine 24.0+
-- Docker Compose v2.0+
+- Docker Compose v2.20+
 
 ### Domain Name
 
