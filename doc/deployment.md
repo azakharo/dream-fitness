@@ -8,15 +8,15 @@ This guide covers the complete deployment process for DreamFitness using Docker 
 
 1. [Overview](#1-overview)
 2. [Prerequisites](#2-prerequisites)
-3. [Server Setup](#4-server-setup)
-4. [Application Deployment](#5-application-deployment)
-5. [SSL Certificate Configuration](#6-ssl-certificate-configuration)
-6. [Environment Variables Reference](#7-environment-variables-reference)
-7. [Database Management](#8-database-management)
-8. [Monitoring and Logging](#9-monitoring-and-logging)
-9. [Update Procedures](#10-update-procedures)
-10. [Troubleshooting Guide](#11-troubleshooting-guide)
-11. [Architecture Overview](#12-architecture-overview)
+3. [Server Setup](#3-server-setup)
+4. [Application Deployment](#4-application-deployment)
+5. [SSL Certificate Configuration](#5-ssl-certificate-configuration)
+6. [Environment Variables Reference](#6-environment-variables-reference)
+7. [Database Management](#7-database-management)
+8. [Monitoring and Logging](#8-monitoring-and-logging)
+9. [Update Procedures](#9-update-procedures)
+10. [Troubleshooting Guide](#10-troubleshooting-guide)
+11. [Architecture Overview](#11-architecture-overview)
 
 ---
 
@@ -269,7 +269,9 @@ cd dreamfitness
 
 ### Environment Configuration
 
-The `.env.production` file is already in the repository with default values.
+Docker Compose automatically reads `.env` file from the working directory for variable substitution in compose files.
+
+The `.env` file in the repository root contains infrastructure variables with default values.
 
 ### Initial SSL Certificate Setup
 
@@ -288,13 +290,13 @@ sudo docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/le
 1. Build and start all services:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 2. Wait for all services to become healthy:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production ps
+docker compose -f docker-compose.prod.yml ps
 ```
 
 All services should show `healthy` in the status column.
@@ -304,13 +306,13 @@ All services should show `healthy` in the status column.
 After all services are healthy, run migrations:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production exec api-gateway npm run migration:run:prod
+docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:run:prod
 ```
 
 Create admin and test users (optional):
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production exec api-gateway npm run db:seed:prod
+docker compose -f docker-compose.prod.yml exec api-gateway npm run db:seed:prod
 ```
 
 ### Verify Deployment
@@ -318,7 +320,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production exec api-ga
 1. Check container logs:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production logs -f
+docker compose -f docker-compose.prod.yml logs -f
 ```
 
 2. Test the health endpoint:
@@ -367,59 +369,60 @@ Certificates are stored in:
 
 ## 6. Environment Variables Reference
 
-| Variable            | Required | Default        | Description                                  |
-| :------------------ | :------- | :------------- | :------------------------------------------- |
-| `DATABASE_USER`     | No       | `dreamfitness` | PostgreSQL database username                 |
-| `DATABASE_PASSWORD` | **Yes**  | -              | PostgreSQL database password (required)      |
-| `DATABASE_NAME`     | No       | `dreamfitness` | PostgreSQL database name                     |
-| `RABBITMQ_USER`     | No       | `dreamfitness` | RabbitMQ username                            |
-| `RABBITMQ_PASSWORD` | **Yes**  | -              | RabbitMQ password (required)                 |
-| `VITE_API_URL`      | No       | ``             | API URL for frontend (empty for same-origin) |
+### Root `.env` File - Infrastructure Variables
 
-### Configuration Examples
+Used by Docker Compose for container configuration (postgres, rabbitmq):
 
-#### Same-Origin Deployment (Recommended)
+| Variable            | Required | Default           | Description                  |
+| :------------------ | :------- | :---------------- | :--------------------------- |
+| `DATABASE_USER`     | No       | `dreamfitness`    | PostgreSQL database username |
+| `DATABASE_PASSWORD` | No       | `dreamfitness123` | PostgreSQL database password |
+| `DATABASE_NAME`     | No       | `dreamfitness`    | PostgreSQL database name     |
+| `DATABASE_PORT`     | No       | `5432`            | PostgreSQL port              |
+| `RABBITMQ_USER`     | No       | `dreamfitness`    | RabbitMQ username            |
+| `RABBITMQ_PASSWORD` | No       | `dreamfitness123` | RabbitMQ password            |
 
-Frontend and backend served from the same domain:
+### Backend `.env` Files - Application Variables
 
-```env
-VITE_API_URL=
-```
+Backend services use separate env files loaded at runtime:
 
-#### Cross-Origin Deployment
+| File                      | Purpose                                     |
+| :------------------------ | :------------------------------------------ |
+| `backend/.env`            | Base configuration                          |
+| `backend/.env.production` | Production-specific settings                |
+| `backend/.env.docker`     | Docker network overrides (hostnames, ports) |
 
-Frontend and backend on different domains:
+### Frontend `.env` Files
 
-```env
-VITE_API_URL=https://api.yourdomain.com
-```
+Frontend uses Vite's built-in env file loading:
+
+| File                       | Purpose                         |
+| :------------------------- | :------------------------------ |
+| `frontend/.env.production` | Production build-time variables |
+
+> **Note:** `VITE_API_URL` is defined in `frontend/.env.production` and baked into the frontend bundle at build time. No need to pass it via Docker build args.
 
 ### Important: Changing RabbitMQ Password
 
-If you need to change the RabbitMQ password, you must update it in **3 files**:
+If you need to change the RabbitMQ password, update it in **2 files**:
 
-1. **`.env.production`** (root) - Docker Compose uses this for container configuration:
+1. **`.env`** (root) - Docker Compose uses this for container configuration:
 
    ```env
    RABBITMQ_PASSWORD=<new-password>
    ```
 
-2. **`backend/.env.production`** - Backend services use this for local connections:
+2. **`backend/.env.docker`** - Backend services use this for Docker network connections:
 
-   ```env
-   RABBITMQ_URL=amqp://dreamfitness:<new-password>@localhost:5672
-   ```
-
-3. **`backend/.env.docker`** - Backend services use this for Docker network connections:
    ```env
    RABBITMQ_URL=amqp://dreamfitness:<new-password>@rabbitmq:5672
    ```
 
-> **Note:** This inconsistency exists because NestJS loads environment files at runtime, and variable substitution in `RABBITMQ_URL` is not supported. All three files must have matching credentials.
+> **Note:** `backend/.env.production` uses `localhost` for local development and does not need updating for Docker deployment.
 
 ---
 
-## 8. Database Management
+## 7. Database Management
 
 ### Database Migrations
 
@@ -430,13 +433,13 @@ Migrations should be run manually after deployment.
 Run migrations inside the api-gateway container:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production exec api-gateway npm run migration:run:prod
+docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:run:prod
 ```
 
 #### Checking Migration Status
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production exec api-gateway npm run migration:show:prod
+docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:show:prod
 ```
 
 #### Reverting Migrations
@@ -444,7 +447,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production exec api-ga
 If you need to revert the last migration:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production exec api-gateway npm run migration:revert:prod
+docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:revert:prod
 ```
 
 ### Backup Considerations
@@ -453,41 +456,41 @@ For manual backups:
 
 ```bash
 # Create a backup
-docker compose -f docker-compose.prod.yml --env-file .env.production exec postgres pg_dump -U dreamfitness dreamfitness > backup_$(date +%Y%m%d).sql
+docker compose -f docker-compose.prod.yml exec postgres pg_dump -U dreamfitness dreamfitness > backup_$(date +%Y%m%d).sql
 
 # Restore from backup
-cat backup_20260320.sql | docker compose -f docker-compose.prod.yml --env-file .env.production exec -T postgres psql -U dreamfitness dreamfitness
+cat backup_20260320.sql | docker compose -f docker-compose.prod.yml exec -T postgres psql -U dreamfitness dreamfitness
 ```
 
 ---
 
-## 9. Monitoring and Logging
+## 8. Monitoring and Logging
 
 ### Viewing Container Logs
 
 View all service logs:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production logs -f
+docker compose -f docker-compose.prod.yml logs -f
 ```
 
 View logs for a specific service:
 
 ```bash
 # Nginx logs
-docker compose -f docker-compose.prod.yml --env-file .env.production logs -f nginx
+docker compose -f docker-compose.prod.yml logs -f nginx
 
 # API Gateway logs
-docker compose -f docker-compose.prod.yml --env-file .env.production logs -f api-gateway
+docker compose -f docker-compose.prod.yml logs -f api-gateway
 
 # Auth service logs
-docker compose -f docker-compose.prod.yml --env-file .env.production logs -f auth-service
+docker compose -f docker-compose.prod.yml logs -f auth-service
 ```
 
 View last 100 lines:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production logs --tail=100 api-gateway
+docker compose -f docker-compose.prod.yml logs --tail=100 api-gateway
 ```
 
 ### Health Check Endpoints
@@ -513,7 +516,7 @@ curl https://fitness.ddns.net/api/docs
 Check container health status:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production ps
+docker compose -f docker-compose.prod.yml ps
 ```
 
 Expected output shows all services as `healthy`.
@@ -528,7 +531,7 @@ docker stats
 
 ---
 
-## 10. Update Procedures
+## 9. Update Procedures
 
 ### Standard Update
 
@@ -548,14 +551,14 @@ git pull origin master
 3. Rebuild and restart containers:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 4. Verify the update:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production ps
-docker compose -f docker-compose.prod.yml --env-file .env.production logs -f --tail=50
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f --tail=50
 ```
 
 ### Quick Restart (No Code Changes)
@@ -563,7 +566,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production logs -f --t
 If you only changed environment variables:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### Rollback Procedure
@@ -573,7 +576,7 @@ If an update causes issues:
 1. Stop the current containers:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production down
+docker compose -f docker-compose.prod.yml down
 ```
 
 2. Checkout the previous version:
@@ -586,7 +589,7 @@ git checkout <previous-commit-hash>
 3. Rebuild and start:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 4. After verifying, return to the latest commit and fix issues:
@@ -597,7 +600,7 @@ git checkout main
 
 ---
 
-## 11. Troubleshooting Guide
+## 10. Troubleshooting Guide
 
 ### Container Won't Start
 
@@ -607,10 +610,10 @@ git checkout main
 
 ```bash
 # Check container status
-docker compose -f docker-compose.prod.yml --env-file .env.production ps
+docker compose -f docker-compose.prod.yml ps
 
 # View container logs
-docker compose -f docker-compose.prod.yml --env-file .env.production logs api-gateway
+docker compose -f docker-compose.prod.yml logs api-gateway
 ```
 
 **Common Causes:**
@@ -618,8 +621,8 @@ docker compose -f docker-compose.prod.yml --env-file .env.production logs api-ga
 1. Missing environment variables:
 
 ```bash
-# Verify .env.production exists
-cat .env.production
+# Verify .env exists
+cat .env
 ```
 
 2. Port conflicts:
@@ -645,24 +648,24 @@ docker system df
 
 ```bash
 # Check if postgres is healthy
-docker compose -f docker-compose.prod.yml --env-file .env.production ps postgres
+docker compose -f docker-compose.prod.yml ps postgres
 
 # Check postgres logs
-docker compose -f docker-compose.prod.yml --env-file .env.production logs postgres
+docker compose -f docker-compose.prod.yml logs postgres
 ```
 
 **Solutions:**
 
-1. Verify database credentials in `.env.production`:
+1. Verify database credentials in `.env`:
 
 ```bash
-cat .env.production | grep DATABASE_
+cat .env | grep DATABASE_
 ```
 
 2. Ensure postgres container is running:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production restart postgres
+docker compose -f docker-compose.prod.yml restart postgres
 ```
 
 ### SSL Certificate Problems
@@ -697,7 +700,7 @@ echo | openssl s_client -connect fitness.ddns.net:443 2>/dev/null | openssl x509
 
 ```bash
 # Test nginx configuration
-docker compose -f docker-compose.prod.yml --env-file .env.production exec nginx nginx -t
+docker compose -f docker-compose.prod.yml exec nginx nginx -t
 ```
 
 **Common Issues:**
@@ -713,12 +716,12 @@ ls -la certbot/conf/live/fitness.ddns.net/
 
 ```bash
 # Validate configuration
-docker compose -f docker-compose.prod.yml --env-file .env.production exec nginx nginx -t
+docker compose -f docker-compose.prod.yml exec nginx nginx -t
 ```
 
 ---
 
-## 12. Architecture Overview
+## 11. Architecture Overview
 
 ### Container Responsibilities
 
@@ -764,22 +767,22 @@ All containers communicate through the `dreamfitness-network` bridge network. On
 
 ```bash
 # Start all services
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+docker compose -f docker-compose.prod.yml up -d
 
 # Stop all services
-docker compose -f docker-compose.prod.yml --env-file .env.production down
+docker compose -f docker-compose.prod.yml down
 
 # Rebuild and restart
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 
 # View logs
-docker compose -f docker-compose.prod.yml --env-file .env.production logs -f
+docker compose -f docker-compose.prod.yml logs -f
 
 # Check status
-docker compose -f docker-compose.prod.yml --env-file .env.production ps
+docker compose -f docker-compose.prod.yml ps
 
 # Restart a single service
-docker compose -f docker-compose.prod.yml --env-file .env.production restart nginx
+docker compose -f docker-compose.prod.yml restart nginx
 ```
 
 ### File Locations
@@ -787,7 +790,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.production restart ngi
 | File                                                    | Purpose                                 |
 | :------------------------------------------------------ | :-------------------------------------- |
 | [`docker-compose.prod.yml`](../docker-compose.prod.yml) | Production Docker Compose configuration |
-| [`.env.production`](../.env.production)                 | Production environment variables        |
+| [`.env`](../.env)                                       | Infrastructure environment variables    |
 | [`nginx/Dockerfile`](../nginx/Dockerfile)               | Nginx + frontend container definition   |
 | [`nginx/nginx.conf`](../nginx/nginx.conf)               | Nginx configuration                     |
 | [`backend/Dockerfile`](../backend/Dockerfile)           | Backend container definition            |
