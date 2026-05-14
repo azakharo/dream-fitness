@@ -42,3 +42,11 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     networks:
       - dreamfitness-network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  dreamfitness-network:
+    driver: bridge
