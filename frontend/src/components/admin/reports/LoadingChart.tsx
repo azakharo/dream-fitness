@@ -30,7 +30,7 @@ export const LoadingChart: React.FC<LoadingChartProps> = ({
           <CardTitle>Загрузка тренировок</CardTitle>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-[300px] w-full" />
+          <Skeleton className="h-80 w-full" />
         </CardContent>
       </Card>
     );
@@ -42,8 +42,13 @@ export const LoadingChart: React.FC<LoadingChartProps> = ({
         <CardTitle>Загрузка тренировок</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-80 w-full">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+          >
             <LineChart
               data={data}
               margin={{top: 5, right: 20, left: 0, bottom: 5}}

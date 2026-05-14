@@ -35,6 +35,7 @@ export const AdminReportsPage: React.FC = () => {
 
   const loadingChartData = useMemo(() => {
     if (!loadingStats) return [];
+    // TODO use date-fns for calc
     const days = Math.ceil(
       (dateTo.getTime() - dateFrom.getTime()) / (1000 * 60 * 60 * 24),
     );
@@ -51,7 +52,10 @@ export const AdminReportsPage: React.FC = () => {
   }, [dateFrom, dateTo, loadingStats]);
 
   const popularTrainingsData = useMemo(() => {
-    if (!popularTrainings) return [];
+    if (!popularTrainings) {
+      return [];
+    }
+
     return popularTrainings.map(t => ({
       name: t.title,
       type: t.type,
@@ -60,7 +64,10 @@ export const AdminReportsPage: React.FC = () => {
   }, [popularTrainings]);
 
   const financialData = useMemo(() => {
-    if (!financialReport) return [];
+    if (!financialReport) {
+      return [];
+    }
+
     const periods = 4;
     const periodDays = Math.ceil(
       (dateTo.getTime() - dateFrom.getTime()) / (periods * 1000 * 60 * 60 * 24),
@@ -90,13 +97,14 @@ export const AdminReportsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Отчёты и статистика"
+        title="Отчёты и статистика (mock)"
         description="Анализ загрузки и финансовых показателей"
       />
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Период:</span>
+          {/* TODO use own DatePicker */}
           <Input
             type="date"
             value={format(dateFrom, 'yyyy-MM-dd')}
@@ -104,6 +112,7 @@ export const AdminReportsPage: React.FC = () => {
             className="w-auto"
           />
           <span className="text-muted-foreground">—</span>
+          {/* TODO use own DatePicker */}
           <Input
             type="date"
             value={format(dateTo, 'yyyy-MM-dd')}

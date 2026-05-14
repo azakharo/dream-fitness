@@ -3,6 +3,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useLogin} from '@/hooks/use-auth';
 import {loginSchema} from '@/schemas/auth.schema';
 import type {LoginFormData} from '@/schemas/auth.schema';
+import {ApiError} from '@/lib/api-client';
 import {Button} from '@/components/ui';
 import {Input} from '@/components/ui';
 import {
@@ -80,7 +81,15 @@ export const LoginForm: React.FC = () => {
             )}
           />
           {loginMutation.isError && (
-            <p className="text-sm text-red-500">Неверный email или пароль</p>
+            <p className="text-sm text-red-500">
+              {loginMutation.error instanceof ApiError &&
+              loginMutation.error.status === 401
+                ? 'Неверный email или пароль'
+                : loginMutation.error instanceof ApiError &&
+                    loginMutation.error.status === 0
+                  ? 'Не удалось подключиться к серверу'
+                  : 'Произошла ошибка'}
+            </p>
           )}
           <Button
             type="submit"
