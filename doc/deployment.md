@@ -285,35 +285,58 @@ mkdir -p certbot/www certbot/conf
 sudo docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt certbot/certbot certonly --webroot -w /var/www/certbot --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
 ```
 
-### Build and Start Containers
+### Start Infrastructure
 
-1. Build and start all services:
+Start only the infrastructure services (postgres, rabbitmq):
+
+```bash
+docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
+```
+
+Wait for infrastructure to become healthy:
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+```
+
+Postgres and rabbitmq should show `healthy` in the status column.
+
+### Run Database Migrations
+
+Run migrations using a temporary container before starting application services:
+
+```bash
+cd backend && npm run docker:prod:migrate:auto
+```
+
+This command:
+
+- Creates a temporary `migration-runner` container
+- Connects to the postgres database
+- Runs migrations and creates admin/test users
+- Automatically removes the container after completion
+
+Return to the root directory:
+
+```bash
+cd ..
+```
+
+### Start Application Services
+
+Start all application services:
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-2. Wait for all services to become healthy:
+Wait for all services to become healthy:
 
 ```bash
 docker compose -f docker-compose.prod.yml ps
 ```
 
 All services should show `healthy` in the status column.
-
-### Run Database Migrations
-
-After all services are healthy, run migrations:
-
-```bash
-docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:run:prod
-```
-
-Create admin and test users (optional):
-
-```bash
-docker compose -f docker-compose.prod.yml exec api-gateway npm run db:seed:prod
-```
 
 ### Verify Deployment
 
@@ -426,28 +449,48 @@ If you need to change the RabbitMQ password, update it in **2 files**:
 
 ### Database Migrations
 
-Migrations should be run manually after deployment.
+Migrations are run using a temporary container that connects to the database.
 
-#### Running Migrations
+> **Prerequisite:** Infrastructure services (postgres, rabbitmq) must be running before executing migrations. Application services should be stopped.
 
-Run migrations inside the api-gateway container:
+#### Running Migrations (Temporary Container)
+
+Ensure infrastructure is running:
 
 ```bash
-docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:run:prod
+docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
+```
+
+Run migrations using a temporary container:
+
+```bash
+cd backend && npm run docker:prod:migrate:auto
+```
+
+This runs both migrations and seeds (admin/test users).
+
+For migrations only:
+
+```bash
+cd backend && npm run docker:prod:migrate:manual
+```
+
+For seeding only:
+
+```bash
+cd backend && npm run docker:prod:seed:manual
 ```
 
 #### Checking Migration Status
 
 ```bash
-docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:show:prod
+cd backend && docker compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run migration:show
 ```
 
 #### Reverting Migrations
 
-If you need to revert the last migration:
-
 ```bash
-docker compose -f docker-compose.prod.yml exec api-gateway npm run migration:revert:prod
+cd backend && npm run docker:prod:migrate:revert
 ```
 
 ### Backup Considerations
