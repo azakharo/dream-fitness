@@ -46,7 +46,7 @@ export const PopularTrainingsChart: React.FC<PopularTrainingsChartProps> = ({
           <CardTitle>Популярные тренировки</CardTitle>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-75 w-full" />
+          <Skeleton className="h-80 w-full" />
         </CardContent>
       </Card>
     );
@@ -58,8 +58,13 @@ export const PopularTrainingsChart: React.FC<PopularTrainingsChartProps> = ({
         <CardTitle>Популярные тренировки</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-75 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-80 w-full">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+          >
             <BarChart
               data={data}
               margin={{top: 5, right: 20, left: 0, bottom: 5}}
