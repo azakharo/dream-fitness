@@ -69,7 +69,11 @@ const beforeErrorHook: BeforeErrorHook = async (state: BeforeErrorState) => {
     }
     return new ApiError(error.response.status, data);
   }
-  return error;
+  // Network errors, connection refused, etc. - convert to ApiError with status 0
+  return new ApiError(0, {
+    message:
+      'Не удалось подключиться к серверу. Проверьте подключение к интернету.',
+  });
 };
 
 const afterResponseHook: AfterResponseHook = async (
