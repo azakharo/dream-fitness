@@ -1,5 +1,5 @@
-# Base infrastructure configuration
-# Extended by docker-compose.dev.yml and docker-compose.prod.yml
+# Migration Runner - Root-level Docker Compose configuration
+# Usage from root: docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
 
 services:
   postgres:
@@ -20,27 +20,26 @@ services:
     networks:
       - dreamfitness-network
 
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
+  migration-runner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.migrations
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-dreamfitness}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-dreamfitness123}
-    ports:
-      - "5672:5672" # AMQP
-      - "15672:15672" # Management UI
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+      - NODE_ENV=${NODE_ENV:-production}
+      - RUN_MIGRATIONS=${RUN_MIGRATIONS:-false}
+      - RUN_SEED=${RUN_SEED:-false}
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.${NODE_ENV:-production}
+      - ./backend/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - dreamfitness-network
 
 volumes:
   postgres_data:
-  rabbitmq_data:
 
 networks:
   dreamfitness-network:

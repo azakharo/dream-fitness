@@ -306,7 +306,7 @@ Postgres and rabbitmq should show `healthy` in the status column.
 Run migrations using a temporary container before starting application services:
 
 ```bash
-cd backend && npm run docker:prod:migrate:auto
+docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
 ```
 
 This command:
@@ -315,12 +315,6 @@ This command:
 - Connects to the postgres database
 - Runs migrations and creates admin/test users
 - Automatically removes the container after completion
-
-Return to the root directory:
-
-```bash
-cd ..
-```
 
 ### Start Application Services
 
@@ -464,7 +458,7 @@ docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
 Run migrations using a temporary container:
 
 ```bash
-cd backend && npm run docker:prod:migrate:auto
+docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
 ```
 
 This runs both migrations and seeds (admin/test users).
@@ -472,25 +466,25 @@ This runs both migrations and seeds (admin/test users).
 For migrations only:
 
 ```bash
-cd backend && npm run docker:prod:migrate:manual
+docker compose -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate
 ```
 
 For seeding only:
 
 ```bash
-cd backend && npm run docker:prod:seed:manual
+docker compose -f docker-compose.migrations.yml run --rm migration-runner npm run db:seed
 ```
 
 #### Checking Migration Status
 
 ```bash
-cd backend && docker compose --env-file .env --env-file .env.production -f docker-compose.base.yml -f docker-compose.migrations.yml run --rm migration-runner npm run migration:show
+docker compose -f docker-compose.migrations.yml run --rm migration-runner npm run migration:show
 ```
 
 #### Reverting Migrations
 
 ```bash
-cd backend && npm run docker:prod:migrate:revert
+docker compose -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate:revert
 ```
 
 ### Backup Considerations
