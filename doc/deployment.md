@@ -285,25 +285,9 @@ mkdir -p certbot/www certbot/conf
 sudo docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt certbot/certbot certonly --webroot -w /var/www/certbot --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
 ```
 
-### Start Infrastructure
-
-Start only the infrastructure services (postgres, rabbitmq):
-
-```bash
-docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
-```
-
-Wait for infrastructure to become healthy:
-
-```bash
-docker compose -f docker-compose.prod.yml ps
-```
-
-Postgres and rabbitmq should show `healthy` in the status column.
-
 ### Run Database Migrations
 
-Run migrations using a temporary container before starting application services:
+Run migrations and seed data using a self-contained Docker Compose configuration:
 
 ```bash
 docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
@@ -311,7 +295,8 @@ docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true 
 
 This command:
 
-- Creates a temporary `migration-runner` container
+- Starts a temporary postgres container automatically (via `depends_on` with healthcheck)
+- Builds the migration-runner image
 - Connects to the postgres database
 - Runs migrations and creates admin/test users
 - Automatically removes the container after completion

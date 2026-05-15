@@ -3,22 +3,9 @@
 
 services:
   postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: ${DATABASE_USER:-dreamfitness}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-dreamfitness123}
-      POSTGRES_DB: ${DATABASE_NAME:-dreamfitness}
-    ports:
-      - "${DATABASE_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-dreamfitness}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - dreamfitness-network
+    extends:
+      file: backend/docker-compose.base.yml
+      service: postgres
 
   migration-runner:
     build:
