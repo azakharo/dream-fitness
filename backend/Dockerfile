@@ -1,7 +1,7 @@
 # ============================================
 # Stage 1: Base - Install dependencies
 # ============================================
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 WORKDIR /app
 
@@ -26,7 +26,7 @@ CMD ["npm", "run", "start:dev:api-gateway"]
 # ============================================
 # Stage 3: Production - Minimal image
 # ============================================
-FROM node:20-alpine AS production
+FROM node:22-alpine AS production
 
 WORKDIR /app
 
