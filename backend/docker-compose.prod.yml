@@ -45,7 +45,7 @@ services:
     networks:
       - dreamfitness-network
     ports:
-      - "3000:3000"
+      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
 
   auth-service:
     build:
