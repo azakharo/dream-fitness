@@ -275,15 +275,18 @@ The `.env` file in the repository root contains infrastructure variables with de
 
 ### Initial SSL Certificate Setup
 
-Before starting the application, obtain initial SSL certificates:
+Before starting the application, obtain initial SSL certificates using standalone mode:
 
 ```bash
 # Create directories for certbot
 mkdir -p certbot/www certbot/conf
 
-# Request initial certificate (replace with your email)
-sudo docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt certbot/certbot certonly --webroot -w /var/www/certbot --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
+# Request initial certificate using standalone mode (certbot runs its own webserver on port 80)
+# IMPORTANT: Port 80 must be free (no nginx or other webserver running)
+docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt -p 80:80 certbot/certbot certonly --standalone --email zangular@yandex.ru -d fitness.ddns.net --agree-tos --no-eff-email
 ```
+
+> **Note**: We use `--standalone` mode for the initial certificate because nginx config requires SSL certificates to start, but webroot method needs nginx running. Standalone mode resolves this chicken-and-egg problem by running certbot's own webserver temporarily.
 
 ### Run Database Migrations
 
@@ -350,13 +353,17 @@ DreamFitness uses Let's Encrypt for trusted SSL certificates via Certbot contain
 
 #### Initial Certificate Request
 
+Use standalone mode for initial certificate (see section 4 for detailed instructions):
+
 ```bash
 # Create directories
 mkdir -p certbot/www certbot/conf
 
-# Request certificate
-sudo docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt certbot/certbot certonly --webroot -w /var/www/certbot --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
+# Request certificate using standalone mode
+docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt -p 80:80 certbot/certbot certonly --standalone --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
 ```
+
+> **Note**: Standalone mode is required for initial certificate because nginx needs SSL certs to start, but webroot method needs nginx running.
 
 #### Auto-Renewal
 
