@@ -1,0 +1,33 @@
+# Migration Runner - Root-level Docker Compose configuration
+# Usage from root: docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
+
+services:
+  postgres:
+    extends:
+      file: backend/docker-compose.base.yml
+      service: postgres
+
+  migration-runner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.migrations
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - RUN_MIGRATIONS=${RUN_MIGRATIONS:-false}
+      - RUN_SEED=${RUN_SEED:-false}
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.${NODE_ENV:-production}
+      - ./backend/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dreamfitness-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dreamfitness-network:
+    driver: bridge

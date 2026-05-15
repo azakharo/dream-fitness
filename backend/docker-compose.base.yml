@@ -4,7 +4,6 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: dreamfitness-postgres
     environment:
       POSTGRES_USER: ${DATABASE_USER:-dreamfitness}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-dreamfitness123}
@@ -23,7 +22,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: dreamfitness-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-dreamfitness}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-dreamfitness123}

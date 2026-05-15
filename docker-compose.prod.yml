@@ -1,0 +1,52 @@
+# Production Docker Compose configuration
+# Usage: docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+
+include:
+  - backend/docker-compose.prod.yml
+
+services:
+  # ============================================
+  # Nginx (Frontend + Reverse Proxy)
+  # ============================================
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: dreamfitness-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    depends_on:
+      - api-gateway
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - dreamfitness-network
+
+  # ============================================
+  # Certbot (Let's Encrypt)
+  # ============================================
+  certbot:
+    image: certbot/certbot:latest
+    container_name: dreamfitness-certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot:rw
+      - ./certbot/conf:/etc/letsencrypt:rw
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - dreamfitness-network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  dreamfitness-network:
+    driver: bridge

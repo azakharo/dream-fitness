@@ -25,9 +25,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: dreamfitness-api-gateway
-    ports:
-      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
     env_file:
@@ -47,15 +44,14 @@ services:
       start_period: 30s
     networks:
       - dreamfitness-network
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
 
   auth-service:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: dreamfitness-auth-service
-    ports:
-      - "${AUTH_SERVICE_PORT:-3001}:${AUTH_SERVICE_PORT:-3001}"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
     env_file:
@@ -83,9 +79,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: dreamfitness-training-service
-    ports:
-      - "${TRAINING_SERVICE_PORT:-3002}:${TRAINING_SERVICE_PORT:-3002}"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
     env_file:
@@ -111,9 +104,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: dreamfitness-booking-service
-    ports:
-      - "${BOOKING_SERVICE_PORT:-3003}:${BOOKING_SERVICE_PORT:-3003}"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
     env_file:
@@ -139,9 +129,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: dreamfitness-notification-service
-    ports:
-      - "${NOTIFICATION_SERVICE_PORT:-3004}:${NOTIFICATION_SERVICE_PORT:-3004}"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
     env_file:
