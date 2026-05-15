@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {Badge, Skeleton} from '@/components/ui';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {useEnrichedBookings} from '@/hooks';
 import {formatDateShort, formatTime} from '@/lib/date-utils';
 

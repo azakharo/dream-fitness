@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {ArrowLeft} from 'lucide-react';
 
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui';
 import {useRouter} from '@tanstack/react-router';
 
 export interface PageHeaderProps {

@@ -1,8 +1,8 @@
 import React from 'react';
 import {Clock, User, Coins, Users} from 'lucide-react';
 import {Link} from '@tanstack/react-router';
-import {Card, CardContent} from '@/components/ui/Card';
-import {Badge} from '@/components/ui/Badge';
+import {Card, CardContent} from '@/components/ui';
+import {Badge} from '@/components/ui';
 import type {TrainingResponseDto} from '@/types';
 import {formatTime, getEndTime, parseApiDate} from '@/lib/date-utils';
 

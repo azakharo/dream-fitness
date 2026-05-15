@@ -3,7 +3,7 @@ import {format, parseISO} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {X} from 'lucide-react';
 
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui';
 import type {TrainingResponseDto, UserDto} from '@/types';
 
 interface ParticipantsDrawerProps {

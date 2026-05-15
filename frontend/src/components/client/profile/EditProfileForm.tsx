@@ -8,7 +8,7 @@ import {editProfileSchema} from '@/schemas/user.schema';
 import type {EditProfileFormData} from '@/schemas/user.schema';
 import {Button} from '@/components/ui';
 import {Input} from '@/components/ui';
-import {DatePicker} from '@/components/ui/DatePicker';
+import {DatePicker} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {
   Form,

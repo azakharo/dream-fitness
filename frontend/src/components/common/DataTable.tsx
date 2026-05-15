@@ -8,8 +8,8 @@ import {
 } from 'lucide-react';
 
 import {cn} from '@/lib/utils';
-import {Skeleton} from '@/components/ui/Skeleton';
-import {Button} from '@/components/ui/Button';
+import {Skeleton} from '@/components/ui';
+import {Button} from '@/components/ui';
 import {
   Table,
   TableBody,
@@ -17,8 +17,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import {Checkbox} from '@/components/ui/Checkbox';
+} from '@/components/ui';
+import {Checkbox} from '@/components/ui';
 
 export interface ColumnDef<T> {
   key: keyof T | string;

@@ -1,7 +1,7 @@
 import type {TrainerResponseDto, TrainingResponseDto} from '@/types';
-import {Badge} from '@/components/ui/Badge';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Badge} from '@/components/ui';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 import {
   formatDateLong,
   formatTime,

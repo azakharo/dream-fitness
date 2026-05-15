@@ -1,7 +1,7 @@
 import type {FallbackProps} from 'react-error-boundary';
 import {AlertTriangle, RefreshCw} from 'lucide-react';
 
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui';
 
 export const ErrorFallback: React.FC<FallbackProps> = ({
   resetErrorBoundary,

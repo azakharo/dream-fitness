@@ -6,9 +6,9 @@ import {
   useMarkAsRead,
 } from '@/hooks/use-notifications';
 import {useUIStore} from '@/stores/ui-store';
-import {Button} from '@/components/ui/Button';
-import {Badge} from '@/components/ui/Badge';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/Popover';
+import {Button} from '@/components/ui';
+import {Badge} from '@/components/ui';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui';
 import {ROUTES} from '@/lib/routes';
 
 export const NotificationsBell: React.FC = () => {

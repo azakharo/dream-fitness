@@ -3,9 +3,9 @@ import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {Lock, User} from 'lucide-react';
 
-import {Badge} from '@/components/ui/Badge';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Badge} from '@/components/ui';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 import type {UserDto} from '@/types';
 
 interface UserInfoCardProps {

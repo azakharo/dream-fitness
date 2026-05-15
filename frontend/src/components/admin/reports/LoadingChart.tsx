@@ -8,8 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 
 export interface LoadingChartProps {
   data: {

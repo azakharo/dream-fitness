@@ -9,8 +9,8 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 
 export interface PopularTrainingsChartProps {
   data: {

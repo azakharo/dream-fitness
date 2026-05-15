@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Link} from '@tanstack/react-router';
 import type {TrainingResponseDto} from '@/types';
 
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {Button, Skeleton} from '@/components/ui';
 import {ROUTES} from '@/lib/routes';
 import {formatDateShort, formatTime} from '@/lib/date-utils';

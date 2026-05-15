@@ -1,8 +1,8 @@
 import React from 'react';
 import {Search} from 'lucide-react';
 
-import {Button} from '@/components/ui/Button';
-import {Input} from '@/components/ui/Input';
+import {Button} from '@/components/ui';
+import {Input} from '@/components/ui';
 import type {UserFilters as UserFiltersType} from '@/hooks/use-users';
 
 interface UserFiltersProps {

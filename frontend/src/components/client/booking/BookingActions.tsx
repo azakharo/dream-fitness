@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {useCancelBooking, useCreateBooking} from '@/hooks/use-bookings';
 import {useJoinWaitlist, useLeaveWaitlist} from '@/hooks/use-waitlist';
-import {Button} from '@/components/ui/Button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
+import {Button} from '@/components/ui';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,8 +13,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/AlertDialog';
-import {Input} from '@/components/ui/Input';
+} from '@/components/ui';
+import {Input} from '@/components/ui';
 import {toast} from 'sonner';
 
 interface BookingActionsProps {

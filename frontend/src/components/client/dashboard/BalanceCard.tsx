@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Link} from '@tanstack/react-router';
 
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {Button, Skeleton} from '@/components/ui';
 import {ROUTES} from '@/lib/routes';
 

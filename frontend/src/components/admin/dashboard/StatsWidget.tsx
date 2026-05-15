@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {TrendingDown, TrendingUp} from 'lucide-react';
-import {Card} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Card} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 
 export interface StatsWidgetProps {
   title: string;

@@ -3,8 +3,8 @@ import {format, parseISO} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {Users, Pencil, Trash} from 'lucide-react';
 
-import {Badge} from '@/components/ui/Badge';
-import {Button} from '@/components/ui/Button';
+import {Badge} from '@/components/ui';
+import {Button} from '@/components/ui';
 import type {TrainingResponseDto} from '@/types';
 import {TRAINING_TYPE_OPTIONS, TRAINING_STATUS_LABELS} from '@/types/constants';
 

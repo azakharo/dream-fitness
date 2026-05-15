@@ -10,9 +10,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/Form';
-import {Input} from '@/components/ui/Input';
-import {Button} from '@/components/ui/Button';
+} from '@/components/ui';
+import {Input} from '@/components/ui';
+import {Button} from '@/components/ui';
 import {
   trainingFormSchema,
   type TrainingFormData,

@@ -1,8 +1,8 @@
 import {Calendar, X, Coins, Bell, Users, Check} from 'lucide-react';
 import type {NotificationResponseDto, NotificationType} from '@/types';
-import {Card, CardContent} from '@/components/ui/Card';
-import {Button} from '@/components/ui/Button';
-import {Badge} from '@/components/ui/Badge';
+import {Card, CardContent} from '@/components/ui';
+import {Button} from '@/components/ui';
+import {Badge} from '@/components/ui';
 import {formatRelativeTime} from '@/lib/date-utils';
 
 interface NotificationItemProps {

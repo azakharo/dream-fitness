@@ -5,8 +5,8 @@ import {PageHeader} from '@/components/common/PageHeader';
 import {LoadingChart} from '@/components/admin/reports/LoadingChart';
 import {PopularTrainingsChart} from '@/components/admin/reports/PopularTrainingsChart';
 import {FinancialReport} from '@/components/admin/reports/FinancialReport';
-import {Button} from '@/components/ui/Button';
-import {Input} from '@/components/ui/Input';
+import {Button} from '@/components/ui';
+import {Input} from '@/components/ui';
 import {
   useLoadingStats,
   usePopularTrainings,

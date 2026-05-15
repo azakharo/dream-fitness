@@ -9,7 +9,7 @@ import {
   TrainingDetails,
   TrainingDetailsSkeleton,
 } from '@/components/client/booking/TrainingDetails';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Skeleton} from '@/components/ui';
 
 export const BookingPage: React.FC = () => {
   const {id} = useParams({from: '/_client/booking/$id'});

@@ -1,8 +1,8 @@
 import React, {useState, useMemo} from 'react';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 import {Link} from '@tanstack/react-router';
-import {Button} from '@/components/ui/Button';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Button} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 import type {TrainingResponseDto} from '@/types';
 import {useBookings} from '@/hooks/use-bookings';
 import {useWaitlist} from '@/hooks/use-waitlist';

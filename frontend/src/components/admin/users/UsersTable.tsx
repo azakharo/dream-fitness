@@ -3,8 +3,8 @@ import {format, parseISO} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {Eye, Lock, Unlock} from 'lucide-react';
 
-import {Badge} from '@/components/ui/Badge';
-import {Button} from '@/components/ui/Button';
+import {Badge} from '@/components/ui';
+import {Button} from '@/components/ui';
 import {
   DataTable,
   type ColumnDef,

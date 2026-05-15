@@ -40,7 +40,7 @@ export {
   FormLabel,
   FormMessage,
 } from './Form';
-export {Input} from './Input';
+export {Input} from './input';
 export {Label} from './Label';
 export {Popover, PopoverContent, PopoverTrigger} from './Popover';
 

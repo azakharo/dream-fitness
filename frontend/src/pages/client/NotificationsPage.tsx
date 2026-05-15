@@ -4,8 +4,8 @@ import {Bell, Inbox} from 'lucide-react';
 import {useMarkAsRead, useNotifications} from '@/hooks/use-notifications';
 import {NotificationItem} from '@/components/client/notifications/NotificationItem';
 import {NotificationFilters} from '@/components/client/notifications/NotificationFilters';
-import {Card, CardContent} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Card, CardContent} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 import type {NotificationResponseDto, NotificationType} from '@/types';
 
 export const NotificationsPage: React.FC = () => {

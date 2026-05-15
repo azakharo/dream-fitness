@@ -2,10 +2,10 @@ import React from 'react';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 
-import {Badge} from '@/components/ui/Badge';
-import {Button} from '@/components/ui/Button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Badge} from '@/components/ui';
+import {Button} from '@/components/ui';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 import type {BookingStatus} from '@/types';
 
 interface UserBookingsListProps {

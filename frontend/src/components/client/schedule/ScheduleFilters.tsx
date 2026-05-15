@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui';
 import {TRAINING_TYPE_OPTIONS} from '@/types/constants';
 import type {TrainerResponseDto} from '@/types';
 

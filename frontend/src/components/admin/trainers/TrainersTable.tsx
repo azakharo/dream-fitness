@@ -3,8 +3,8 @@ import {format} from 'date-fns';
 
 import {DataTable} from '@/components/common/DataTable';
 import type {ColumnDef} from '@/components/common/DataTable';
-import {Badge} from '@/components/ui/Badge';
-import {Button} from '@/components/ui/Button';
+import {Badge} from '@/components/ui';
+import {Button} from '@/components/ui';
 import type {TrainerResponseDto} from '@/types';
 
 interface TrainersTableProps {

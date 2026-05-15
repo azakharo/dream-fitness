@@ -4,8 +4,8 @@ import {useAuthStore} from '@/stores/auth-store';
 import {useLogout} from '@/hooks/use-auth';
 import {NotificationsBell} from './NotificationsBell';
 import {TopNav} from './TopNav';
-import {Button} from '@/components/ui/Button';
-import {Avatar, AvatarFallback} from '@/components/ui/Avatar';
+import {Button} from '@/components/ui';
+import {Avatar, AvatarFallback} from '@/components/ui';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu';
+} from '@/components/ui';
 import {ROUTES} from '@/lib/routes';
 
 export const Header: React.FC = () => {

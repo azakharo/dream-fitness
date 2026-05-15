@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/AlertDialog';
+} from '@/components/ui';
 import type {TrainerResponseDto} from '@/types';
 
 interface TrainerDeleteDialogProps {

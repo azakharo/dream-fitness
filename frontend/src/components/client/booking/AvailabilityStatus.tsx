@@ -1,4 +1,4 @@
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 
 interface AvailabilityStatusProps {
   availableSpots: number;

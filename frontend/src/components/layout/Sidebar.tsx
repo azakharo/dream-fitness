@@ -12,7 +12,7 @@ import {
 import {useState} from 'react';
 import {ROUTES} from '@/lib/routes';
 import {cn} from '@/lib/utils';
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui';
 import {useUIStore} from '@/stores/ui-store';
 
 interface NavItem {

@@ -3,9 +3,9 @@ import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {ArrowDown, ArrowUp, RotateCcw} from 'lucide-react';
 
-import {Button} from '@/components/ui/Button';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Button} from '@/components/ui';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 import type {TransactionType} from '@/types';
 
 interface UserTransactionsListProps {

@@ -6,9 +6,9 @@ import {Calendar as CalendarIcon} from 'lucide-react';
 import {type DayPickerProps} from 'react-day-picker';
 
 import {cn} from '@/lib/utils';
-import {Button} from '@/components/ui/Button';
-import {Calendar} from '@/components/ui/calendar';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/Popover';
+import {Button} from '@/components/ui';
+import {Calendar} from '@/components/ui';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui';
 import {DATE_FORMAT} from '@/lib/constants';
 
 export interface DatePickerProps extends Omit<

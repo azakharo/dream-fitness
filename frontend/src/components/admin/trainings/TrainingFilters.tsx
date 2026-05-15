@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {Button} from '@/components/ui/Button';
-import {DatePicker} from '@/components/ui/DatePicker';
+import {Button} from '@/components/ui';
+import {DatePicker} from '@/components/ui';
 import {
   TRAINING_TYPE_OPTIONS,
   TRAINING_STATUS_OPTIONS,

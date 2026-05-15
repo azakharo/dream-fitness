@@ -5,14 +5,14 @@ import {PageHeader} from '@/components/common/PageHeader';
 import {TrainersTable} from '@/components/admin/trainers/TrainersTable';
 import {TrainerForm} from '@/components/admin/trainers/TrainerForm';
 import {TrainerDeleteDialog} from '@/components/admin/trainers/TrainerDeleteDialog';
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/Sheet';
-import {Skeleton} from '@/components/ui/Skeleton';
+} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 import type {TrainerResponseDto} from '@/types';
 import {useTrainers, useDeleteTrainer} from '@/hooks/use-trainers';
 

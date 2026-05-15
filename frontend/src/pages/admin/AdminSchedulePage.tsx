@@ -7,7 +7,7 @@ import {TrainingFilters} from '@/components/admin/trainings/TrainingFilters';
 import {TrainingsTable} from '@/components/admin/trainings/TrainingsTable';
 import {ParticipantsDrawer} from '@/components/admin/trainings/ParticipantsDrawer';
 import {TrainingDeleteDialog} from '@/components/admin/trainings/TrainingDeleteDialog';
-import {Button} from '@/components/ui/Button';
+import {Button} from '@/components/ui';
 import {
   useTrainings,
   useDeleteTraining,

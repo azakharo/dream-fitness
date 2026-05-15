@@ -2,7 +2,7 @@ import * as React from 'react';
 import {toast} from 'sonner';
 
 import {Button, Skeleton} from '@/components/ui';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {useEnrichedWaitlist, useLeaveWaitlist} from '@/hooks';
 import {formatDateShort, formatTime} from '@/lib/date-utils';
 

@@ -2,8 +2,8 @@ import * as React from 'react';
 import {format} from 'date-fns';
 import {toast} from 'sonner';
 import {Download} from 'lucide-react';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/Card';
-import {Button} from '@/components/ui/Button';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {Button} from '@/components/ui';
 import {
   Table,
   TableBody,
@@ -11,8 +11,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import {Skeleton} from '@/components/ui/Skeleton';
+} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 
 export interface FinancialReportProps {
   data: {

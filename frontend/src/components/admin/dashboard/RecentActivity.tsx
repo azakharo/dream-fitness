@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {Check, X, UserPlus, ChevronRight} from 'lucide-react';
 import {formatDistanceToNow} from 'date-fns';
-import {Card} from '@/components/ui/Card';
-import {Skeleton} from '@/components/ui/Skeleton';
+import {Card} from '@/components/ui';
+import {Skeleton} from '@/components/ui';
 
 export interface Activity {
   id: string;
