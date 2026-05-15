@@ -21,7 +21,7 @@ export {
   ListItemSkeleton,
   TrainingCardSkeleton,
 } from './Skeleton';
-export {Calendar, CalendarDayButton} from './calendar';
+export {Calendar, CalendarDayButton} from './Calendar';
 export {
   Card,
   CardContent,
@@ -40,7 +40,7 @@ export {
   FormLabel,
   FormMessage,
 } from './Form';
-export {Input} from './input';
+export {Input} from './Input';
 export {Label} from './Label';
 export {Popover, PopoverContent, PopoverTrigger} from './Popover';
 
@@ -73,3 +73,7 @@ export {Badge} from './Badge';
 
 // Variant helpers
 export {buttonVariants, type ButtonVariantProps} from './button-variants';
+
+export * from './Table';
+export * from './Sheet';
+export {Checkbox} from './Checkbox';
