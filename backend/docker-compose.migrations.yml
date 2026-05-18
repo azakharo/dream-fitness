@@ -1,6 +1,6 @@
 # Migration Runner - Docker Compose configuration
-# Usage: docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml up
-# Or with automatic migrations: RUN_MIGRATIONS=true RUN_SEED=true docker-compose -f docker-compose.base.yml -f docker-compose.migrations.yml up
+# Usage: docker compose -f docker-compose.base.yml -f docker-compose.migrations.yml up
+# Or with automatic migrations: RUN_MIGRATIONS=true RUN_SEED=true docker compose -f docker-compose.base.yml -f docker-compose.migrations.yml up
 
 services:
   migration-runner:

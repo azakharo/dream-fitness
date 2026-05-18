@@ -21,5 +21,5 @@ RUN chmod +x /app/scripts/migration-entrypoint.sh
 ENV NODE_ENV=production
 
 # Use entrypoint script - handles automatic mode based on env vars
-# For manual mode, pass command as argument: docker-compose run migration-runner npm run db:migrate:revert
+# For manual mode, pass command as argument: docker compose run migration-runner npm run db:migrate:revert
 ENTRYPOINT ["sh", "/app/scripts/migration-entrypoint.sh"]

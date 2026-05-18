@@ -1,5 +1,5 @@
 # Development override - extends docker-compose.base.yml
-# Usage: docker-compose -f docker-compose.base.yml  -f docker-compose.dev.yml up
+# Usage: docker compose -f docker-compose.base.yml  -f docker-compose.dev.yml up
 
 services:
   # ============================================
