@@ -51,9 +51,20 @@ flowchart TD
 
 #### Step 2: Install Runner on VPS
 
+> **Important**: GitHub Actions runner cannot run as root. Create a dedicated user for security.
+
 SSH into VPS and run:
 
 ```bash
+# Create dedicated user for runner
+useradd -m -s /bin/bash github-runner
+
+# Add to docker group (required for CI/CD)
+usermod -aG docker github-runner
+
+# Switch to runner user
+su - github-runner
+
 # Create directory for runner
 mkdir -p ~/actions-runner && cd ~/actions-runner
 
@@ -70,8 +81,12 @@ tar xzf ./actions-runner-linux-x64-2.321.0.tar.gz
   --token <YOUR_REGISTRATION_TOKEN> \
   --labels self-hosted,dreamfitness
 
-# Install as service
-sudo ./svc.sh install
+# Exit back to root for service installation
+exit
+
+# Install as service (run as root, specify user)
+cd /home/github-runner/actions-runner
+sudo ./svc.sh install github-runner
 sudo ./svc.sh start
 ```
 
@@ -82,7 +97,7 @@ sudo ./svc.sh start
 sudo ./svc.sh status
 
 # View runner logs
-tail -f ~/actions-runner/_diag/Runner_*.log
+tail -f /home/github-runner/actions-runner/_diag/Runner_*.log
 ```
 
 ### 2. Environment Variables
@@ -416,7 +431,7 @@ sudo ./svc.sh stop
 sudo ./svc.sh start
 
 # Check logs
-tail -f ~/actions-runner/_diag/Runner_*.log
+tail -f /home/github-runner/actions-runner/_diag/Runner_*.log
 ```
 
 ### Tests Failing in CI but Passing Locally
