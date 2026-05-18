@@ -140,12 +140,12 @@ jobs:
     # needs: integration-tests
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v6
-
       - name: Pull latest changes
+        working-directory: /root/dream-fitness
         run: git pull origin master
 
       - name: Run database migrations
+        working-directory: /root/dream-fitness
         run: |
           docker compose -f docker-compose.migrations.yml run --rm \
             -e RUN_MIGRATIONS=true \
@@ -153,6 +153,7 @@ jobs:
             migration-runner
 
       - name: Deploy application
+        working-directory: /root/dream-fitness
         run: docker compose -f docker-compose.prod.yml up -d --build
 
       - name: Wait for services
