@@ -141,20 +141,13 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Pull latest changes
-        working-directory: /root/dream-fitness
-        run: git pull origin master
+        run: cd /root/dream-fitness && git pull origin master
 
       - name: Run database migrations
-        working-directory: /root/dream-fitness
-        run: |
-          docker compose -f docker-compose.migrations.yml run --rm \
-            -e RUN_MIGRATIONS=true \
-            -e RUN_SEED=true \
-            migration-runner
+        run: cd /root/dream-fitness && docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
 
       - name: Deploy application
-        working-directory: /root/dream-fitness
-        run: docker compose -f docker-compose.prod.yml up -d --build
+        run: cd /root/dream-fitness && docker compose -f docker-compose.prod.yml up -d --build
 
       - name: Wait for services
         run: npx wait-on -t 120000 https://fitness.ddns.net/health
