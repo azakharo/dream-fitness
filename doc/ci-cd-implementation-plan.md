@@ -309,6 +309,8 @@ jobs:
           echo "Deployment successful!"
 ```
 
+> **Note:** Integration tests use a separate `docker-compose.integration-tests.yml` file that extends production config but exposes port 3000 for Playwright to access the api-gateway.
+
 ---
 
 ## Workflow Diagram
@@ -481,10 +483,11 @@ tail -f /home/github-runner/actions-runner/_diag/Runner_*.log
 
 ## Files to Create
 
-| File                                | Purpose                 |
-| ----------------------------------- | ----------------------- |
-| `.github/workflows/ci-cd.yml`       | Main CI/CD workflow     |
-| `.github/dependabot.yml` (optional) | Auto-dependency updates |
+| File                                   | Purpose                                 |
+| -------------------------------------- | --------------------------------------- |
+| `.github/workflows/ci-cd.yml`          | Main CI/CD workflow                     |
+| `.github/dependabot.yml` (optional)    | Auto-dependency updates                 |
+| `docker-compose.integration-tests.yml` | Exposes port 3000 for integration tests |
 
 ---
 

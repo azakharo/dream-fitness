@@ -1,0 +1,8 @@
+# Integration tests override - extends docker-compose.prod.yml
+# Exposes port 3000 for Playwright tests to access api-gateway
+# Usage: docker compose -f docker-compose.base.yml -f docker-compose.prod.yml -f docker-compose.integration-tests.yml up -d
+
+services:
+  api-gateway:
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:${API_GATEWAY_PORT:-3000}"
