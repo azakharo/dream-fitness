@@ -56,11 +56,19 @@ flowchart TD
 SSH into VPS and run:
 
 ```bash
+# Install Node.js globally (required for npx commands like playwright install-deps)
+curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
+apt-get install -y nodejs
+
 # Create dedicated user for runner
 useradd -m -s /bin/bash github-runner
 
 # Add to docker group (required for CI/CD)
 usermod -aG docker github-runner
+
+# Install Playwright dependencies for Chromium (required for integration tests)
+# Run as root - these are system packages needed by Playwright
+npx playwright install-deps chromium
 
 # Switch to runner user
 su - github-runner
@@ -249,7 +257,7 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       - name: Run migrations for integration tests
         run: npm run docker:test:migrate:auto
