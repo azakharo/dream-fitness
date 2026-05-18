@@ -9,8 +9,8 @@ This document describes the CI/CD pipeline implementation for DreamFitness using
 ```mermaid
 flowchart TD
     A[Push to master] --> B[GitHub Actions Trigger]
-    B --> C[Backend Lint]
-    B --> D[Frontend Lint + Type Check]
+    B --> C[Backend Check: TypeScript + Lint]
+    B --> D[Frontend Check: TypeScript + Lint]
     C --> E[Backend Unit/E2E Tests]
     D --> E
     E --> F[Backend Integration Tests]
@@ -26,8 +26,8 @@ flowchart TD
 
 | Stage | Job               | Description                      | Duration |
 | ----- | ----------------- | -------------------------------- | -------- |
-| 1     | Backend Lint      | ESLint check for backend         | ~30s     |
-| 1     | Frontend Check    | Lint + TypeScript check          | ~30s     |
+| 1     | Backend Check     | TypeScript + ESLint check        | ~30s     |
+| 1     | Frontend Check    | TypeScript + ESLint check        | ~30s     |
 | 2     | Unit/E2E Tests    | Jest tests with PostgreSQL       | ~2-3 min |
 | 3     | Integration Tests | Playwright tests with full stack | ~3-5 min |
 | 4     | Migrations        | Run database migrations          | ~1 min   |
@@ -65,8 +65,10 @@ curl -o actions-runner-linux-x64-2.321.0.tar.gz -L \
 tar xzf ./actions-runner-linux-x64-2.321.0.tar.gz
 
 # Configure (use token from GitHub UI)
+# Add labels to runner for job targeting
 ./config.sh --url https://github.com/azakharo/dream-fitness \
-  --token <YOUR_REGISTRATION_TOKEN>
+  --token <YOUR_REGISTRATION_TOKEN> \
+  --labels self-hosted,dreamfitness
 
 # Install as service
 sudo ./svc.sh install
@@ -83,18 +85,7 @@ sudo ./svc.sh status
 tail -f ~/actions-runner/_diag/Runner_*.log
 ```
 
-### 2. Runner Labels
-
-Add labels to runner for job targeting:
-
-```yaml
-# In config.sh step, add labels
-./config.sh --url https://github.com/azakharo/dream-fitness \
---token <TOKEN> \
---labels self-hosted,dreamfitness
-```
-
-### 3. Environment Variables
+### 2. Environment Variables
 
 Add required secrets in GitHub:
 
@@ -131,12 +122,11 @@ on:
   push:
     branches:
       - master
-      - main
   workflow_dispatch: # Manual trigger option
 
 jobs:
-  # Stage 1: Linting
-  backend-lint:
+  # Stage 1: Code Quality Checks
+  backend-check:
     runs-on: self-hosted
     defaults:
       run:
@@ -153,6 +143,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: TypeScript check
+        run: npm run ts
 
       - name: Run ESLint
         run: npm run lint
@@ -175,16 +168,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run ESLint
-        run: npm run lint
-
       - name: TypeScript check
         run: npm run ts
+
+      - name: Run ESLint
+        run: npm run lint
 
   # Stage 2: Unit/E2E Tests
   unit-e2e-tests:
     runs-on: self-hosted
-    needs: [backend-lint, frontend-check]
+    needs: [backend-check, frontend-check]
     defaults:
       run:
         working-directory: backend
@@ -263,7 +256,7 @@ jobs:
   deploy:
     runs-on: self-hosted
     needs: integration-tests
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
 
@@ -274,6 +267,7 @@ jobs:
         run: |
           docker compose -f docker-compose.migrations.yml run --rm \
             -e RUN_MIGRATIONS=true \
+            -e RUN_SEED=true \
             migration-runner
 
       - name: Deploy application
@@ -298,9 +292,9 @@ jobs:
 
 ```mermaid
 flowchart LR
-    subgraph Stage1[Stage 1: Lint]
-        BL[Backend Lint]
-        FC[Frontend Check]
+    subgraph Stage1[Stage 1: Code Quality]
+        BC[Backend Check: TS + Lint]
+        FC[Frontend Check: TS + Lint]
     end
 
     subgraph Stage2[Stage 2: Unit/E2E]
@@ -318,7 +312,7 @@ flowchart LR
         HC[Health Check]
     end
 
-    BL --> UT
+    BC --> UT
     FC --> UT
     UT --> E2E
     E2E --> IT
@@ -353,7 +347,7 @@ Recommended settings for `master` branch:
 2. Configure:
    - Require status checks to pass before merging
    - Require branches to be up to date before merging
-   - Status checks: `backend-lint`, `frontend-check`, `unit-e2e-tests`, `integration-tests`
+   - Status checks: `backend-check`, `frontend-check`, `unit-e2e-tests`, `integration-tests`
 
 ---
 
