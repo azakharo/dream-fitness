@@ -349,9 +349,9 @@ describe('TrainingsController (e2e)', () => {
       const trainerRes = await trainersHelper.create(headers, trainerData);
       const trainerId = trainerRes.body.id;
 
-      const date1 = futureDate(1);
-      const date2 = futureDate(2);
-      const date3 = futureDate(3);
+      const date1 = '2026-05-19T10:00:00.000Z';
+      const date2 = '2026-05-20T09:00:00.000Z';
+      const date3 = '2026-05-21T10:00:00.000Z';
 
       await trainingsHelper.create(
         headers,
@@ -381,8 +381,9 @@ describe('TrainingsController (e2e)', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.items.length).toBe(1);
+      expect(response.body.items.length).toBe(2);
       expect(response.body.items[0].title).toBe('Training 1');
+      expect(response.body.items[1].title).toBe('Training 2');
     });
 
     it('should respect pagination (page, limit)', async () => {

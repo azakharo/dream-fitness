@@ -60,13 +60,13 @@ export class TrainingRepository extends Repository<Training> {
 
     if (filterDto.dateFrom) {
       queryBuilder.andWhere('training.scheduledAt >= :dateFrom', {
-        dateFrom: filterDto.dateFrom,
+        dateFrom: new Date(filterDto.dateFrom),
       });
     }
 
     if (filterDto.dateTo) {
       queryBuilder.andWhere('training.scheduledAt <= :dateTo', {
-        dateTo: filterDto.dateTo,
+        dateTo: new Date(filterDto.dateTo),
       });
     }
 
