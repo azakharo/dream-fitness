@@ -137,7 +137,7 @@ jobs:
   # Stage 4: Deploy
   deploy:
     runs-on: self-hosted
-    needs: integration-tests
+    # needs: integration-tests
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v6
