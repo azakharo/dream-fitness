@@ -1,0 +1,478 @@
+# CI/CD Implementation Plan for DreamFitness
+
+## Overview
+
+This document describes the CI/CD pipeline implementation for DreamFitness using GitHub Actions with a self-hosted runner on VPS.
+
+## Architecture
+
+```mermaid
+flowchart TD
+    A[Push to master] --> B[GitHub Actions Trigger]
+    B --> C[Backend Lint]
+    B --> D[Frontend Lint + Type Check]
+    C --> E[Backend Unit/E2E Tests]
+    D --> E
+    E --> F[Backend Integration Tests]
+    F --> G{Tests Passed?}
+    G -->|Yes| H[Run Migrations]
+    G -->|No| I[Fail Pipeline]
+    H --> J[Deploy Application]
+    J --> K[Health Check]
+    K --> L[Deployment Complete]
+```
+
+## Pipeline Stages
+
+| Stage | Job               | Description                      | Duration |
+| ----- | ----------------- | -------------------------------- | -------- |
+| 1     | Backend Lint      | ESLint check for backend         | ~30s     |
+| 1     | Frontend Check    | Lint + TypeScript check          | ~30s     |
+| 2     | Unit/E2E Tests    | Jest tests with PostgreSQL       | ~2-3 min |
+| 3     | Integration Tests | Playwright tests with full stack | ~3-5 min |
+| 4     | Migrations        | Run database migrations          | ~1 min   |
+| 5     | Deploy            | Docker Compose deployment        | ~2-3 min |
+| 6     | Health Check      | Verify deployment                | ~30s     |
+
+**Total estimated time: 8-12 minutes**
+
+---
+
+## Prerequisites
+
+### 1. Self-Hosted Runner Setup
+
+#### Step 1: Create Runner in GitHub
+
+1. Go to GitHub repository → Settings → Actions → Runners
+2. Click "New self-hosted runner"
+3. Select Linux x64
+4. Copy the registration token
+
+#### Step 2: Install Runner on VPS
+
+SSH into VPS and run:
+
+```bash
+# Create directory for runner
+mkdir -p ~/actions-runner && cd ~/actions-runner
+
+# Download the runner package
+curl -o actions-runner-linux-x64-2.321.0.tar.gz -L \
+  https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
+
+# Extract
+tar xzf ./actions-runner-linux-x64-2.321.0.tar.gz
+
+# Configure (use token from GitHub UI)
+./config.sh --url https://github.com/azakharo/dream-fitness \
+  --token <YOUR_REGISTRATION_TOKEN>
+
+# Install as service
+sudo ./svc.sh install
+sudo ./svc.sh start
+```
+
+#### Step 3: Verify Runner
+
+```bash
+# Check runner status
+sudo ./svc.sh status
+
+# View runner logs
+tail -f ~/actions-runner/_diag/Runner_*.log
+```
+
+### 2. Runner Labels
+
+Add labels to runner for job targeting:
+
+```yaml
+# In config.sh step, add labels
+./config.sh --url https://github.com/azakharo/dream-fitness \
+--token <TOKEN> \
+--labels self-hosted,dreamfitness
+```
+
+### 3. Environment Variables
+
+Add required secrets in GitHub:
+
+1. Go to repository → Settings → Secrets and variables → Actions
+2. Add secrets:
+
+| Secret Name            | Description          | Example                |
+| ---------------------- | -------------------- | ---------------------- |
+| `DATABASE_PASSWORD`    | PostgreSQL password  | `your-secure-password` |
+| `RABBITMQ_PASSWORD`    | RabbitMQ password    | `your-secure-password` |
+| `JWT_SECRET`           | JWT signing secret   | `your-jwt-secret`      |
+| `REFRESH_TOKEN_SECRET` | Refresh token secret | `your-refresh-secret`  |
+
+> Note: Most secrets are already in `.env` files on VPS. Only add secrets needed for CI that differ from production.
+
+---
+
+## GitHub Actions Workflow
+
+### File Structure
+
+```
+.github/
+└── workflows/
+    └── ci-cd.yml
+```
+
+### Workflow Definition
+
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  workflow_dispatch: # Manual trigger option
+
+jobs:
+  # Stage 1: Linting
+  backend-lint:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  frontend-check:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: TypeScript check
+        run: npm run ts
+
+  # Stage 2: Unit/E2E Tests
+  unit-e2e-tests:
+    runs-on: self-hosted
+    needs: [backend-lint, frontend-check]
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start test infrastructure
+        run: npm run start:test:infra
+
+      - name: Wait for PostgreSQL
+        run: npx wait-on -t 60000 tcp:5432
+
+      - name: Setup test database
+        run: npm run test:setup
+
+      - name: Run Unit tests
+        run: npm run test:unit
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Stop test infrastructure
+        if: always()
+        run: npm run stop:test:infra
+
+  # Stage 3: Integration Tests
+  integration-tests:
+    runs-on: self-hosted
+    needs: unit-e2e-tests
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run migrations for integration tests
+        run: npm run docker:test:migrate:auto
+
+      - name: Start services for integration tests
+        run: npm run docker:test
+
+      - name: Wait for API Gateway
+        run: npx wait-on -t 120000 http://localhost:3000/health
+
+      - name: Run integration tests
+        run: npm run test:api-gateway
+
+      - name: Stop services
+        if: always()
+        run: npm run docker:test:down
+
+  # Stage 4: Deploy
+  deploy:
+    runs-on: self-hosted
+    needs: integration-tests
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git pull origin master
+
+      - name: Run database migrations
+        run: |
+          docker compose -f docker-compose.migrations.yml run --rm \
+            -e RUN_MIGRATIONS=true \
+            migration-runner
+
+      - name: Deploy application
+        run: docker compose -f docker-compose.prod.yml up -d --build
+
+      - name: Wait for services
+        run: npx wait-on -t 120000 https://fitness.ddns.net/health
+
+      - name: Health check
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://fitness.ddns.net/health)
+          if [ "$response" != "200" ]; then
+            echo "Health check failed with status $response"
+            exit 1
+          fi
+          echo "Deployment successful!"
+```
+
+---
+
+## Workflow Diagram
+
+```mermaid
+flowchart LR
+    subgraph Stage1[Stage 1: Lint]
+        BL[Backend Lint]
+        FC[Frontend Check]
+    end
+
+    subgraph Stage2[Stage 2: Unit/E2E]
+        UT[Unit Tests]
+        E2E[E2E Tests]
+    end
+
+    subgraph Stage3[Stage 3: Integration]
+        IT[Integration Tests]
+    end
+
+    subgraph Stage4[Stage 4: Deploy]
+        MG[Run Migrations]
+        DP[Deploy Services]
+        HC[Health Check]
+    end
+
+    BL --> UT
+    FC --> UT
+    UT --> E2E
+    E2E --> IT
+    IT --> MG
+    MG --> DP
+    DP --> HC
+```
+
+---
+
+## Security Considerations
+
+### Self-Hosted Runner Security
+
+1. **Runner User**: Run as dedicated user, not root
+2. **Network**: Runner only needs outbound HTTPS to GitHub
+3. **Updates**: Keep runner updated monthly
+4. **Access**: Runner has access to VPS - protect secrets
+
+### Secrets Management
+
+- Never commit secrets to repository
+- Use GitHub Secrets for sensitive values
+- Production secrets stay in `.env` files on VPS
+- CI uses test database with separate credentials
+
+### Branch Protection
+
+Recommended settings for `master` branch:
+
+1. Go to Settings → Branches → Add rule
+2. Configure:
+   - Require status checks to pass before merging
+   - Require branches to be up to date before merging
+   - Status checks: `backend-lint`, `frontend-check`, `unit-e2e-tests`, `integration-tests`
+
+---
+
+## Rollback Procedure
+
+If deployment fails or causes issues:
+
+### Option 1: Revert Commit
+
+```bash
+# On VPS
+cd ~/dreamfitness
+git log --oneline -5  # Find last good commit
+git revert HEAD       # Revert last commit
+# Pipeline will trigger and deploy reverted version
+```
+
+### Option 2: Manual Rollback
+
+```bash
+# On VPS
+cd ~/dreamfitness
+git checkout <previous-good-commit>
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+### Option 3: Database Rollback
+
+```bash
+# Revert last migration
+docker compose -f docker-compose.migrations.yml run --rm \
+  migration-runner npm run db:migrate:revert
+```
+
+---
+
+## Monitoring and Notifications
+
+### GitHub Actions Notifications
+
+GitHub sends email notifications for:
+
+- Failed workflows
+- Successful workflows (if previously failed)
+
+### Additional Monitoring
+
+Consider adding:
+
+1. Slack/Discord webhook for deployment notifications
+2. Uptime monitoring (UptimeRobot, Pingdom)
+3. Log aggregation (optional)
+
+---
+
+## Troubleshooting
+
+### Runner Not Picking Up Jobs
+
+```bash
+# Check runner status
+sudo ./svc.sh status
+
+# Restart runner
+sudo ./svc.sh stop
+sudo ./svc.sh start
+
+# Check logs
+tail -f ~/actions-runner/_diag/Runner_*.log
+```
+
+### Tests Failing in CI but Passing Locally
+
+1. Check environment variables in `.env.test`
+2. Verify Docker has enough resources
+3. Check for port conflicts
+4. Review test logs in GitHub Actions
+
+### Deployment Fails
+
+1. Check Docker logs: `docker compose -f docker-compose.prod.yml logs`
+2. Verify migrations ran successfully
+3. Check disk space: `df -h`
+4. Verify SSL certificates are valid
+
+### Database Migration Fails
+
+1. Check migration logs
+2. Verify database connection
+3. Run migration manually to see error:
+   ```bash
+   docker compose -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate
+   ```
+
+---
+
+## Implementation Checklist
+
+- [ ] Install self-hosted runner on VPS
+- [ ] Configure runner labels
+- [ ] Add GitHub secrets
+- [ ] Create `.github/workflows/ci-cd.yml` file
+- [ ] Test workflow with manual trigger
+- [ ] Configure branch protection rules
+- [ ] Document any VPS-specific configurations
+
+---
+
+## Files to Create
+
+| File                                | Purpose                 |
+| ----------------------------------- | ----------------------- |
+| `.github/workflows/ci-cd.yml`       | Main CI/CD workflow     |
+| `.github/dependabot.yml` (optional) | Auto-dependency updates |
+
+---
+
+## Next Steps
+
+1. Review this plan
+2. Make any adjustments
+3. Switch to Code mode to implement
