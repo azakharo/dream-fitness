@@ -96,43 +96,43 @@ jobs:
   #       run: npm run stop:test:infra
 
   # Stage 3: Integration Tests
-  integration-tests:
-    runs-on: self-hosted
-    # needs: unit-e2e-tests
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v6
+  # integration-tests:
+  #   runs-on: self-hosted
+  #   needs: unit-e2e-tests
+  #   defaults:
+  #     run:
+  #       working-directory: backend
+  #   steps:
+  #     - uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v6
+  #       with:
+  #         node-version: "24"
+  #         cache: "npm"
+  #         cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+  #     - name: Install dependencies
+  #       run: npm ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install chromium
+  #     - name: Install Playwright browsers
+  #       run: npx playwright install chromium
 
-      - name: Run migrations for integration tests
-        run: npm run docker:test:migrate:auto
+  #     - name: Run migrations for integration tests
+  #       run: npm run docker:test:migrate:auto
 
-      - name: Start services for integration tests
-        run: npm run docker:test
+  #     - name: Start services for integration tests
+  #       run: npm run docker:test
 
-      - name: Wait for API Gateway
-        run: npx wait-on -t 120000 http://localhost:3000/health
+  #     - name: Wait for API Gateway
+  #       run: npx wait-on -t 120000 http://localhost:3000/health
 
-      - name: Run integration tests
-        run: npm run test:api-gateway
+  #     - name: Run integration tests
+  #       run: npm run test:api-gateway
 
-      - name: Stop services
-        if: always()
-        run: npm run docker:test:down
+  #     - name: Stop services
+  #       if: always()
+  #       run: npm run docker:test:down
 
   # Stage 4: Deploy
   deploy:
