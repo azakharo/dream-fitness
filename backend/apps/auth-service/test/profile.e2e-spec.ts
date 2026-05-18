@@ -106,7 +106,7 @@ describe('UsersController (e2e)', () => {
       const response = await profileHelper.updateMe(headers, {
         name: 'Full Name',
         phone: '+79001234567',
-        birthDate: new Date('1990-01-01'),
+        birthDate: '1990-01-01',
         gender: UserGender.MALE,
       });
 
