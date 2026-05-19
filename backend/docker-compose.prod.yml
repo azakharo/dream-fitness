@@ -32,6 +32,12 @@ services:
       - .env.${NODE_ENV:-production}
       - .env.docker
     depends_on:
+      auth-service:
+        condition: service_healthy
+      training-service:
+        condition: service_healthy
+      booking-service:
+        condition: service_healthy
       notification-service:
         condition: service_healthy
     restart: always
@@ -84,7 +90,9 @@ services:
       - .env.${NODE_ENV:-production}
       - .env.docker
     depends_on:
-      auth-service:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     restart: always
     command: node dist/apps/training-service/main.js
@@ -109,7 +117,9 @@ services:
       - .env.${NODE_ENV:-production}
       - .env.docker
     depends_on:
-      training-service:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     restart: always
     command: node dist/apps/booking-service/main.js
@@ -134,7 +144,9 @@ services:
       - .env.${NODE_ENV:-production}
       - .env.docker
     depends_on:
-      booking-service:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     restart: always
     command: node dist/apps/notification-service/main.js
