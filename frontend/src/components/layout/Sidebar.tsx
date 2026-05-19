@@ -153,7 +153,7 @@ export const Sidebar: React.FC = () => {
               className="flex items-center space-x-2"
             >
               <span className="text-xl font-bold text-primary">
-                DreamFitness admin
+                DreamFitness admin!!!
               </span>
             </Link>
           </div>
