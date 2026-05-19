@@ -93,7 +93,7 @@ jobs:
 
       - name: Stop test infrastructure
         if: always()
-        run: npm run stop:test:infra
+        run: npm run stop:test:infra -- -v
 
   # Stage 3: Integration Tests
   integration-tests:
@@ -132,7 +132,7 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: npm run docker:test:down
+        run: npm run docker:test:down -- -v
 
   # Stage 4: Deploy
   deploy:
