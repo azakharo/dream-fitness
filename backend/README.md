@@ -133,14 +133,8 @@ For that edit `.env.production` file.
 
 ### Run migrations and create admin and test users
 
-> **Note:** PostgreSQL must be running first. For fresh deployment, start infrastructure first.
-
 ```bash
-# Start PostgreSQL and RabbitMQ (if not running)
-docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
-
-# Run migrations and seed
-npm run docker:prod:migrate:auto
+$ npm run docker:prod:migrate:auto
 ```
 
 ### Start services
