@@ -30,9 +30,8 @@ flowchart TD
 | 1     | Frontend Check    | TypeScript + ESLint check        | ~30s     |
 | 2     | Unit/E2E Tests    | Jest tests with PostgreSQL       | ~2-3 min |
 | 3     | Integration Tests | Playwright tests with full stack | ~3-5 min |
-| 4     | Migrations        | Run database migrations          | ~1 min   |
-| 5     | Deploy            | Docker Compose deployment        | ~2-3 min |
-| 6     | Health Check      | Verify deployment                | ~30s     |
+| 4     | Deploy            | Docker Compose deployment        | ~2-3 min |
+| 5     | Health Check      | Verify deployment                | ~30s     |
 
 **Total estimated time: 8-12 minutes**
 
@@ -295,13 +294,6 @@ jobs:
 
       - name: Pull latest changes
         run: git pull origin master
-
-      - name: Run database migrations
-        run: |
-          docker compose -f docker-compose.migrations.yml run --rm \
-            -e RUN_MIGRATIONS=true \
-            -e RUN_SEED=true \
-            migration-runner
 
       - name: Deploy application
         run: docker compose -f docker-compose.prod.yml up -d --build
