@@ -49,4 +49,5 @@ volumes:
 
 networks:
   dreamfitness-network:
+    name: dreamfitness-network
     driver: bridge
