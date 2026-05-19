@@ -311,15 +311,16 @@ su - github-runner
 2. Clone the DreamFitness repository:
 
 ```bash
-git clone https://github.com/azakharo/dream-fitness.git dreamfitness
-cd dreamfitness
+git clone https://github.com/azakharo/dream-fitness.git
+cd dream-fitness
+
 ```
 
 3. Verify the clone location:
 
 ```bash
 pwd
-# Should output: /home/github-runner/dreamfitness
+# Should output: /home/github-runner/dream-fitness
 ```
 
 ### Environment Configuration
@@ -609,7 +610,7 @@ docker stats
 
 ```bash
 ssh github-runner@fitness.ddns.net
-cd dreamfitness
+cd dream-fitness
 ```
 
 2. Pull the latest changes:
@@ -855,17 +856,17 @@ docker system prune -a
 exit
 
 # Remove the project directory
-rm -rf /home/github-runner/dreamfitness
+rm -rf /home/github-runner/dream-fitness
 
 # Or if installed in root's home
-rm -rf /root/dreamfitness
+rm -rf /root/dream-fitness
 ```
 
 ### Remove SSL Certificates
 
 ```bash
 # Remove certbot directories
-rm -rf /home/github-runner/dreamfitness/certbot
+rm -rf /home/github-runner/dream-fitness/certbot
 # Or
 rm -rf /root/dream-fitness/certbot
 ```
@@ -946,8 +947,8 @@ docker compose -f docker-compose.prod.yml restart nginx
 
 ### Important Paths
 
-| Path                                            | Description           |
-| :---------------------------------------------- | :-------------------- |
-| `/home/github-runner/dreamfitness`              | Project directory     |
-| `/home/github-runner/dreamfitness/certbot/conf` | SSL certificates      |
-| `/home/github-runner/actions-runner`            | GitHub Actions runner |
+| Path                                             | Description           |
+| :----------------------------------------------- | :-------------------- |
+| `/home/github-runner/dream-fitness`              | Project directory     |
+| `/home/github-runner/dream-fitness/certbot/conf` | SSL certificates      |
+| `/home/github-runner/actions-runner`             | GitHub Actions runner |

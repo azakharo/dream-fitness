@@ -166,11 +166,11 @@ su - github-runner
 
 # Clone repository
 cd ~
-git clone <your-repository-url> dreamfitness
+git clone <your-repository-url> dream-fitness
 
 # Verify location
 pwd
-# Should output: /home/github-runner/dreamfitness
+# Should output: /home/github-runner/dream-fitness
 ```
 
 ### 3. Environment Variables
@@ -374,7 +374,7 @@ jobs:
           echo "Deployment successful!"
 ```
 
-> **Note:** The deploy job uses `actions/checkout` which checks out the repository to the runner's work directory. This works correctly because the project is also cloned at `/home/github-runner/dreamfitness` and the runner runs as `github-runner` user.
+> **Note:** The deploy job uses `actions/checkout` which checks out the repository to the runner's work directory. This works correctly because the project is also cloned at `/home/github-runner/dream-fitness` and the runner runs as `github-runner` user.
 
 ---
 
@@ -418,7 +418,7 @@ flowchart LR
 ### Self-Hosted Runner Security
 
 1. **Runner User**: Run as dedicated `github-runner` user, not root
-2. **Project Location**: Clone to `/home/github-runner/dreamfitness` (accessible by runner)
+2. **Project Location**: Clone to `/home/github-runner/dream-fitness` (accessible by runner)
 3. **Network**: Runner only needs outbound HTTPS to GitHub
 4. **Updates**: Keep runner updated monthly
 5. **Access**: Runner has access to VPS - protect secrets
@@ -450,7 +450,7 @@ If deployment fails or causes issues:
 
 ```bash
 # On VPS (as github-runner user)
-cd ~/dreamfitness
+cd ~/dream-fitness
 git log --oneline -5  # Find last good commit
 git revert HEAD       # Revert last commit
 # Pipeline will trigger and deploy reverted version
@@ -460,7 +460,7 @@ git revert HEAD       # Revert last commit
 
 ```bash
 # On VPS (as github-runner user)
-cd ~/dreamfitness
+cd ~/dream-fitness
 git checkout <previous-good-commit>
 docker compose -f docker-compose.prod.yml up -d --build
 ```
@@ -548,12 +548,12 @@ If CI/CD fails with permission errors:
 
    ```bash
    ls -la /home/github-runner/
-   # Should show github-runner:github-runner for dreamfitness
+   # Should show github-runner:github-runner for dream-fitness
    ```
 
 3. Fix ownership if needed:
    ```bash
-   chown -R github-runner:github-runner /home/github-runner/dreamfitness
+   chown -R github-runner:github-runner /home/github-runner/dream-fitness
    ```
 
 ---
@@ -561,7 +561,7 @@ If CI/CD fails with permission errors:
 ## Implementation Checklist
 
 - [ ] Install self-hosted runner on VPS (as github-runner user)
-- [ ] Clone repository to `/home/github-runner/dreamfitness`
+- [ ] Clone repository to `/home/github-runner/dream-fitness`
 - [ ] Configure runner labels
 - [ ] Add GitHub secrets
 - [ ] Create `.github/workflows/ci-cd.yml` file
