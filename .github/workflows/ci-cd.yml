@@ -142,6 +142,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Ensure infrastructure is running
+        run: docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
+
+      - name: Wait for PostgreSQL
+        run: npx wait-on -t 60000 tcp:5432
+
       - name: Run database migrations
         run: |
           docker compose -f docker-compose.migrations.yml run --rm \

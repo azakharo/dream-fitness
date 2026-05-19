@@ -345,7 +345,15 @@ docker run --rm -v $(pwd)/certbot/www:/var/www/certbot -v $(pwd)/certbot/conf:/e
 
 ### Run Database Migrations
 
-Run migrations and seed data using a self-contained Docker Compose configuration:
+> **Prerequisite:** PostgreSQL must be running. If not started yet, start it first.
+
+Ensure PostgreSQL is running:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
+```
+
+Run migrations and seed data using Docker Compose:
 
 ```bash
 docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
@@ -353,9 +361,7 @@ docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true 
 
 This command:
 
-- Starts a temporary postgres container automatically (via `depends_on` with healthcheck)
-- Builds the migration-runner image
-- Connects to the postgres database
+- Connects to the existing postgres database
 - Runs migrations and creates admin/test users
 - Automatically removes the container after completion
 

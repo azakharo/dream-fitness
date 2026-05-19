@@ -1,12 +1,9 @@
 # Migration Runner - Root-level Docker Compose configuration
-# Usage from root: docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
+# Usage from root:
+#   1. First ensure PostgreSQL is running: docker compose -f docker-compose.prod.yml up -d postgres rabbitmq
+#   2. Then run migrations: docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true -e RUN_SEED=true migration-runner
 
 services:
-  postgres:
-    extends:
-      file: backend/docker-compose.base.yml
-      service: postgres
-
   migration-runner:
     build:
       context: ./backend
@@ -19,15 +16,9 @@ services:
       - ./backend/.env
       - ./backend/.env.${NODE_ENV:-production}
       - ./backend/.env.docker
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - dreamfitness-network
 
-volumes:
-  postgres_data:
-
 networks:
   dreamfitness-network:
-    driver: bridge
+    external: true
