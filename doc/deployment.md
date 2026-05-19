@@ -118,6 +118,7 @@ This guide covers the complete deployment process for DreamFitness using Docker 
 
 - Docker Engine 24.0+
 - Docker Compose v2.20+
+- Node.js 24.x (for GitHub Actions runner)
 
 ### Domain Name
 
@@ -238,20 +239,61 @@ sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-6. Add your user to the docker group (optional, for non-root access):
-
-> **Note:** Skip this step if you're logged in as `root`. Root already has full Docker access.
-
-```bash
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-7. Verify Docker installation:
+6. Verify Docker installation:
 
 ```bash
 docker --version
 docker compose version
+```
+
+### Create Deployment User
+
+> **Important:** For security and CI/CD compatibility, create a dedicated user for deployment.
+
+1. Create the `github-runner` user:
+
+```bash
+# Create user with home directory
+useradd -m -s /bin/bash github-runner
+
+# Add to docker group (allows running docker without sudo)
+usermod -aG docker github-runner
+```
+
+2. Set up SSH access for the user (optional, for manual deployment):
+
+```bash
+# Switch to the user
+su - github-runner
+
+# Create .ssh directory
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
+# Add your public key (run from your local machine)
+# ssh-copy-id github-runner@your_server_ip
+
+# Exit back to root
+exit
+```
+
+### Install Node.js (for GitHub Actions Runner)
+
+```bash
+# Install Node.js 24.x
+curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
+apt-get install -y nodejs
+
+# Verify installation
+node --version
+npm --version
+```
+
+### Install Playwright Dependencies (for Integration Tests)
+
+```bash
+# Install system dependencies for Chromium
+npx playwright install-deps chromium
 ```
 
 ---
@@ -260,11 +302,24 @@ docker compose version
 
 ### Clone Repository
 
-1. Clone the DreamFitness repository:
+1. Switch to the `github-runner` user:
+
+```bash
+su - github-runner
+```
+
+2. Clone the DreamFitness repository:
 
 ```bash
 git clone <your-repository-url> dreamfitness
 cd dreamfitness
+```
+
+3. Verify the clone location:
+
+```bash
+pwd
+# Should output: /home/github-runner/dreamfitness
 ```
 
 ### Environment Configuration
@@ -283,7 +338,7 @@ mkdir -p certbot/www certbot/conf
 
 # Request initial certificate using standalone mode (certbot runs its own webserver on port 80)
 # IMPORTANT: Port 80 must be free (no nginx or other webserver running)
-docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt -p 80:80 certbot/certbot certonly --standalone --email zangular@yandex.ru -d fitness.ddns.net --agree-tos --no-eff-email
+docker run --rm -v $(pwd)/certbot/www:/var/www/certbot -v $(pwd)/certbot/conf:/etc/letsencrypt -p 80:80 certbot/certbot certonly --standalone --email zangular@yandex.ru -d fitness.ddns.net --agree-tos --no-eff-email
 ```
 
 > **Note**: We use `--standalone` mode for the initial certificate because nginx config requires SSL certificates to start, but webroot method needs nginx running. Standalone mode resolves this chicken-and-egg problem by running certbot's own webserver temporarily.
@@ -360,7 +415,7 @@ Use standalone mode for initial certificate (see section 4 for detailed instruct
 mkdir -p certbot/www certbot/conf
 
 # Request certificate using standalone mode
-docker run --rm -v ./certbot/www:/var/www/certbot -v ./certbot/conf:/etc/letsencrypt -p 80:80 certbot/certbot certonly --standalone --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
+docker run --rm -v $(pwd)/certbot/www:/var/www/certbot -v $(pwd)/certbot/conf:/etc/letsencrypt -p 80:80 certbot/certbot certonly --standalone --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
 ```
 
 > **Note**: Standalone mode is required for initial certificate because nginx needs SSL certs to start, but webroot method needs nginx running.
@@ -567,7 +622,7 @@ docker stats
 1. SSH into your server:
 
 ```bash
-ssh user@fitness.ddns.net
+ssh github-runner@fitness.ddns.net
 cd dreamfitness
 ```
 
@@ -790,6 +845,85 @@ All containers communicate through the `dreamfitness-network` bridge network. On
 
 ---
 
+## 12. VPS Cleanup Procedure
+
+If you need to completely reset the VPS and start fresh:
+
+### Stop and Remove All Containers
+
+```bash
+# Stop all running containers
+docker compose -f docker-compose.prod.yml down
+
+# Remove all containers, networks, and volumes
+docker compose -f docker-compose.prod.yml down -v
+
+# Remove all Docker images (optional)
+docker system prune -a
+```
+
+### Remove Project Directory
+
+```bash
+# Exit to root user if logged in as github-runner
+exit
+
+# Remove the project directory
+rm -rf /home/github-runner/dreamfitness
+
+# Or if installed in root's home
+rm -rf /root/dreamfitness
+```
+
+### Remove SSL Certificates
+
+```bash
+# Remove certbot directories
+rm -rf /home/github-runner/dreamfitness/certbot
+# Or
+rm -rf /root/dream-fitness/certbot
+```
+
+### Remove Docker Volumes (Optional)
+
+```bash
+# List all volumes
+docker volume ls
+
+# Remove specific volumes
+docker volume rm dreamfitness_postgres_data
+docker volume rm dreamfitness_rabbitmq_data
+
+# Or remove all unused volumes
+docker volume prune
+```
+
+### Full Reset (Nuclear Option)
+
+```bash
+# Stop all containers
+docker stop $(docker ps -aq)
+
+# Remove all containers
+docker rm $(docker ps -aq)
+
+# Remove all images
+docker rmi $(docker images -q)
+
+# Remove all volumes
+docker volume prune -f
+
+# Remove all networks (except default)
+docker network prune -f
+
+# Full system prune
+docker system prune -a --volumes -f
+```
+
+After cleanup, follow the deployment steps from Section 4.
+
+---
+
 ## Quick Reference
 
 ### Common Commands
@@ -823,3 +957,11 @@ docker compose -f docker-compose.prod.yml restart nginx
 | [`nginx/Dockerfile`](../nginx/Dockerfile)               | Nginx + frontend container definition   |
 | [`nginx/nginx.conf`](../nginx/nginx.conf)               | Nginx configuration                     |
 | [`backend/Dockerfile`](../backend/Dockerfile)           | Backend container definition            |
+
+### Important Paths
+
+| Path                                            | Description           |
+| :---------------------------------------------- | :-------------------- |
+| `/home/github-runner/dreamfitness`              | Project directory     |
+| `/home/github-runner/dreamfitness/certbot/conf` | SSL certificates      |
+| `/home/github-runner/actions-runner`            | GitHub Actions runner |

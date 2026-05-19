@@ -18,8 +18,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /root/dream-fitness/certbot/www:/var/www/certbot:ro
-      - /root/dream-fitness/certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
     depends_on:
       - api-gateway
     healthcheck:
@@ -37,8 +37,8 @@ services:
     image: certbot/certbot:latest
     container_name: dreamfitness-certbot
     volumes:
-      - /root/dream-fitness/certbot/www:/var/www/certbot:rw
-      - /root/dream-fitness/certbot/conf:/etc/letsencrypt:rw
+      - ./certbot/www:/var/www/certbot:rw
+      - ./certbot/conf:/etc/letsencrypt:rw
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     networks:
       - dreamfitness-network
