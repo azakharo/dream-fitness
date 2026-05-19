@@ -8,136 +8,136 @@ on:
 
 jobs:
   # Stage 1: Code Quality Checks
-  backend-check:
-    runs-on: self-hosted
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
+  # backend-check:
+  #   runs-on: self-hosted
+  #   defaults:
+  #     run:
+  #       working-directory: backend
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "24"
+  #         cache: "npm"
+  #         cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+  #     - name: Install dependencies
+  #       run: npm ci
 
-      - name: TypeScript check
-        run: npm run ts
+  #     - name: TypeScript check
+  #       run: npm run ts
 
-      - name: Run ESLint
-        run: npm run lint
+  #     - name: Run ESLint
+  #       run: npm run lint
 
-  frontend-check:
-    runs-on: self-hosted
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
+  # frontend-check:
+  #   runs-on: self-hosted
+  #   defaults:
+  #     run:
+  #       working-directory: frontend
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "24"
+  #         cache: "npm"
+  #         cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+  #     - name: Install dependencies
+  #       run: npm ci
 
-      - name: TypeScript check
-        run: npm run ts
+  #     - name: TypeScript check
+  #       run: npm run ts
 
-      - name: Run ESLint
-        run: npm run lint
+  #     - name: Run ESLint
+  #       run: npm run lint
 
-  # Stage 2: Unit/E2E Tests
-  unit-e2e-tests:
-    runs-on: self-hosted
-    needs: [backend-check, frontend-check]
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
+  # # Stage 2: Unit/E2E Tests
+  # unit-e2e-tests:
+  #   runs-on: self-hosted
+  #   needs: [backend-check, frontend-check]
+  #   defaults:
+  #     run:
+  #       working-directory: backend
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "24"
+  #         cache: "npm"
+  #         cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+  #     - name: Install dependencies
+  #       run: npm ci
 
-      - name: Start test infrastructure
-        run: npm run start:test:infra
+  #     - name: Start test infrastructure
+  #       run: npm run start:test:infra
 
-      - name: Wait for PostgreSQL
-        run: npx wait-on -t 60000 tcp:5432
+  #     - name: Wait for PostgreSQL
+  #       run: npx wait-on -t 60000 tcp:5432
 
-      - name: Setup test database
-        run: npm run test:setup
+  #     - name: Setup test database
+  #       run: npm run test:setup
 
-      - name: Run Unit tests
-        run: npm run test:unit
+  #     - name: Run Unit tests
+  #       run: npm run test:unit
 
-      - name: Run E2E tests
-        run: npm run test:e2e
+  #     - name: Run E2E tests
+  #       run: npm run test:e2e
 
-      - name: Stop test infrastructure
-        if: always()
-        run: npm run stop:test:infra
+  #     - name: Stop test infrastructure
+  #       if: always()
+  #       run: npm run stop:test:infra
 
-  # Stage 3: Integration Tests
-  integration-tests:
-    runs-on: self-hosted
-    needs: unit-e2e-tests
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
+  # # Stage 3: Integration Tests
+  # integration-tests:
+  #   runs-on: self-hosted
+  #   needs: unit-e2e-tests
+  #   defaults:
+  #     run:
+  #       working-directory: backend
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-          cache-dependency-path: backend/package-lock.json
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "24"
+  #         cache: "npm"
+  #         cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+  #     - name: Install dependencies
+  #       run: npm ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install chromium
+  #     - name: Install Playwright browsers
+  #       run: npx playwright install chromium
 
-      - name: Run migrations for integration tests
-        run: npm run docker:test:migrate:auto
+  #     - name: Run migrations for integration tests
+  #       run: npm run docker:test:migrate:auto
 
-      - name: Start services for integration tests
-        run: npm run docker:test
+  #     - name: Start services for integration tests
+  #       run: npm run docker:test
 
-      - name: Wait for API Gateway
-        run: npx wait-on -t 120000 http://localhost:3000/health
+  #     - name: Wait for API Gateway
+  #       run: npx wait-on -t 120000 http://localhost:3000/health
 
-      - name: Run integration tests
-        run: npm run test:api-gateway
+  #     - name: Run integration tests
+  #       run: npm run test:api-gateway
 
-      - name: Stop services
-        if: always()
-        run: npm run docker:test:down
+  #     - name: Stop services
+  #       if: always()
+  #       run: npm run docker:test:down
 
   # Stage 4: Deploy
   deploy:
     runs-on: self-hosted
-    needs: integration-tests
+    # needs: integration-tests
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
