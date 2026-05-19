@@ -311,7 +311,7 @@ su - github-runner
 2. Clone the DreamFitness repository:
 
 ```bash
-git clone <your-repository-url> dreamfitness
+git clone https://github.com/azakharo/dream-fitness.git dreamfitness
 cd dreamfitness
 ```
 
@@ -400,27 +400,7 @@ curl https://fitness.ddns.net/health
 
 ---
 
-## 5. SSL Certificate Configuration
-
-### Let's Encrypt Certificates
-
-DreamFitness uses Let's Encrypt for trusted SSL certificates via Certbot container.
-
-#### Initial Certificate Request
-
-Use standalone mode for initial certificate (see section 4 for detailed instructions):
-
-```bash
-# Create directories
-mkdir -p certbot/www certbot/conf
-
-# Request certificate using standalone mode
-docker run --rm -v $(pwd)/certbot/www:/var/www/certbot -v $(pwd)/certbot/conf:/etc/letsencrypt -p 80:80 certbot/certbot certonly --standalone --email your-email@example.com -d fitness.ddns.net --agree-tos --no-eff-email
-```
-
-> **Note**: Standalone mode is required for initial certificate because nginx needs SSL certs to start, but webroot method needs nginx running.
-
-#### Auto-Renewal
+## 5. SSL Certificate Auto-Renewal
 
 The Certbot container automatically handles certificate renewal. It checks every 12 hours and renews certificates that expire within 30 days.
 
