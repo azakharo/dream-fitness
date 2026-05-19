@@ -142,13 +142,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Run database migrations
-        run: |
-          docker compose -f docker-compose.migrations.yml run --rm \
-            -e RUN_MIGRATIONS=true \
-            -e RUN_SEED=true \
-            migration-runner
-
       - name: Deploy application
         run: docker compose -f docker-compose.prod.yml up -d --build
 
