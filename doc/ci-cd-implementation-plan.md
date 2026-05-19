@@ -101,7 +101,62 @@ cd /home/github-runner/actions-runner
 tail -f /home/github-runner/actions-runner/_diag/Runner_*.log
 ```
 
-### 2. Clone Repository for Deployment
+### 2. Uninstall Runner from VPS
+
+If you need to remove the existing runner and reconfigure from scratch:
+
+#### Step 1: Stop and Uninstall Service
+
+```bash
+# SSH into VPS as root
+cd /home/github-runner/actions-runner
+
+# Stop the service
+./svc.sh stop
+
+# Uninstall the service
+./svc.sh uninstall
+```
+
+#### Step 2: Remove Runner Configuration
+
+```bash
+# Switch to github-runner user
+su - github-runner
+
+# Remove runner directory
+cd ~
+rm -rf actions-runner
+
+# Exit back to root
+exit
+```
+
+#### Step 3: Remove Runner from GitHub
+
+1. Go to GitHub repository → Settings → Actions → Runners
+2. Find your runner in the list
+3. Click the runner name
+4. Click "Remove" button
+
+#### Step 4: Optional - Remove github-runner User
+
+If you want to completely clean up:
+
+```bash
+# As root, remove the user and home directory
+userdel -r github-runner
+
+# Verify removal
+id github-runner
+# Should output: id: 'github-runner': no such user
+```
+
+After cleanup, you can reinstall the runner by following the "Self-Hosted Runner Setup" section from Step 1.
+
+---
+
+### 3. Clone Repository for Deployment
 
 The repository must be cloned to the `github-runner` home directory for CI/CD to work:
 
