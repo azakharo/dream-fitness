@@ -51,24 +51,16 @@ flowchart TD
 
 #### Step 2: Install Runner on VPS
 
-> **Important**: GitHub Actions runner cannot run as root. Create a dedicated user for security.
+> **Important**: GitHub Actions runner must run as a non-root user. We use `github-runner` user created during server setup.
 
-SSH into VPS and run:
+SSH into VPS as root and run:
 
 ```bash
-# Install Node.js globally (required for npx commands like playwright install-deps)
-curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
-apt-get install -y nodejs
-
-# Create dedicated user for runner
+# Create dedicated user for runner (if not already created)
 useradd -m -s /bin/bash github-runner
 
 # Add to docker group (required for CI/CD)
 usermod -aG docker github-runner
-
-# Install Playwright dependencies for Chromium (required for integration tests)
-# Run as root - these are system packages needed by Playwright
-npx playwright install-deps chromium
 
 # Switch to runner user
 su - github-runner
@@ -94,21 +86,94 @@ exit
 
 # Install as service (run as root, specify user)
 cd /home/github-runner/actions-runner
-sudo ./svc.sh install github-runner
-sudo ./svc.sh start
+./svc.sh install github-runner
+./svc.sh start
 ```
 
 #### Step 3: Verify Runner
 
 ```bash
 # Check runner status
-sudo ./svc.sh status
+cd /home/github-runner/actions-runner
+./svc.sh status
 
 # View runner logs
 tail -f /home/github-runner/actions-runner/_diag/Runner_*.log
 ```
 
-### 2. Environment Variables
+### 2. Uninstall Runner from VPS
+
+If you need to remove the existing runner and reconfigure from scratch:
+
+#### Step 1: Stop and Uninstall Service
+
+```bash
+# SSH into VPS as root
+cd /home/github-runner/actions-runner
+
+# Stop the service
+./svc.sh stop
+
+# Uninstall the service
+./svc.sh uninstall
+```
+
+#### Step 2: Remove Runner Configuration
+
+```bash
+# Switch to github-runner user
+su - github-runner
+
+# Remove runner directory
+cd ~
+rm -rf actions-runner
+
+# Exit back to root
+exit
+```
+
+#### Step 3: Remove Runner from GitHub
+
+1. Go to GitHub repository → Settings → Actions → Runners
+2. Find your runner in the list
+3. Click the runner name
+4. Click "Remove" button
+
+#### Step 4: Optional - Remove github-runner User
+
+If you want to completely clean up:
+
+```bash
+# As root, remove the user and home directory
+userdel -r github-runner
+
+# Verify removal
+id github-runner
+# Should output: id: 'github-runner': no such user
+```
+
+After cleanup, you can reinstall the runner by following the "Self-Hosted Runner Setup" section from Step 1.
+
+---
+
+### 3. Clone Repository for Deployment
+
+The repository must be cloned to the `github-runner` home directory for CI/CD to work:
+
+```bash
+# Switch to github-runner user
+su - github-runner
+
+# Clone repository
+cd ~
+git clone <your-repository-url> dreamfitness
+
+# Verify location
+pwd
+# Should output: /home/github-runner/dreamfitness
+```
+
+### 3. Environment Variables
 
 Add required secrets in GitHub:
 
@@ -309,7 +374,7 @@ jobs:
           echo "Deployment successful!"
 ```
 
-> **Note:** Integration tests use a separate `docker-compose.integration-tests.yml` file that extends production config but exposes port 3000 for Playwright to access the api-gateway.
+> **Note:** The deploy job uses `actions/checkout` which checks out the repository to the runner's work directory. This works correctly because the project is also cloned at `/home/github-runner/dreamfitness` and the runner runs as `github-runner` user.
 
 ---
 
@@ -352,10 +417,11 @@ flowchart LR
 
 ### Self-Hosted Runner Security
 
-1. **Runner User**: Run as dedicated user, not root
-2. **Network**: Runner only needs outbound HTTPS to GitHub
-3. **Updates**: Keep runner updated monthly
-4. **Access**: Runner has access to VPS - protect secrets
+1. **Runner User**: Run as dedicated `github-runner` user, not root
+2. **Project Location**: Clone to `/home/github-runner/dreamfitness` (accessible by runner)
+3. **Network**: Runner only needs outbound HTTPS to GitHub
+4. **Updates**: Keep runner updated monthly
+5. **Access**: Runner has access to VPS - protect secrets
 
 ### Secrets Management
 
@@ -383,7 +449,7 @@ If deployment fails or causes issues:
 ### Option 1: Revert Commit
 
 ```bash
-# On VPS
+# On VPS (as github-runner user)
 cd ~/dreamfitness
 git log --oneline -5  # Find last good commit
 git revert HEAD       # Revert last commit
@@ -393,7 +459,7 @@ git revert HEAD       # Revert last commit
 ### Option 2: Manual Rollback
 
 ```bash
-# On VPS
+# On VPS (as github-runner user)
 cd ~/dreamfitness
 git checkout <previous-good-commit>
 docker compose -f docker-compose.prod.yml up -d --build
@@ -433,12 +499,13 @@ Consider adding:
 ### Runner Not Picking Up Jobs
 
 ```bash
-# Check runner status
-sudo ./svc.sh status
+# Check runner status (as root)
+cd /home/github-runner/actions-runner
+./svc.sh status
 
 # Restart runner
-sudo ./svc.sh stop
-sudo ./svc.sh start
+./svc.sh stop
+./svc.sh start
 
 # Check logs
 tail -f /home/github-runner/actions-runner/_diag/Runner_*.log
@@ -467,11 +534,34 @@ tail -f /home/github-runner/actions-runner/_diag/Runner_*.log
    docker compose -f docker-compose.migrations.yml run --rm migration-runner npm run db:migrate
    ```
 
+### Permission Denied Errors
+
+If CI/CD fails with permission errors:
+
+1. Verify runner is running as `github-runner` user:
+
+   ```bash
+   ps aux | grep runner
+   ```
+
+2. Verify project directory ownership:
+
+   ```bash
+   ls -la /home/github-runner/
+   # Should show github-runner:github-runner for dreamfitness
+   ```
+
+3. Fix ownership if needed:
+   ```bash
+   chown -R github-runner:github-runner /home/github-runner/dreamfitness
+   ```
+
 ---
 
 ## Implementation Checklist
 
-- [ ] Install self-hosted runner on VPS
+- [ ] Install self-hosted runner on VPS (as github-runner user)
+- [ ] Clone repository to `/home/github-runner/dreamfitness`
 - [ ] Configure runner labels
 - [ ] Add GitHub secrets
 - [ ] Create `.github/workflows/ci-cd.yml` file
