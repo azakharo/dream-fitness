@@ -139,6 +139,7 @@ jobs:
     runs-on: self-hosted
     needs: integration-tests
     if: github.ref == 'refs/heads/master'
+    environment: production # Enables manual approval before deployment
     defaults:
       run:
         working-directory: /home/github-runner/dream-fitness

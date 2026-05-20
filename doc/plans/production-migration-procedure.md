@@ -181,9 +181,14 @@ Before using this workflow, configure GitHub Environment:
 1. Go to repository **Settings** > **Environments**
 2. Click **New environment** → Name it `production`
 3. Configure protection rules:
-   - ✅ **Required reviewers** → Add yourself or team
+   - ✅ **Required reviewers** → Add reviewers by username or team slug
+     - Type your GitHub username in the search field
+     - Click your name from dropdown to add
+     - Minimum 1 reviewer required (can be yourself)
    - ✅ **Wait timer** → Optional: Add delay for last-minute checks
 4. Save environment
+
+> **Note**: You must be a repository admin to configure environments. If you don't see Environments in Settings, ask repository owner to add you as admin or configure it for you.
 
 ### Implementation
 
