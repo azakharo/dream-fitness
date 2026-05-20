@@ -156,93 +156,108 @@ docker compose -f docker-compose.prod.yml up -d
 
 ### Current Pipeline
 
-The CI/CD pipeline in [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml) does NOT handle migrations automatically. This is intentional for production safety.
+The CI/CD pipeline in [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml) uses **GitHub Environment Protection** for manual approval before deployment. This ensures developer reviews migration status before deploying.
 
-### Recommended Workflow
+### Workflow
 
 ```mermaid
 flowchart TD
-    A[Code Push to master] --> B[CI: Tests]
-    B --> C{Check for New Migrations}
-    C -->|No migrations| D[Auto Deploy]
-    C -->|Migrations detected| E[Block Deploy]
-    E --> F[Manual SSH: Apply Migrations]
-    F --> G[Manual Trigger: Deploy Workflow]
-    D --> H[Done]
-    G --> H
+    A[Code Push to master] --> B[CI: Tests and Build]
+    B --> C[Deploy Job Paused]
+    C --> D{Developer Decision}
+    D -->|No migrations| E[Approve in GitHub UI]
+    D -->|Has migrations| F[Cancel Workflow]
+    E --> G[Auto Deploy]
+    F --> H[Manual SSH: Apply Migrations]
+    H --> I[Re-run Workflow]
+    I --> C
+    G --> J[Done]
 ```
+
+### GitHub Environment Setup
+
+Before using this workflow, configure GitHub Environment:
+
+1. Go to repository **Settings** > **Environments**
+2. Click **New environment** → Name it `production`
+3. Configure protection rules:
+   - ✅ **Required reviewers** → Add yourself or team
+   - ✅ **Wait timer** → Optional: Add delay for last-minute checks
+4. Save environment
 
 ### Implementation
 
-Add the following job to [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml):
+Deploy job in [`.github/workflows/ci-cd.yml`](../../.github/workflows/ci-cd.yml):
 
 ```yaml
-# Stage 5: Check for migrations
-check-migrations:
-  runs-on: self-hosted
-  needs: integration-tests
-  outputs:
-    has_migrations: ${{ steps.check.outputs.has_migrations }}
-  steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 0 # Need full history for git diff
-
-    - name: Check for new migration files
-      id: check
-      run: |
-        # Get list of changed migration files
-        MIGRATION_FILES=$(git diff --name-only origin/master~1 origin/master -- 'backend/apps/*/src/migrations/*.ts' 2>/dev/null || echo "")
-
-        if [ -n "$MIGRATION_FILES" ]; then
-          echo "has_migrations=true" >> $GITHUB_OUTPUT
-          echo "::warning::New migrations detected:"
-          echo "$MIGRATION_FILES"
-        else
-          echo "has_migrations=false" >> $GITHUB_OUTPUT
-          echo "No new migrations detected"
-        fi
-
-# Stage 6: Deploy (conditional)
 deploy:
   runs-on: self-hosted
-  needs: check-migrations
-  if: needs.check-migrations.outputs.has_migrations == 'false'
-  # ... existing deploy steps ...
+  needs: integration-tests
+  environment: production # This enables manual approval
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Deploy to production
+      run: |
+        cd /home/github-runner/dream-fitness
+        docker compose -f docker-compose.prod.yml up -d --build
+
+    - name: Health check
+      run: |
+        curl -f https://fitness.ddns.net/health || exit 1
 ```
 
 ### How It Works
 
-1. **check-migrations job**:
-   - Compares current commit with previous commit
-   - Checks for changes in `backend/apps/*/src/migrations/*.ts`
-   - Sets output variable `has_migrations`
+1. **Workflow starts automatically** on push to master
+2. **Tests and build run** without interruption
+3. **Deploy job pauses** at `environment: production`
+4. **Developer reviews** in GitHub Actions UI:
+   - Check commit history for migration files
+   - Check `backend/apps/*/src/migrations/*.ts` changes
+5. **Developer decides**:
+   - **No migrations**: Click **Approve** → Auto deploy
+   - **Has migrations**: Click **Cancel** → Manual process
 
-2. **deploy job**:
-   - Only runs if `has_migrations == 'false'`
-   - Automatic deployment for code-only changes
+### When Migrations Exist
 
-3. **When migrations exist**:
-   - Deploy job is skipped
-   - Developer receives warning in GitHub Actions
-   - Manual process required:
-     1. SSH to production
-     2. Apply migrations (follow procedure above)
-     3. Manually trigger deploy or re-run workflow
+If migrations detected during review:
 
-### Manual Deploy After Migrations
-
-After applying migrations manually, trigger deploy via:
+1. **Cancel** the workflow in GitHub Actions UI
+2. **SSH to production** and apply migrations:
 
 ```bash
-# Option 1: GitHub CLI
-gh workflow run ci-cd.yml --ref master
-
-# Option 2: GitHub UI
-# Actions > CI/CD Pipeline > Run workflow
-
-# Option 3: Manual deploy on server
+ssh github-runner@fitness.ddns.net
 cd /home/github-runner/dream-fitness
+git pull origin master
+
+# Backup database
+docker exec dreamfitness-postgres pg_dump -U dreamfitness dreamfitness > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Stop production
+docker compose -f docker-compose.prod.yml down
+
+# Run migrations
+docker compose -f docker-compose.migrations.yml run --rm -e RUN_MIGRATIONS=true migration-runner
+
+# Start production
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+3. **Verify** deployment is healthy
+4. **Done** - no need to re-run workflow
+
+### Manual Deploy Without Migrations
+
+If workflow was cancelled but no migrations needed:
+
+```bash
+# Option 1: Re-run workflow in GitHub UI
+# Actions > CI/CD Pipeline > Re-run jobs
+
+# Option 2: Manual deploy on server
+cd /home/github-runner/dream-fitness
+git pull origin master
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
