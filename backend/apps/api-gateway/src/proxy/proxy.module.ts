@@ -6,6 +6,7 @@ import { AuthProxyController } from './auth.proxy';
 import { TrainingProxyController } from './training.proxy';
 import { BookingProxyController } from './booking.proxy';
 import { NotificationProxyController } from './notification.proxy';
+import { PaymentProxyController } from './payment.proxy';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { NotificationProxyController } from './notification.proxy';
     TrainingProxyController,
     BookingProxyController,
     NotificationProxyController,
+    PaymentProxyController,
   ],
   providers: [ProxyService],
 })

@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { PaymentStatus } from '../enums/payment-status.enum';
+import { PaymentStatus } from '@app/shared';
 
 @Entity('payments')
 @Index(['userId'])

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Payment } from '../entities/payment.entity';
-import { PaymentStatus } from '../enums/payment-status.enum';
+import { PaymentStatus } from '@app/shared';
 import { PaginationParams, normalizePaginationParams } from '@app/shared';
 
 export interface CreatePaymentParams {
