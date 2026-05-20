@@ -516,6 +516,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/payments/webhook': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Handle Tinkoff Kassa webhook */
+    post: operations['PaymentProxyController_handleWebhook'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/payments/init': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Initialize a new payment */
+    post: operations['PaymentProxyController_initPayment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/payments/{id}/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get payment status by ID */
+    get: operations['PaymentProxyController_getPaymentStatus'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/payments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get user payment history */
+    get: operations['PaymentProxyController_getPaymentHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/health': {
     parameters: {
       query?: never;
@@ -932,6 +1000,65 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       readAt?: string;
+    };
+    TinkoffWebhookDto: {
+      /** @description Terminal identifier */
+      TerminalKey: string;
+      /** @description Payment ID in Tinkoff */
+      PaymentId: string;
+      /**
+       * @description Payment status
+       * @example CONFIRMED
+       * @enum {string}
+       */
+      Status: 'AUTHORIZED' | 'CONFIRMED' | 'REJECTED';
+      /** @description Amount in kopeks */
+      Amount: number;
+      /** @description Our payment UUID */
+      OrderId: string;
+      /** @description SHA256 signature */
+      Token: string;
+      /** @description Success flag */
+      Success: boolean;
+      /** @description Error code if failed */
+      ErrorCode?: string;
+      /** @description Error message */
+      Message?: string;
+      /** @description Error details */
+      Details?: string;
+    };
+    TinkoffWebhookResponseDto: {
+      /**
+       * @description Must return OK to Tinkoff
+       * @example OK
+       */
+      status: string;
+    };
+    InitPaymentDto: {
+      /**
+       * @description Amount in points (integer)
+       * @example 100
+       */
+      amount: number;
+    };
+    InitPaymentResponseDto: {
+      /** @example f47ac10b-58cc-4372-a567-0e02b2c3d479 */
+      paymentId: string;
+      /** @example https://securepay.tinkoff.ru/... */
+      paymentUrl: string;
+    };
+    PaymentStatusResponseDto: {
+      id: string;
+      /** @example 100 */
+      amount: number;
+      /** @enum {string} */
+      status: 'PENDING' | 'AUTHORIZED' | 'CONFIRMED' | 'CANCELED' | 'REJECTED';
+      createdAt: string;
+    };
+    PaymentHistoryResponseDto: {
+      payments: components['schemas']['PaymentStatusResponseDto'][];
+      /** @example 25 */
+      total: number;
     };
   };
   responses: never;
@@ -2495,6 +2622,95 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  PaymentProxyController_handleWebhook: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TinkoffWebhookDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TinkoffWebhookResponseDto'];
+        };
+      };
+    };
+  };
+  PaymentProxyController_initPayment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['InitPaymentDto'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['InitPaymentResponseDto'];
+        };
+      };
+    };
+  };
+  PaymentProxyController_getPaymentStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PaymentStatusResponseDto'];
+        };
+      };
+    };
+  };
+  PaymentProxyController_getPaymentHistory: {
+    parameters: {
+      query?: {
+        page?: number;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PaymentHistoryResponseDto'];
+        };
       };
     };
   };
