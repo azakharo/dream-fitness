@@ -1,7 +1,12 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PaymentRepository } from './repositories/payment.repository';
 import { TinkoffClientService } from './tinkoff-client.service';
-import { InitPaymentDto } from '@app/contracts';
+import { BalanceService } from '../balance/balance.service';
+import {
+  InitPaymentDto,
+  TinkoffWebhookDto,
+  TinkoffWebhookResponseDto,
+} from '@app/contracts';
 import { PaymentStatus } from '@app/shared';
 
 @Injectable()
@@ -11,6 +16,7 @@ export class PaymentsService {
   constructor(
     private readonly paymentRepository: PaymentRepository,
     private readonly tinkoffClient: TinkoffClientService,
+    private readonly balanceService: BalanceService,
   ) {}
 
   async initPayment(
@@ -119,5 +125,92 @@ export class PaymentsService {
       })),
       total: result.total,
     };
+  }
+
+  async handleWebhook(
+    dto: TinkoffWebhookDto,
+  ): Promise<TinkoffWebhookResponseDto> {
+    this.logger.log(
+      `Webhook received: PaymentId=${dto.PaymentId}, Status=${dto.Status}, OrderId=${dto.OrderId}`,
+    );
+
+    const isTokenValid = this.tinkoffClient.verifyToken({
+      TerminalKey: dto.TerminalKey,
+      PaymentId: dto.PaymentId,
+      Status: dto.Status,
+      Amount: dto.Amount,
+      OrderId: dto.OrderId,
+      Success: dto.Success,
+      ErrorCode: dto.ErrorCode,
+      Message: dto.Message,
+      Details: dto.Details,
+      Token: dto.Token,
+    });
+
+    if (!isTokenValid) {
+      this.logger.error(
+        `Invalid token for webhook PaymentId=${dto.PaymentId}, OrderId=${dto.OrderId}`,
+      );
+      return { status: 'OK' };
+    }
+
+    this.logger.log(`Token verified for OrderId=${dto.OrderId}`);
+
+    const payment = await this.paymentRepository.findById(dto.OrderId);
+
+    if (!payment) {
+      this.logger.warn(`Payment not found for OrderId=${dto.OrderId}`);
+      return { status: 'OK' };
+    }
+
+    if (payment.status === PaymentStatus.CONFIRMED) {
+      this.logger.log(
+        `Payment ${dto.OrderId} already confirmed, skipping duplicate webhook`,
+      );
+      return { status: 'OK' };
+    }
+
+    await this.paymentRepository.updateStatus(
+      payment.id,
+      this.mapTinkoffStatusToPaymentStatus(dto.Status),
+      dto.PaymentId,
+      dto.Status,
+    );
+
+    if (dto.Status === 'CONFIRMED') {
+      const amountPoints = Math.floor(dto.Amount / 100);
+
+      await this.balanceService.deposit({
+        userId: payment.userId,
+        amount: amountPoints,
+        description: 'Пополнение через Тинькофф Кассу',
+      });
+
+      this.logger.log(
+        `Balance credited: userId=${payment.userId}, amount=${amountPoints}`,
+      );
+    }
+
+    this.logger.log(
+      `Webhook processed: OrderId=${dto.OrderId}, Status=${dto.Status}`,
+    );
+    return { status: 'OK' };
+  }
+
+  private mapTinkoffStatusToPaymentStatus(
+    tinkoffStatus: string,
+  ): PaymentStatus {
+    switch (tinkoffStatus) {
+      case 'AUTHORIZED':
+        return PaymentStatus.AUTHORIZED;
+      case 'CONFIRMED':
+        return PaymentStatus.CONFIRMED;
+      case 'REJECTED':
+        return PaymentStatus.REJECTED;
+      case 'CANCELED':
+        return PaymentStatus.CANCELED;
+      default:
+        return PaymentStatus.PENDING;
+    }
   }
 }

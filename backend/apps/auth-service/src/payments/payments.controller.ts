@@ -25,17 +25,28 @@ import {
   PaymentStatusResponseDto,
   PaymentHistoryResponseDto,
   GetPaymentHistoryQueryDto,
+  TinkoffWebhookDto,
+  TinkoffWebhookResponseDto,
 } from '@app/contracts';
 
 @ApiTags('Payments')
 @ApiBearerAuth()
 @Controller('payments')
-@UseGuards(InternalGuard)
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
+  @Post('webhook')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Handle Tinkoff Kassa webhook' })
+  @ApiOkResponse({ type: TinkoffWebhookResponseDto })
+  async handleWebhook(
+    @Body() dto: TinkoffWebhookDto,
+  ): Promise<TinkoffWebhookResponseDto> {
+    return this.paymentsService.handleWebhook(dto);
+  }
+
   @Post('init')
-  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Initialize a new payment' })
   @ApiCreatedResponse({ type: InitPaymentResponseDto })
   async initPayment(
@@ -46,6 +57,7 @@ export class PaymentsController {
   }
 
   @Get(':id/status')
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Get payment status by ID' })
   @ApiOkResponse({ type: PaymentStatusResponseDto })
   async getPaymentStatus(
@@ -56,6 +68,7 @@ export class PaymentsController {
   }
 
   @Get()
+  @UseGuards(InternalGuard)
   @ApiOperation({ summary: 'Get user payment history' })
   @ApiOkResponse({ type: PaymentHistoryResponseDto })
   async getPaymentHistory(

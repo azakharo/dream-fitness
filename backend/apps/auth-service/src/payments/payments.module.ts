@@ -6,9 +6,10 @@ import { PaymentRepository } from './repositories/payment.repository';
 import { TinkoffClientService } from './tinkoff-client.service';
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
+import { BalanceModule } from '../balance/balance.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment]), HttpModule],
+  imports: [TypeOrmModule.forFeature([Payment]), HttpModule, BalanceModule],
   providers: [PaymentRepository, TinkoffClientService, PaymentsService],
   controllers: [PaymentsController],
   exports: [PaymentsService, PaymentRepository, TinkoffClientService],

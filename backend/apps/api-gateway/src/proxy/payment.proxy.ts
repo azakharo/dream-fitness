@@ -25,6 +25,8 @@ import {
   PaymentStatusResponseDto,
   PaymentHistoryResponseDto,
   GetPaymentHistoryQueryDto,
+  TinkoffWebhookDto,
+  TinkoffWebhookResponseDto,
 } from '@app/contracts';
 
 const AUTH_SERVICE_URL = 'AUTH_SERVICE_URL';
@@ -34,6 +36,24 @@ const AUTH_SERVICE_DEFAULT_URL = 'http://localhost:3001';
 @Controller('api/payments')
 export class PaymentProxyController {
   constructor(private readonly proxyService: ProxyService) {}
+
+  @Post('webhook')
+  @ApiOperation({ summary: 'Handle Tinkoff Kassa webhook' })
+  @ApiOkResponse({ type: TinkoffWebhookResponseDto })
+  @ApiBody({ type: TinkoffWebhookDto })
+  async handleWebhook(
+    @Req() req: RequestWithUser,
+    @Body() body: TinkoffWebhookDto,
+  ): Promise<TinkoffWebhookResponseDto> {
+    return this.proxyService.proxyRequest(
+      req,
+      body,
+      '/payments/webhook',
+      'POST',
+      AUTH_SERVICE_URL,
+      AUTH_SERVICE_DEFAULT_URL,
+    );
+  }
 
   @Post('init')
   @UseGuards(JwtAuthGuard)
