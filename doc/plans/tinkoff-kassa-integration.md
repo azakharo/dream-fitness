@@ -306,7 +306,7 @@ TINKOFF_WEBHOOK_URL=https://fitness.ddns.net/api/payments/webhook
 
 ### Этап 4: Frontend
 
-- [ ] Обновить типы (запустить `npm run gen:types`, когда локально запущен backend)
+- [ ] Обновить типы (Разработчик делает сам. Подождать пока он выполнит необходимые команды.)
 - [ ] Создать usePayments hook
 - [ ] Обновить TopUpBalance компонент
 - [ ] Создать страницы PaymentSuccess и PaymentFail
