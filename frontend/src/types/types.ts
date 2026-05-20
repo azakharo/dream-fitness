@@ -87,3 +87,38 @@ export type UserListResponseDto = components['schemas']['UserListResponseDto'];
 export type UpdateUserStatusDto = components['schemas']['UpdateUserStatusDto'];
 export type UserRole = 'client' | 'admin';
 export type UserStatus = UserDto['status'];
+
+// ===========================================
+// Payment Domain
+// ===========================================
+
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  AUTHORIZED: 'AUTHORIZED',
+  CONFIRMED: 'CONFIRMED',
+  CANCELED: 'CANCELED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
+export interface InitPaymentDto {
+  amount: number;
+}
+
+export interface InitPaymentResponseDto {
+  paymentId: string;
+  paymentUrl: string;
+}
+
+export interface PaymentStatusResponseDto {
+  id: string;
+  amount: number;
+  status: PaymentStatus;
+  createdAt: string;
+}
+
+export interface PaymentHistoryResponseDto {
+  payments: PaymentStatusResponseDto[];
+  total: number;
+}

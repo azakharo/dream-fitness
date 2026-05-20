@@ -35,6 +35,7 @@ export const ADMIN_ROUTES = {
 export const MISC_ROUTES = {
   HOME: '/',
   UNAUTHORIZED: '/unauthorized',
+  PAYMENT_RESULT: '/payment/result',
 } as const;
 
 /**

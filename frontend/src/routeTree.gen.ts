@@ -15,6 +15,7 @@ import { Route as ClientRouteImport } from './routes/_client'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTrainersRouteImport } from './routes/admin.trainers'
 import { Route as AdminScheduleRouteImport } from './routes/admin.schedule'
@@ -60,6 +61,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const PaymentResultRoute = PaymentResultRouteImport.update({
+  id: '/payment/result',
+  path: '/payment/result',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/trainers': typeof AdminTrainersRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
+  '/payment/result': typeof PaymentResultRoute
   '/admin/': typeof AdminIndexRoute
   '/booking/$id': typeof ClientBookingIdRoute
   '/admin/schedule/new': typeof AdminScheduleNewRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/schedule': typeof ClientScheduleRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/trainers': typeof AdminTrainersRoute
+  '/payment/result': typeof PaymentResultRoute
   '/admin': typeof AdminIndexRoute
   '/booking/$id': typeof ClientBookingIdRoute
   '/admin/schedule/new': typeof AdminScheduleNewRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/admin/schedule': typeof AdminScheduleRouteWithChildren
   '/admin/trainers': typeof AdminTrainersRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
+  '/payment/result': typeof PaymentResultRoute
   '/admin/': typeof AdminIndexRoute
   '/_client/booking/$id': typeof ClientBookingIdRoute
   '/admin/schedule/new': typeof AdminScheduleNewRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/trainers'
     | '/admin/users'
+    | '/payment/result'
     | '/admin/'
     | '/booking/$id'
     | '/admin/schedule/new'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/admin/reports'
     | '/admin/trainers'
+    | '/payment/result'
     | '/admin'
     | '/booking/$id'
     | '/admin/schedule/new'
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/admin/schedule'
     | '/admin/trainers'
     | '/admin/users'
+    | '/payment/result'
     | '/admin/'
     | '/_client/booking/$id'
     | '/admin/schedule/new'
@@ -293,6 +305,7 @@ export interface RootRouteChildren {
   ClientRoute: typeof ClientRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   UnauthorizedRoute: typeof UnauthorizedRoute
+  PaymentResultRoute: typeof PaymentResultRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/payment/result': {
+      id: '/payment/result'
+      path: '/payment/result'
+      fullPath: '/payment/result'
+      preLoaderRoute: typeof PaymentResultRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
       id: '/admin/users'
@@ -548,6 +568,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientRoute: ClientRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   UnauthorizedRoute: UnauthorizedRoute,
+  PaymentResultRoute: PaymentResultRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
