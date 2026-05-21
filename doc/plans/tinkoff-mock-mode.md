@@ -47,7 +47,7 @@ sequenceDiagram
     GW->>AS: POST /payments/init
     AS->>Mock: initPayment
     Mock-->>AS: PaymentId + PaymentURL
-    Note over Mock: PaymentURL = /payment/success?paymentId=...
+    Note over Mock: PaymentURL = /payment/result?paymentId=...
     AS-->>GW: paymentId + paymentUrl
     GW-->>F: paymentId + paymentUrl
     F-->>U: Редирект на paymentUrl
@@ -96,7 +96,7 @@ export interface ITinkoffClient {
 **Логика initPayment:**
 
 1. Генерирует mock PaymentId = `mock_${orderId}`
-2. Возвращает PaymentURL = `/payment/success?paymentId=${mockPaymentId}`
+2. Возвращает PaymentURL = `/payment/result?paymentId=${mockPaymentId}`
 3. Сразу обновляет статус платежа на CONFIRMED через PaymentsService
 4. Зачисляет баллы на баланс
 
@@ -152,7 +152,7 @@ TINKOFF_MOCK=true
 4. Проверить:
    - Payment создан со статусом CONFIRMED
    - Баланс пополнен
-   - PaymentURL указывает на `/payment/success`
+   - PaymentURL указывает на `/payment/result`
 
 ---
 

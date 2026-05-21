@@ -17,7 +17,7 @@ export class MockTinkoffClientService implements ITinkoffClient {
     receipt?: TinkoffReceipt,
   ): Promise<TinkoffInitResponse> {
     const mockPaymentId = `mock_${orderId}`;
-    const mockPaymentUrl = `/payment/success?paymentId=${mockPaymentId}`;
+    const mockPaymentUrl = `/payment/result?paymentId=${mockPaymentId}`;
 
     this.logger.log(
       `[MOCK] initPayment: orderId=${orderId}, amountKopeks=${amountKopeks}, paymentId=${mockPaymentId}`,

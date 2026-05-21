@@ -185,8 +185,8 @@ enum PaymentStatus {
 
 Страницы:
 
-- `/payment/success` - успешная оплата
-- `/payment/fail` - ошибка оплаты
+- `/payment/result?paymentId=...&status=success` - успешная оплата
+- `/payment/result?paymentId=...` - проверка статуса (общая страница)
 
 Функционал:
 
@@ -208,8 +208,7 @@ export const usePaymentHistory = () => { ... }
 
 Добавить маршруты:
 
-- `/payment/success?paymentId=...`
-- `/payment/fail?paymentId=...`
+- `/payment/result?paymentId=...` - страница результата оплаты
 
 ---
 
