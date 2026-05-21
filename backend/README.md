@@ -18,13 +18,13 @@ $ npm install
 $ npm run dev
 ```
 
-### Run migrations (if required)
+### Run migrations in a separate console windows (if required)
 
 ```bash
 $ npm run migration:run
 ```
 
-### Create users (if required)
+### Create users in a separate console windows (if required)
 
 ```bash
 $ npm run db:seed
@@ -39,7 +39,7 @@ $ npm run dev:stop
 If you want to clear the DB data, then run instead:
 
 ```bash
-$ npm run dev:stop:dev -- -v
+$ npm run stop:dev:infra -- -v
 ```
 
 ---
