@@ -98,6 +98,14 @@ export class ProxyService {
       headers['X-User-Role'] = req.user.role;
     }
 
+    // Forward cookies to downstream services
+    if (req.cookies && Object.keys(req.cookies).length > 0) {
+      const cookieString = Object.entries(req.cookies)
+        .map(([key, value]) => `${key}=${value}`)
+        .join('; ');
+      headers['Cookie'] = cookieString;
+    }
+
     return headers;
   }
 

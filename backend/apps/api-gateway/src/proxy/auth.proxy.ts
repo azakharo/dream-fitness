@@ -127,15 +127,12 @@ export class AuthProxyController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = (req.cookies as Record<string, string>)?.refreshToken;
-
-    const body = refreshToken ? { refreshToken } : {};
-
+    // Cookies are now forwarded automatically by proxyService.buildHeaders()
     const authResponse = await this.proxyService.proxyRequestWithHeaders<{
       accessToken: string;
     }>(
       req,
-      body,
+      {},
       '/auth/refresh',
       'POST',
       AUTH_SERVICE_URL,
