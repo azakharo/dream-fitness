@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, Logger, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PaymentRepository } from './repositories/payment.repository';
 import type { ITinkoffClient } from './interfaces/tinkoff-client.interface';
 import { BalanceService } from '../balance/balance.service';
@@ -18,6 +19,7 @@ export class PaymentsService {
     @Inject('TINKOFF_CLIENT')
     private readonly tinkoffClient: ITinkoffClient,
     private readonly balanceService: BalanceService,
+    private readonly configService: ConfigService,
   ) {}
 
   async initPayment(
@@ -65,6 +67,30 @@ export class PaymentsService {
     this.logger.log(
       `Payment ${payment.id} initialized with Tinkoff PaymentId ${tinkoffResponse.PaymentId}`,
     );
+
+    // Mock mode: auto-confirm payment and credit balance
+    const isMockMode =
+      this.configService.get<string>('TINKOFF_MOCK') === 'true';
+    if (isMockMode) {
+      this.logger.log(`[MOCK] Auto-confirming payment ${payment.id}`);
+
+      await this.paymentRepository.updateStatus(
+        payment.id,
+        PaymentStatus.CONFIRMED,
+        tinkoffResponse.PaymentId,
+        'CONFIRMED',
+      );
+
+      await this.balanceService.deposit({
+        userId,
+        amount: dto.amount,
+        description: 'Пополнение через Тинькофф Кассу (mock)',
+      });
+
+      this.logger.log(
+        `[MOCK] Balance credited: userId=${userId}, amount=${dto.amount}`,
+      );
+    }
 
     return {
       paymentId: payment.id,
