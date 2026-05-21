@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Inject } from '@nestjs/common';
 import { PaymentRepository } from './repositories/payment.repository';
-import { TinkoffClientService } from './tinkoff-client.service';
+import type { ITinkoffClient } from './interfaces/tinkoff-client.interface';
 import { BalanceService } from '../balance/balance.service';
 import {
   InitPaymentDto,
@@ -15,7 +15,8 @@ export class PaymentsService {
 
   constructor(
     private readonly paymentRepository: PaymentRepository,
-    private readonly tinkoffClient: TinkoffClientService,
+    @Inject('TINKOFF_CLIENT')
+    private readonly tinkoffClient: ITinkoffClient,
     private readonly balanceService: BalanceService,
   ) {}
 
