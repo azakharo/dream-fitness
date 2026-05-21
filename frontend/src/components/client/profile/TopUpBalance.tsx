@@ -8,6 +8,7 @@ import {Button} from '@/components/ui';
 import {Input} from '@/components/ui';
 import {Label} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {useNavigate} from '@tanstack/react-router';
 
 interface TopUpBalanceProps {
   currentBalance: number;
@@ -26,6 +27,7 @@ const topUpSchema = z.object({
 type TopUpFormData = z.infer<typeof topUpSchema>;
 
 export const TopUpBalance: React.FC<TopUpBalanceProps> = ({currentBalance}) => {
+  const navigate = useNavigate();
   const initPaymentMutation = useInitPayment();
   const [selectedAmount, setSelectedAmount] = useState<number>(1000);
 
@@ -46,7 +48,7 @@ export const TopUpBalance: React.FC<TopUpBalanceProps> = ({currentBalance}) => {
       {amount: data.amount},
       {
         onSuccess: response => {
-          window.location.href = response.paymentUrl;
+          void navigate({to: response.paymentUrl, search: true});
         },
         onError: () => {
           toast.error('Не удалось инициализировать платёж');
