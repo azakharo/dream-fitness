@@ -95,7 +95,7 @@ export interface ITinkoffClient {
 
 **Логика initPayment:**
 
-1. Генерирует mock PaymentId = `mock_${orderId}`
+1. Генерирует mock PaymentId = orderId
 2. Возвращает PaymentURL = `/payment/result?paymentId=${mockPaymentId}`
 3. Сразу обновляет статус платежа на CONFIRMED через PaymentsService
 4. Зачисляет баллы на баланс
