@@ -4,6 +4,7 @@ import { ConfigService } from '../config/config.service';
 import { ConfigModule } from '../config/config.module';
 import { User } from '../users/entities/user.entity';
 import { Transaction } from '../balance/entities/transaction.entity';
+import { Payment } from '../payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { Transaction } from '../balance/entities/transaction.entity';
         username: configService.getDatabaseConfig().username,
         password: configService.getDatabaseConfig().password,
         database: configService.getDatabaseConfig().database,
-        entities: [User, Transaction],
+        entities: [User, Transaction, Payment],
         synchronize: false,
         logging: process.env.NODE_ENV === 'development',
       }),
