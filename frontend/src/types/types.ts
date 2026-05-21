@@ -100,3 +100,11 @@ export type PaymentStatusResponseDto =
 export type PaymentHistoryResponseDto =
   components['schemas']['PaymentHistoryResponseDto'];
 export type PaymentStatus = PaymentStatusResponseDto['status'];
+
+export const PAYMENT_STATUS = {
+  PENDING: 'PENDING',
+  AUTHORIZED: 'AUTHORIZED',
+  CONFIRMED: 'CONFIRMED',
+  CANCELED: 'CANCELED',
+  REJECTED: 'REJECTED',
+} as const satisfies Record<string, PaymentStatus>;

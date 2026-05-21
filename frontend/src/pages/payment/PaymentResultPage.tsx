@@ -4,7 +4,7 @@ import {CheckCircle, XCircle, Loader2} from 'lucide-react';
 import {usePaymentStatus, useRefreshBalance} from '@/hooks/use-payments';
 import {Button} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
-import {PaymentStatus as PaymentStatusType} from '@/types';
+import {type PaymentStatus, PAYMENT_STATUS} from '@/types';
 
 export const PaymentResultPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,8 +18,8 @@ export const PaymentResultPage: React.FC = () => {
 
   useEffect(() => {
     if (
-      paymentData?.status === PaymentStatusType.CONFIRMED ||
-      paymentData?.status === PaymentStatusType.AUTHORIZED
+      paymentData?.status === PAYMENT_STATUS.CONFIRMED ||
+      paymentData?.status === PAYMENT_STATUS.AUTHORIZED
     ) {
       refreshBalance();
     }
@@ -38,8 +38,8 @@ export const PaymentResultPage: React.FC = () => {
   }
 
   const isPaymentSuccess =
-    paymentData?.status === PaymentStatusType.CONFIRMED ||
-    paymentData?.status === PaymentStatusType.AUTHORIZED ||
+    paymentData?.status === PAYMENT_STATUS.CONFIRMED ||
+    paymentData?.status === PAYMENT_STATUS.AUTHORIZED ||
     isSuccess;
 
   return (
@@ -78,17 +78,17 @@ export const PaymentResultPage: React.FC = () => {
   );
 };
 
-function getStatusLabel(status: PaymentStatusType): string {
+function getStatusLabel(status: PaymentStatus): string {
   switch (status) {
-    case PaymentStatusType.PENDING:
+    case PAYMENT_STATUS.PENDING:
       return 'В обработке';
-    case PaymentStatusType.AUTHORIZED:
+    case PAYMENT_STATUS.AUTHORIZED:
       return 'Авторизован';
-    case PaymentStatusType.CONFIRMED:
+    case PAYMENT_STATUS.CONFIRMED:
       return 'Подтверждён';
-    case PaymentStatusType.CANCELED:
+    case PAYMENT_STATUS.CANCELED:
       return 'Отменён';
-    case PaymentStatusType.REJECTED:
+    case PAYMENT_STATUS.REJECTED:
       return 'Отклонён';
     default:
       return status;
