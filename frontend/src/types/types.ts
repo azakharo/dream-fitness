@@ -87,3 +87,24 @@ export type UserListResponseDto = components['schemas']['UserListResponseDto'];
 export type UpdateUserStatusDto = components['schemas']['UpdateUserStatusDto'];
 export type UserRole = 'client' | 'admin';
 export type UserStatus = UserDto['status'];
+
+// ===========================================
+// Payment Domain
+// ===========================================
+
+export type InitPaymentDto = components['schemas']['InitPaymentDto'];
+export type InitPaymentResponseDto =
+  components['schemas']['InitPaymentResponseDto'];
+export type PaymentStatusResponseDto =
+  components['schemas']['PaymentStatusResponseDto'];
+export type PaymentHistoryResponseDto =
+  components['schemas']['PaymentHistoryResponseDto'];
+export type PaymentStatus = PaymentStatusResponseDto['status'];
+
+export const PAYMENT_STATUS = {
+  PENDING: 'PENDING',
+  AUTHORIZED: 'AUTHORIZED',
+  CONFIRMED: 'CONFIRMED',
+  CANCELED: 'CANCELED',
+  REJECTED: 'REJECTED',
+} as const satisfies Record<string, PaymentStatus>;

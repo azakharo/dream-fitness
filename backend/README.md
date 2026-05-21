@@ -10,7 +10,41 @@
 $ npm install
 ```
 
-## Development mode
+## Development mode (start all microservices by one command)
+
+### Start
+
+```bash
+$ npm run dev
+```
+
+### Run migrations in a separate console windows (if required)
+
+```bash
+$ npm run migration:run
+```
+
+### Create users in a separate console windows (if required)
+
+```bash
+$ npm run db:seed
+```
+
+### Stop
+
+```bash
+$ npm run dev:stop
+```
+
+If you want to clear the DB data, then run instead:
+
+```bash
+$ npm run stop:dev:infra -- -v
+```
+
+---
+
+## Development mode (start each microservice separately)
 
 ### Start dev infrastructure (Postgres and RabbitMQ)
 

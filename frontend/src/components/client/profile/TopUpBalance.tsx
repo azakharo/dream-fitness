@@ -3,12 +3,12 @@ import {z} from 'zod';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {toast} from 'sonner';
-import {useDeposit} from '@/hooks/use-balance';
-import {useAuthStore} from '@/stores/auth-store';
+import {useInitPayment} from '@/hooks/use-payments';
 import {Button} from '@/components/ui';
 import {Input} from '@/components/ui';
 import {Label} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
+import {useNavigate} from '@tanstack/react-router';
 
 interface TopUpBalanceProps {
   currentBalance: number;
@@ -26,12 +26,9 @@ const topUpSchema = z.object({
 
 type TopUpFormData = z.infer<typeof topUpSchema>;
 
-export const TopUpBalance: React.FC<TopUpBalanceProps> = ({
-  currentBalance,
-  onSuccess,
-}) => {
-  const depositMutation = useDeposit();
-  const {user} = useAuthStore();
+export const TopUpBalance: React.FC<TopUpBalanceProps> = ({currentBalance}) => {
+  const navigate = useNavigate();
+  const initPaymentMutation = useInitPayment();
   const [selectedAmount, setSelectedAmount] = useState<number>(1000);
 
   const form = useForm<TopUpFormData>({
@@ -47,15 +44,14 @@ export const TopUpBalance: React.FC<TopUpBalanceProps> = ({
   };
 
   const onSubmit = (data: TopUpFormData) => {
-    depositMutation.mutate(
-      {userId: user?.id || '', amount: data.amount},
+    initPaymentMutation.mutate(
+      {amount: data.amount},
       {
-        onSuccess: () => {
-          toast.success(`Баланс пополнен на ${data.amount} баллов`);
-          onSuccess?.();
+        onSuccess: response => {
+          void navigate({to: response.paymentUrl, search: true});
         },
         onError: () => {
-          toast.error('Не удалось пополнить баланс');
+          toast.error('Не удалось инициализировать платёж');
         },
       },
     );
@@ -114,15 +110,11 @@ export const TopUpBalance: React.FC<TopUpBalanceProps> = ({
           <Button
             type="submit"
             className="w-full"
-            disabled={depositMutation.isPending}
+            disabled={initPaymentMutation.isPending}
           >
-            {depositMutation.isPending ? 'Пополнение...' : 'Пополнить'}
+            {initPaymentMutation.isPending ? 'Перенаправление...' : 'Пополнить'}
           </Button>
         </form>
-
-        <p className="text-center text-xs text-muted-foreground">
-          Интеграция с Тинькофф — в разработке
-        </p>
       </CardContent>
     </Card>
   );

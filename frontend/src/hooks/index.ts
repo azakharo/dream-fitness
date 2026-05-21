@@ -5,6 +5,7 @@ export * from './use-enriched-bookings';
 export * from './use-enriched-waitlist';
 export * from './use-notification-refresh';
 export * from './use-notifications';
+export * from './use-payments';
 export {useTraining} from './use-trainings';
 export * from './use-waitlist';
 export {useTrainingsByIds} from './use-trainings-by-ids';

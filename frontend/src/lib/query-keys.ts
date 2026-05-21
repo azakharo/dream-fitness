@@ -128,3 +128,14 @@ export const waitlistKeys = {
 export const profileKeys = {
   all: () => ['profile'] as const,
 };
+
+// ============================================================================
+// Payments Keys
+// ============================================================================
+
+export const paymentsKeys = {
+  all: () => ['payments'] as const,
+  status: (id: string) => [...paymentsKeys.all(), 'status', id] as const,
+  history: (page?: number, limit?: number) =>
+    [...paymentsKeys.all(), 'history', {page, limit}] as const,
+};

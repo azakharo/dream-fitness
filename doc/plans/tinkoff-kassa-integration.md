@@ -185,8 +185,8 @@ enum PaymentStatus {
 
 Страницы:
 
-- `/payment/success` - успешная оплата
-- `/payment/fail` - ошибка оплаты
+- `/payment/result?paymentId=...&status=success` - успешная оплата
+- `/payment/result?paymentId=...` - проверка статуса (общая страница)
 
 Функционал:
 
@@ -208,8 +208,7 @@ export const usePaymentHistory = () => { ... }
 
 Добавить маршруты:
 
-- `/payment/success?paymentId=...`
-- `/payment/fail?paymentId=...`
+- `/payment/result?paymentId=...` - страница результата оплаты
 
 ---
 
@@ -306,7 +305,7 @@ TINKOFF_WEBHOOK_URL=https://fitness.ddns.net/api/payments/webhook
 
 ### Этап 4: Frontend
 
-- [ ] Обновить типы (запустить `npm run gen:types`, когда локально запущен backend)
+- [ ] Обновить типы (Разработчик делает сам. Подождать пока он выполнит необходимые команды.)
 - [ ] Создать usePayments hook
 - [ ] Обновить TopUpBalance компонент
 - [ ] Создать страницы PaymentSuccess и PaymentFail
