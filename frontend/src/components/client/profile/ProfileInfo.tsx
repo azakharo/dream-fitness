@@ -3,6 +3,7 @@ import {Button} from '@/components/ui';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui';
 import {Skeleton} from '@/components/ui';
 import {formatDate} from '@/lib/date-utils';
+import {useBalance} from '@/hooks/use-balance';
 
 interface ProfileInfoProps {
   user: UserProfileDto;
@@ -22,6 +23,9 @@ export const ProfileInfo: React.FC<ProfileInfoProps> = ({
   onTopUp,
   isLoading = false,
 }) => {
+  const {data: balanceData} = useBalance();
+  const balance = balanceData?.balance ?? user.balance ?? 0;
+
   if (isLoading) {
     return (
       <Card>
@@ -69,7 +73,7 @@ export const ProfileInfo: React.FC<ProfileInfoProps> = ({
 
         <div className="border-t pt-4">
           <p className="text-lg font-medium">
-            Баланс: {user.balance.toLocaleString('ru-RU')} баллов
+            Баланс: {balance.toLocaleString('ru-RU')} баллов
           </p>
         </div>
 
