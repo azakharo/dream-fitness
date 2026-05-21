@@ -6,7 +6,7 @@ TBD
 
 ---
 
-## ✨ Features
+## ✨ Features from the user's point of view
 
 TBD
 
