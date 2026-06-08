@@ -1,6 +1,7 @@
 export * from './use-auth';
 export * from './use-balance';
 export * from './use-bookings';
+export * from './use-breakpoint';
 export * from './use-enriched-bookings';
 export * from './use-enriched-waitlist';
 export * from './use-notification-refresh';
