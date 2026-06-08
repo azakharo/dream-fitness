@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui';
 import {ROUTES} from '@/lib/routes';
+import {Logo} from '@/components/common/Logo';
 
 export const Header: React.FC = () => {
   const {user} = useAuthStore();
@@ -33,18 +34,18 @@ export const Header: React.FC = () => {
       className={`
         sticky top-0 z-50 flex h-14 w-full items-center
         ${role === 'admin' ? 'justify-end' : 'justify-between'}
-        border-b bg-background/95 px-4 backdrop-blur-sm
+        border-b border-[oklch(0.90_0.01_130)] bg-background/80 px-4
+        backdrop-blur-xl
         supports-backdrop-filter:bg-background/60
+        dark:border-[oklch(0.30_0.02_130)]
       `}
     >
-      {/* Logo */}
       {role === 'client' && (
-        <Link to={ROUTES.DASHBOARD} className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-primary">DreamFitness</span>
+        <Link to={ROUTES.DASHBOARD}>
+          <Logo size="sm" />
         </Link>
       )}
 
-      {/* Desktop Navigation - shown only on desktop */}
       {role === 'client' && (
         <div
           className="
@@ -56,12 +57,9 @@ export const Header: React.FC = () => {
         </div>
       )}
 
-      {/* Right side */}
       <div className="flex items-center space-x-4">
-        {/* Notifications */}
         <NotificationsBell />
 
-        {/* User menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative size-8 rounded-full">

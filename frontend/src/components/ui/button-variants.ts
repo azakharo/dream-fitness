@@ -19,15 +19,21 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default: `
-          bg-primary text-primary-foreground
-          [a]:hover:bg-primary/80
+          bg-linear-to-r from-[oklch(0.75_0.22_125)] to-[oklch(0.65_0.20_135)]
+          text-white shadow-[0_4px_14px_oklch(0.68_0.22_130/0.35)]
+          hover:-translate-y-px
+          hover:shadow-[0_6px_20px_oklch(0.68_0.22_130/0.45)]
+          active:translate-y-0
+          [a]:hover:-translate-y-px
+          [a]:hover:shadow-[0_6px_20px_oklch(0.68_0.22_130/0.45)]
         `,
         outline: `
-          border-border bg-background
-          hover:bg-muted hover:text-foreground
-          aria-expanded:bg-muted aria-expanded:text-foreground
-          dark:border-input dark:bg-input/30
-          dark:hover:bg-input/50
+          border-2 border-[oklch(0.90_0.01_130)] bg-background
+          hover:border-[oklch(0.68_0.22_130)] hover:bg-[oklch(0.94_0.10_130)]
+          aria-expanded:border-[oklch(0.68_0.22_130)]
+          aria-expanded:bg-[oklch(0.94_0.10_130)]
+          dark:border-[oklch(0.30_0.02_130)] dark:bg-input/30
+          dark:hover:bg-[oklch(0.25_0.05_130)]
         `,
         secondary: `
           bg-secondary text-secondary-foreground
