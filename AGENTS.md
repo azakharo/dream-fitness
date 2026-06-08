@@ -2,35 +2,44 @@
 
 **DreamFitness** — система управления фитнес-клубом (backend + frontend).
 
-## Требования
+## Requirements
 
 - Node.js v24.x
 - Docker Desktop
 
-## Структура
+## Structure
 
-Два независимых проекта (не npm workspaces):
-- `backend/` — NestJS monorepo (5 микросервисов), отдельный `package.json`
-- `frontend/` — React + Vite, отдельный `package.json`
+Two independent projects (not npm workspaces), each with own `package.json`:
+- `backend/` — NestJS monorepo: api-gateway, auth-service, training-service, booking-service, notification-service
+- `frontend/` — React 19 + Vite
 
-## Ключевые правила
+## Key Rules
 
-- После изменений TS/JS файлов: запускать `npm run ts` затем `npm run lint` в соответствующей папке
-- После изменений backend API: напомнить пользователю выполнить `cd frontend && npm run gen:types`
-- DTO для backend: сохранять в `backend/libs/contracts/src` по доменам
-- Frontend файл `src/types/api.generated.ts` автогенерируется — не редактировать
+- After TS/JS changes: run `npm run ts` then `npm run lint` in the corresponding directory
+- After backend API changes: remind user to run `cd frontend && npm run gen:types`
+- Backend DTOs: save in `backend/libs/contracts/src` organized by domain
+- Frontend `src/types/api.generated.ts` is auto-generated — do not edit
 
-## Быстрый старт
+## Quick Start
 
 ```bash
 cd backend && npm install && npm run dev
 cd frontend && npm install && npm run dev
 ```
 
-API: http://localhost:3000 (Swagger: /api/docs) | Frontend: http://localhost:5173
+API: http://localhost:3000 | Swagger: http://localhost:3000/api/docs | Frontend: http://localhost:5173
 
-## Документация
+## Testing (Backend)
+
+```bash
+npm run start:test:infra          # Start PostgreSQL container
+npm run test:setup                 # Create test DB + run migrations
+npm run test:unit                  # Unit tests (no DB needed)
+npm run test:e2e                   # E2E tests (requires test DB)
+npm run stop:test:infra            # Stop containers
+```
+
+## Documentation
 
 - [PRD](./doc/PRD.md), [Backend ADR](./doc/ADR.md), [Frontend ADR](./doc/Frontend-ADR.md)
-- [OpenAPI спецификация](./doc/openapi.json)
-- Специфичные правила: [backend/AGENTS.md](./backend/AGENTS.md), [frontend/AGENTS.md](./frontend/AGENTS.md)
+- Detailed rules: [backend/AGENTS.md](./backend/AGENTS.md), [frontend/AGENTS.md](./frontend/AGENTS.md)
