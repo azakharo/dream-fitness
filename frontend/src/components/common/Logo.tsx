@@ -1,4 +1,5 @@
 import {cn} from '@/lib/utils';
+import logoSrc from './logo.png';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -43,7 +44,7 @@ export const Logo: React.FC<LogoProps> = ({
         )}
       >
         <img
-          src="/logo.png"
+          src={logoSrc}
           alt="DreamFitness"
           className={cn('object-contain', config.img)}
         />
