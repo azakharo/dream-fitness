@@ -60,7 +60,7 @@ export const buttonVariants = cva(
       },
       size: {
         default: `
-          h-8 gap-1.5 px-2.5
+          gap-2 px-6 py-3.5 text-[15px] font-semibold
           has-data-[icon=inline-end]:pr-2
           has-data-[icon=inline-start]:pl-2
         `,
@@ -72,14 +72,14 @@ export const buttonVariants = cva(
           [&_svg:not([class*='size-'])]:size-3
         `,
         sm: `
-          h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem]
+          h-9 gap-1.5 rounded-[min(var(--radius-md),12px)] px-3 text-sm
           in-data-[slot=button-group]:rounded-lg
-          has-data-[icon=inline-end]:pr-1.5
-          has-data-[icon=inline-start]:pl-1.5
-          [&_svg:not([class*='size-'])]:size-3.5
+          has-data-[icon=inline-end]:pr-2
+          has-data-[icon=inline-start]:pl-2
+          [&_svg:not([class*='size-'])]:size-4
         `,
         lg: `
-          h-9 gap-1.5 px-2.5
+          gap-2 px-6 py-4 text-base
           has-data-[icon=inline-end]:pr-2
           has-data-[icon=inline-start]:pl-2
         `,
