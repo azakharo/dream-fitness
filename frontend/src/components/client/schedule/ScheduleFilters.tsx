@@ -45,9 +45,11 @@ export const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
         value={filters.type || 'all'}
         onChange={handleTypeChange}
         className="
-          h-10 rounded-md border border-input bg-background px-3 py-2 text-sm
-          ring-offset-background
-          focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none
+          h-11 rounded-xl border-2 border-[oklch(0.90_0.01_130)] bg-background
+          px-4 py-2 text-sm
+          focus:border-[oklch(0.68_0.22_130)] focus:ring-4
+          focus:ring-[oklch(0.94_0.10_130)] focus:outline-none
+          dark:border-[oklch(0.30_0.02_130)]
         "
       >
         <option value="all">Все типы</option>
@@ -62,9 +64,11 @@ export const ScheduleFilters: React.FC<ScheduleFiltersProps> = ({
         value={filters.trainerId || 'all'}
         onChange={handleTrainerChange}
         className="
-          h-10 rounded-md border border-input bg-background px-3 py-2 text-sm
-          ring-offset-background
-          focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none
+          h-11 rounded-xl border-2 border-[oklch(0.90_0.01_130)] bg-background
+          px-4 py-2 text-sm
+          focus:border-[oklch(0.68_0.22_130)] focus:ring-4
+          focus:ring-[oklch(0.94_0.10_130)] focus:outline-none
+          dark:border-[oklch(0.30_0.02_130)]
         "
       >
         <option value="all">Все тренеры</option>

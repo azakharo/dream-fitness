@@ -1,7 +1,9 @@
 import {useState} from 'react';
+import {Target} from 'lucide-react';
 import {ProfileInfo} from '@/components/client/profile/ProfileInfo';
 import {EditProfileForm} from '@/components/client/profile/EditProfileForm';
 import {TopUpBalance} from '@/components/client/profile/TopUpBalance';
+import {TipCard} from '@/components/common/TipCard';
 import {useAuthStore} from '@/stores/auth-store';
 import {useBalance} from '@/hooks/use-balance';
 
@@ -39,7 +41,9 @@ export const ProfilePage: React.FC = () => {
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold">Профиль</h1>
+          <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+            Профиль
+          </h1>
           <p className="text-muted-foreground">Загрузка данных...</p>
         </div>
       </div>
@@ -49,11 +53,13 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold">Профиль</h1>
+        <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+          Профиль
+        </h1>
         <p className="text-muted-foreground">Управление личными данными</p>
       </div>
 
-      <div className="max-w-md">
+      <div className="max-w-md space-y-4">
         {isEditMode && user ? (
           <EditProfileForm
             user={user}
@@ -70,16 +76,20 @@ export const ProfilePage: React.FC = () => {
             />
           )
         )}
-      </div>
 
-      {isTopUpOpen && (
-        <div className="max-w-md">
+        {isTopUpOpen && (
           <TopUpBalance
             currentBalance={balance}
             onSuccess={handleTopUpSuccess}
           />
-        </div>
-      )}
+        )}
+
+        <TipCard
+          title="Достигай новых высот"
+          text="Записывай свои достижения и следи за прогрессом. Маленькие шаги ведут к большим результатам!"
+          icon={<Target />}
+        />
+      </div>
     </div>
   );
 };

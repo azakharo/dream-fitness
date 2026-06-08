@@ -1,8 +1,10 @@
 import * as React from 'react';
+import {Flame} from 'lucide-react';
 
 import {BalanceCard} from '@/components/client/dashboard/BalanceCard';
 import {QuickActions} from '@/components/client/dashboard/QuickActions';
 import {UpcomingTrainings} from '@/components/client/dashboard/UpcomingTrainings';
+import {MotivationBanner} from '@/components/common/MotivationBanner';
 import {useBalance} from '@/hooks/use-balance';
 import {useTrainings} from '@/hooks/use-trainings';
 import type {TrainingResponseDto} from '@/types';
@@ -38,7 +40,9 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold">Добро пожаловать!</h1>
+        <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+          Добро пожаловать!
+        </h1>
         <p className="text-muted-foreground">Ваш фитнес-дневник</p>
       </div>
 
@@ -49,6 +53,12 @@ export const DashboardPage: React.FC = () => {
           isLoading={isLoading}
         />
         <QuickActions />
+
+        <MotivationBanner
+          title="Продолжай в том же духе!"
+          description="Каждая тренировка приближает тебя к цели"
+          icon={<Flame />}
+        />
       </div>
     </div>
   );
