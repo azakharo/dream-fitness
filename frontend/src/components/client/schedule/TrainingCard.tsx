@@ -3,6 +3,7 @@ import {Clock, User, Coins, Users} from 'lucide-react';
 import {Link} from '@tanstack/react-router';
 import {Card, CardContent} from '@/components/ui';
 import {Badge} from '@/components/ui';
+import {TrainingTypeIcon} from './TrainingTypeIcon';
 import type {TrainingResponseDto} from '@/types';
 import {formatTime, getEndTime, parseApiDate} from '@/lib/date-utils';
 
@@ -18,10 +19,6 @@ export const TrainingCard: React.FC<TrainingCardProps> = ({
   const startTime = parseApiDate(training.scheduledAt);
   const endTime = getEndTime(training.scheduledAt, training.durationMinutes);
 
-  const formatPrice = (price: number): string => {
-    return `${price} баллов`;
-  };
-
   const spotsRemaining = training.availableSlots;
   const isAlmostFull = spotsRemaining <= 3;
   const isFull = spotsRemaining === 0;
@@ -34,24 +31,44 @@ export const TrainingCard: React.FC<TrainingCardProps> = ({
       onClick={onClick}
     >
       <Card
-        className="
-          cursor-pointer transition-all
-          hover:shadow-md hover:ring-2 hover:ring-primary/20
-        "
+        className={`
+          cursor-pointer overflow-hidden transition-all duration-200
+          hover:-translate-y-1 hover:border-[oklch(0.68_0.22_130)]
+          hover:shadow-md
+        `}
       >
-        <CardContent className="p-4">
-          <div className="mb-3">
-            <h3 className="text-lg font-medium">{training.title}</h3>
-            <Badge variant="secondary" className="mt-1 capitalize">
+        <div
+          className="
+            flex h-[100px] items-center justify-center bg-linear-to-br
+            from-[oklch(0.96_0.05_130)] to-[oklch(0.94_0.08_130)]
+          "
+        >
+          <div className="relative">
+            <Badge
+              variant="secondary"
+              className="absolute -top-8 left-1/2 -translate-x-1/2 capitalize"
+            >
               {training.type}
             </Badge>
+            <TrainingTypeIcon
+              type={training.type}
+              size="lg"
+              className="text-[oklch(0.68_0.22_130)]"
+            />
           </div>
+        </div>
+
+        <CardContent className="p-4">
+          <h3 className="mb-3 text-lg font-medium text-[oklch(0.15_0.02_130)]">
+            {training.title}
+          </h3>
 
           <div className="space-y-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Clock className="size-4" />
               <span>
-                {formatTime(startTime)} - {formatTime(endTime)}
+                {formatTime(startTime)} - {formatTime(endTime)} (
+                {training.durationMinutes} мин)
               </span>
             </div>
 
@@ -61,14 +78,15 @@ export const TrainingCard: React.FC<TrainingCardProps> = ({
                 <span>{training.trainerName}</span>
               </div>
             )}
-
-            <div className="flex items-center gap-2">
-              <Coins className="size-4" />
-              <span>{formatPrice(training.price)}</span>
-            </div>
           </div>
 
-          <div className="mt-3 border-t pt-3">
+          <div
+            className="
+              mt-3 flex items-center justify-between border-t
+              border-[oklch(0.90_0.01_130)] pt-3
+              dark:border-[oklch(0.30_0.02_130)]
+            "
+          >
             <div className="flex items-center gap-2">
               <Users className="size-4" />
               {isFull ? (
@@ -80,9 +98,18 @@ export const TrainingCard: React.FC<TrainingCardProps> = ({
                     ${isAlmostFull ? 'text-orange-500' : ''}
                   `}
                 >
-                  {spotsRemaining} из {training.capacity} мест
+                  {spotsRemaining} из {training.capacity}
                 </span>
               )}
+            </div>
+
+            <div
+              className="
+                flex items-center gap-1 font-medium text-[oklch(0.35_0.12_130)]
+              "
+            >
+              <Coins className="size-4" />
+              <span>{training.price}</span>
             </div>
           </div>
         </CardContent>

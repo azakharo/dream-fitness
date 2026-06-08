@@ -34,7 +34,9 @@ export const BookingPage: React.FC = () => {
   if (isTrainingLoading || isBalanceLoading || isWaitlistLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Бронирование тренировки</h1>
+        <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+          Бронирование тренировки
+        </h1>
         <div
           className="
             grid gap-6
@@ -54,7 +56,9 @@ export const BookingPage: React.FC = () => {
   if (!training) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Бронирование тренировки</h1>
+        <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+          Бронирование тренировки
+        </h1>
         <p className="text-muted-foreground">Тренировка не найдена</p>
       </div>
     );
@@ -62,7 +66,9 @@ export const BookingPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Бронирование тренировки</h1>
+      <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+        Бронирование тренировки
+      </h1>
       <div
         className="
           grid gap-6

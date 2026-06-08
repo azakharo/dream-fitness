@@ -187,3 +187,11 @@
 .shadow-primary-lg {
     box-shadow: 0 8px 24px oklch(0.68 0.22 130 / 0.40);
 }
+
+.gradient-soft {
+    background: linear-gradient(135deg, oklch(0.98 0.02 130), oklch(0.96 0.05 130));
+}
+
+.accent-soft-bg {
+    background-color: oklch(0.94 0.10 130);
+}

@@ -7,21 +7,18 @@ export const ClientLayout: React.FC = () => {
   useNotificationRefresh();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header includes TopNav for desktop */}
+    <div className="min-h-screen bg-[oklch(0.98_0.01_130)]">
       <Header />
 
-      {/* Main content area */}
       <main
         className="
-          container px-4 py-6 pb-20
+          mx-auto max-w-[1200px] p-6 pb-24
           md:pb-6
         "
       >
         <Outlet />
       </main>
 
-      {/* Mobile bottom navigation */}
       <BottomNav />
     </div>
   );

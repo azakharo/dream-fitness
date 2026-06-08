@@ -10,20 +10,33 @@ export const HistoryPage: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<TabType>('upcoming');
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-6">
-      <h1 className="mb-6 text-2xl font-bold">История</h1>
+    <div className="max-w-2xl space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+          История
+        </h1>
+        <p className="text-muted-foreground">Ваши тренировки и записи</p>
+      </div>
 
-      <div className="mb-4 flex gap-2 border-b">
+      <div
+        className="
+          flex gap-2 border-b border-[oklch(0.90_0.01_130)]
+          dark:border-[oklch(0.30_0.02_130)]
+        "
+      >
         <button
           onClick={() => setActiveTab('upcoming')}
           className={`
             px-1 pb-2 text-sm font-medium transition-colors
             ${
               activeTab === 'upcoming'
-                ? 'border-b-2 border-primary text-primary'
+                ? `
+                  border-b-2 border-[oklch(0.68_0.22_130)]
+                  text-[oklch(0.35_0.12_130)]
+                `
                 : `
                   text-muted-foreground
-                  hover:text-foreground
+                  hover:text-[oklch(0.68_0.22_130)]
                 `
             }
           `}
@@ -36,10 +49,13 @@ export const HistoryPage: React.FC = () => {
             px-1 pb-2 text-sm font-medium transition-colors
             ${
               activeTab === 'past'
-                ? 'border-b-2 border-primary text-primary'
+                ? `
+                  border-b-2 border-[oklch(0.68_0.22_130)]
+                  text-[oklch(0.35_0.12_130)]
+                `
                 : `
                   text-muted-foreground
-                  hover:text-foreground
+                  hover:text-[oklch(0.68_0.22_130)]
                 `
             }
           `}
@@ -52,10 +68,13 @@ export const HistoryPage: React.FC = () => {
             px-1 pb-2 text-sm font-medium transition-colors
             ${
               activeTab === 'waitlist'
-                ? 'border-b-2 border-primary text-primary'
+                ? `
+                  border-b-2 border-[oklch(0.68_0.22_130)]
+                  text-[oklch(0.35_0.12_130)]
+                `
                 : `
                   text-muted-foreground
-                  hover:text-foreground
+                  hover:text-[oklch(0.68_0.22_130)]
                 `
             }
           `}

@@ -11,7 +11,7 @@ import reactCompiler from 'eslint-plugin-react-compiler';
 import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'node_modules']),
   {
     files: ['./src/**/*.{ts,tsx}', './eslint.config.js', './vite.config.js'],
     extends: [

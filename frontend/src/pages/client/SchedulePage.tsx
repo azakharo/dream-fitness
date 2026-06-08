@@ -1,8 +1,11 @@
 import * as React from 'react';
 import {useNavigate} from '@tanstack/react-router';
+import {Gift, Droplets, TrendingUp} from 'lucide-react';
 
 import {ScheduleFilters} from '@/components/client/schedule/ScheduleFilters';
 import {WeeklyCalendar} from '@/components/client/schedule/WeeklyCalendar';
+import {MotivationBanner} from '@/components/common/MotivationBanner';
+import {TipCard} from '@/components/common/TipCard';
 import {
   useTrainings,
   useTrainers,
@@ -14,10 +17,8 @@ import {Route} from '@/routes/_client.schedule';
 export const SchedulePage: React.FC = () => {
   const navigate = useNavigate({from: Route.fullPath});
 
-  // Read URL search params via TanStack Router (fully typed via validateSearch)
   const search = Route.useSearch();
 
-  // Parse week from URL or default to current week's Monday
   const currentWeekStart = search.week
     ? parseApiDate(search.week)
     : getWeekStart(new Date());
@@ -56,7 +57,9 @@ export const SchedulePage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold">Расписание</h1>
+        <h1 className="text-2xl font-bold text-[oklch(0.15_0.02_130)]">
+          Расписание
+        </h1>
         <p className="text-muted-foreground">Выберите тренировку</p>
       </div>
 
@@ -72,6 +75,35 @@ export const SchedulePage: React.FC = () => {
         onWeekChange={handleWeekChange}
         isLoading={isTrainingsLoading}
       />
+
+      <MotivationBanner
+        title="Запишись на 5 тренировок и получи бонус!"
+        description="Каждая 6-я тренировка — бесплатно"
+        icon={<Gift />}
+      />
+
+      <div
+        className="
+          grid gap-4
+          md:grid-cols-3
+        "
+      >
+        <TipCard
+          title="Приходи вовремя"
+          text="Приходи за 10-15 минут до начала, чтобы успеть переодеться и настроиться на тренировку"
+          icon={<TrendingUp />}
+        />
+        <TipCard
+          title="Пей воду"
+          text="Не забывай брать воду на тренировку. Гидратация важна для эффективных занятий"
+          icon={<Droplets />}
+        />
+        <TipCard
+          title="Отслеживай прогресс"
+          text="Записывай свои достижения и следи за прогрессом в личном кабинете"
+          icon={<TrendingUp />}
+        />
+      </div>
     </div>
   );
 };

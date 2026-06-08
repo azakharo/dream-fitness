@@ -31,9 +31,13 @@ export const TopNav: React.FC = () => {
               `
                 flex items-center space-x-2 text-sm font-medium
                 transition-colors
-                hover:text-primary
               `,
-              isActive ? 'text-primary' : 'text-muted-foreground',
+              isActive
+                ? 'text-[oklch(0.35_0.12_130)]'
+                : `
+                  text-muted-foreground
+                  hover:text-[oklch(0.68_0.22_130)]
+                `,
             )}
           >
             <item.icon className="size-4" />

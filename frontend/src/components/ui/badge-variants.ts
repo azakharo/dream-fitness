@@ -17,8 +17,8 @@ export const badgeVariants = cva(
     variants: {
       variant: {
         default: `
-          bg-primary text-primary-foreground
-          [a]:hover:bg-primary/80
+          bg-linear-to-r from-[oklch(0.75_0.22_125)] to-[oklch(0.65_0.20_135)]
+          text-[10px] font-bold tracking-wider text-white uppercase
         `,
         secondary: `
           bg-secondary text-secondary-foreground

@@ -22,8 +22,10 @@ export const BottomNav: React.FC = () => {
   return (
     <nav
       className="
-        fixed inset-x-0 bottom-0 z-50 border-t bg-background
+        fixed inset-x-0 bottom-0 z-50 border-t border-[oklch(0.90_0.01_130)]
+        bg-background/95 backdrop-blur-sm
         md:hidden
+        dark:border-[oklch(0.30_0.02_130)]
       "
     >
       <div className="flex h-16 items-center justify-around">
@@ -39,10 +41,10 @@ export const BottomNav: React.FC = () => {
                   transition-colors
                 `,
                 isActive
-                  ? 'text-primary'
+                  ? 'text-[oklch(0.35_0.12_130)]'
                   : `
                     text-muted-foreground
-                    hover:text-primary
+                    hover:text-[oklch(0.68_0.22_130)]
                   `,
               )}
             >
