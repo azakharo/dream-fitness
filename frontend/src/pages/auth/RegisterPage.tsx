@@ -4,8 +4,21 @@ import {RegisterForm} from '@/components/auth/RegisterForm';
 import {Logo} from '@/components/common/Logo';
 import {MotivationBanner} from '@/components/common/MotivationBanner';
 import {ROUTES} from '@/lib/routes';
+import {useIsAtLeast} from '@/hooks';
 
 export const RegisterPage: React.FC = () => {
+  const isLg = useIsAtLeast('lg');
+
+  const title = (
+    <h2
+      className="
+        mt-4 text-center text-2xl font-bold text-[oklch(0.15_0.02_130)]
+      "
+    >
+      Создай аккаунт
+    </h2>
+  );
+
   return (
     <div className="flex min-h-screen">
       {/* Hero Section - Hidden on mobile */}
@@ -86,15 +99,17 @@ export const RegisterPage: React.FC = () => {
       >
         <div className="w-full max-w-md space-y-6">
           {/* Header with Logo */}
-          <div className="mb-6 flex flex-col items-center">
-            <Logo size="md" />
-            <h2 className="mt-4 text-2xl font-bold text-[oklch(0.15_0.02_130)]">
-              Создай аккаунт
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Заполни форму и начни тренироваться
-            </p>
-          </div>
+          {isLg ? (
+            title
+          ) : (
+            <div className="mb-6 flex flex-col items-center">
+              <Logo size="md" />
+              {title}
+              <p className="mt-2 text-sm text-muted-foreground">
+                Заполни форму и начни тренироваться
+              </p>
+            </div>
+          )}
 
           {/* Register Form */}
           <div
