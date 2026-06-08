@@ -4,6 +4,8 @@ export * from './use-bookings';
 export * from './use-breakpoint';
 export * from './use-enriched-bookings';
 export * from './use-enriched-waitlist';
+export * from './use-is-at-least';
+export * from './use-is-lower-than';
 export * from './use-notification-refresh';
 export * from './use-notifications';
 export * from './use-payments';
