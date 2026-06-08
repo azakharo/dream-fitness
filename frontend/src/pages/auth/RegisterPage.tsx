@@ -1,5 +1,5 @@
 import {Link} from '@tanstack/react-router';
-import {Dumbbell, Calendar, Trophy, Users} from 'lucide-react';
+import {Calendar, Trophy, Users} from 'lucide-react';
 import {RegisterForm} from '@/components/auth/RegisterForm';
 import {Logo} from '@/components/common/Logo';
 import {MotivationBanner} from '@/components/common/MotivationBanner';
@@ -13,22 +13,21 @@ export const RegisterPage: React.FC = () => {
         className="
           hidden w-[45%] bg-linear-to-br from-[oklch(0.75_0.22_125)]
           to-[oklch(0.65_0.20_135)]
-          lg:flex lg:flex-col lg:p-10
+          lg:flex lg:flex-col lg:items-center lg:p-10
         "
       >
-        <div className="mb-8">
-          <Logo size="sm" />
-        </div>
-
-        {/* Running person illustration placeholder */}
-        <div className="relative my-8 flex flex-1 items-center justify-center">
-          <div className="size-48 rounded-full bg-white/10" />
-          <div className="absolute text-white/30">
-            <Dumbbell className="size-24" />
+        <div className="max-w-md text-center text-white">
+          <div className="mb-8 flex justify-center">
+            <div
+              className="
+                flex size-[220px] items-center justify-center rounded-full
+                bg-white/20 backdrop-blur-sm
+              "
+            >
+              <Logo size="lg" showText={false} />
+            </div>
           </div>
-        </div>
 
-        <div className="max-w-sm text-white">
           <h1 className="mb-4 text-3xl font-bold">
             Начни путь к лучшей версии себя
           </h1>
@@ -37,39 +36,41 @@ export const RegisterPage: React.FC = () => {
             стремящихся к здоровому образу жизни.
           </p>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div
-                className="
-                  flex size-10 items-center justify-center rounded-full
-                  bg-white/20
-                "
-              >
-                <Calendar className="size-5" />
+          <div className="flex justify-center">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="
+                    flex size-10 items-center justify-center rounded-full
+                    bg-white/20
+                  "
+                >
+                  <Calendar className="size-5" />
+                </div>
+                <span className="text-sm">Гибкое расписание тренировок</span>
               </div>
-              <span className="text-sm">Гибкое расписание тренировок</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div
-                className="
-                  flex size-10 items-center justify-center rounded-full
-                  bg-white/20
-                "
-              >
-                <Trophy className="size-5" />
+              <div className="flex items-center gap-3">
+                <div
+                  className="
+                    flex size-10 items-center justify-center rounded-full
+                    bg-white/20
+                  "
+                >
+                  <Trophy className="size-5" />
+                </div>
+                <span className="text-sm">Профессиональные тренеры</span>
               </div>
-              <span className="text-sm">Профессиональные тренеры</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div
-                className="
-                  flex size-10 items-center justify-center rounded-full
-                  bg-white/20
-                "
-              >
-                <Users className="size-5" />
+              <div className="flex items-center gap-3">
+                <div
+                  className="
+                    flex size-10 items-center justify-center rounded-full
+                    bg-white/20
+                  "
+                >
+                  <Users className="size-5" />
+                </div>
+                <span className="text-sm">Дружелюбное сообщество</span>
               </div>
-              <span className="text-sm">Дружелюбное сообщество</span>
             </div>
           </div>
         </div>
